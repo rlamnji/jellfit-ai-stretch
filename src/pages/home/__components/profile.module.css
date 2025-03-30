@@ -1,0 +1,11 @@
+.profileCard{
+    display: flex;
+    background-color: beige;
+    width: 300px;
+    padding: 20px;
+
+}
+
+img{
+    width: 100px;   
+}
