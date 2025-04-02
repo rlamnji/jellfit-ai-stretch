@@ -9,3 +9,49 @@
 img{
     width: 100px;   
 }
+
+.startButton{
+    position: relative;
+}
+
+.freeMode {
+    position: absolute;
+    bottom: 0px;
+    right: 220px;
+  }
+  
+.guildMode {
+    position: absolute;
+    bottom: 0px;
+    right: 0px;
+}
+  
+
+.guildMode img,
+.freeMode img{
+    cursor: pointer;
+    width: 300px;
+}
+
+@keyframes moveing {
+    0% {
+      transform: translateY(0px);
+    }
+    50% {
+      transform: translateY(-10px);
+    }
+    100% {
+      transform: translateY(0px);
+    }
+  }
+  
+.freeMode img,
+.guildMode img{
+    animation: moveing 3s ease-in-out infinite;
+}
+
+.guildMode img:hover,
+.freeMode img:hover{
+    animation: none;
+    transform: translateY(-5px)scale(1.02);
+}

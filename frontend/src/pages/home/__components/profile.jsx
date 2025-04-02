@@ -2,7 +2,7 @@
 import styles from './profile.module.css';
 import test from './test.jpg';
 
-function profileCard() {
+function ProfileCard() {
   return (
     <div className={styles.profileCard}>
       <div className={styles.profileImage}>
@@ -16,4 +16,4 @@ function profileCard() {
   );
 }
 
-export default profileCard;
+export default ProfileCard;
