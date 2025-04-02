@@ -1,27 +1,11 @@
 // 메인 페이지 화면
-import ProfileCard from "../home/__components/profile";
-import SideWidget from "../../components/menu/side_widget";
-import styles from "./home_page.module.css";
-import DashBoard from "../home/__components/dash_board";
-import StartButton from "../home/__components/start_button";
+import ProfileCard from "../../components/home/profile";
+import SideWidget from "../../components/home/menu/side_widget";
+import styles from "../../styles/pages/home_page.module.css";
+import DashBoard from "../../components/home/menu/dash_board";
+import StartButton from "../../components/home/start_button";
 import { Canvas } from '@react-three/fiber';
-import Test3d from "../../components/background_3d/space_scence"
-
-import {
-  Stars,
-  Sparkles,
-  OrbitControls,
-} from '@react-three/drei';
-import { Suspense } from "react";
-/* 컴포넌트 목록 
-  - 프로필 V
-  - 알림창(우편함) V
-  - 설정 V
-  - 친구 V
-  - 도감 V
-  - 운동일지 V
-  - 게임(가이드, 자율) 
-*/
+import Test3d from "../../components/home/background_3d/space_scence"
 
 
 function HomePage() {

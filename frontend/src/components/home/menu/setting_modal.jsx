@@ -1,5 +1,5 @@
 // 환경설정 팝업창
-import style from './modal.module.css';
+import style from '../../../styles/components/modal.module.css';
 import { useState } from 'react';
 
 function SettingModal ({openModal,setOpenModal}){

@@ -1,5 +1,5 @@
 // 프로필 컴포넌트
-import styles from './profile.module.css';
+import styles from '../../styles/components/profile.module.css';
 import test from './test.jpg';
 
 function ProfileCard() {

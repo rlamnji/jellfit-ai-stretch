@@ -1,7 +1,7 @@
 // 자율모드, 가이드모드 시작 버튼
-import styles from './profile.module.css';
-import freeModeBtn from './free_mode.png';
-import guideModeBtn from './guide_mode.png';
+import styles from '../../styles/components/profile.module.css';
+import freeModeBtn from '../../assets/images/icons/free_mode.png';
+import guideModeBtn from '../../assets/images/icons/guide_mode.png';
 
 function StartButton() {
   return (

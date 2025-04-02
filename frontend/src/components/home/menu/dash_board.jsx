@@ -1,8 +1,8 @@
 // 친구, 도감, 운동일지 컴포넌트
 import { useNavigate } from 'react-router-dom';
 
-import styles from './profile.module.css';
-import test from './test.jpg';
+import styles from '../../../styles/components/profile.module.css';
+import test from '../test.jpg';
 
 function DashBoard() {
   const navigate = useNavigate();

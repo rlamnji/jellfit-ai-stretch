@@ -1,11 +1,11 @@
 import { useState } from 'react';
 // 오른쪽 사이드바 위젯(우편함, 설정)
-import setting from './settings.png';
-import mail from './mail.png';
-import styles from './side_widget.module.css';
+import setting from '../../../assets/images/icons/settings.png';
+import mail from '../../../assets/images/icons/mail.png';
+import styles from '../../../styles/components/side_widget.module.css';
 
 // 팝업창
-import SettingModal from '../menu/setting_modal';
+import SettingModal from './setting_modal';
 
 function SideWidget() {
   const [openModal, setOpenModal] = useState(false);

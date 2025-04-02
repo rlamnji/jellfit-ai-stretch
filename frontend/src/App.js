@@ -1,15 +1,8 @@
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import HomePage from './pages/home/home_page';
-import ProfilePage from '../src/pages/user_settings/friendPage';
+import Router from './routes/router';
 
 function App() {
   return (
-    <Router>
-      <Routes>
-        <Route path="/" element={<HomePage />} />
-        <Route path="/profile" element={<ProfilePage />} />
-      </Routes>
-    </Router>
+    <Router />
   );
 }
 
