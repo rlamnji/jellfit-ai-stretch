@@ -5,6 +5,7 @@ import LoginPage from '../pages/login/login_page';
 import HomePage from '../pages/home/home_page';
 import JoinPage from '../pages/join/join_page';
 import ConditionPage from '../pages/condition/condition_page';
+import ProfilePage from '../pages/user_settings/friend_page';
 
 function Router() {
     return (
@@ -15,6 +16,7 @@ function Router() {
                 <Route path="/" element={<LoginPage />} />
                 <Route path="/join" element={<JoinPage />} />
                 <Route path="/condition" element={<ConditionPage />} />
+                <Route path="/profile" element={<ProfilePage />} />
             </Routes>
         </BrowserRouter>
     );

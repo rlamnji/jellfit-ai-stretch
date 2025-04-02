@@ -1,4 +1,4 @@
-import styles from './join_page.module.css';
+import styles from '../../styles/pages/join_page.module.css';
 import { Link } from "react-router-dom";
 import InputField from '../../components/input_field';
 import { useState } from 'react';

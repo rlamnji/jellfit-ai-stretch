@@ -1,0 +1,10 @@
+.loginPage {
+    display: flex;
+    flex-direction: column;
+}
+.activeLoginBtn {
+    color: blue;
+}
+.LoginBtn {
+    color: brown;
+}

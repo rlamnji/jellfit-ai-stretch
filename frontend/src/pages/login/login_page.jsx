@@ -1,4 +1,4 @@
-import styles from './login_page.module.css';
+import styles from '../../styles/pages/login_page.module.css';
 import InputField from '../../components/input_field';
 import { Link } from 'react-router-dom';
 import { useState } from 'react';

@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import styles from './condition_page.module.css';
+import styles from '../../styles/pages/condition_page.module.css';
 function ConditionPage (){
     console.log("컨디션 선택 페이지 진입");
     return (
