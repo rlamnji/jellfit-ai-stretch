@@ -4,6 +4,7 @@ import test from './test.jpg';
 
 function ProfileCard() {
   return (
+
     <div className={styles.profileCard}>
       <div className={styles.profileImage}>
         <img src= {test} />

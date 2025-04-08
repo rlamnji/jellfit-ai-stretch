@@ -5,18 +5,22 @@ import LoginPage from '../pages/login/login_page';
 import HomePage from '../pages/home/home_page';
 import JoinPage from '../pages/join/join_page';
 import ConditionPage from '../pages/condition/condition_page';
-import ProfilePage from '../pages/user_settings/friend_page';
+import FriendPage from '../pages/dash_board/friend_page';
+import CollectPage from '../pages/dash_board/collect_page';
 
 function Router() {
     return (
         <BrowserRouter>
             <Routes>
-                {/* /을 /home으로 바꿈. */}
-                <Route path="/home" element={<HomePage />} /> 
+
                 <Route path="/" element={<LoginPage />} />
                 <Route path="/join" element={<JoinPage />} />
                 <Route path="/condition" element={<ConditionPage />} />
-                <Route path="/profile" element={<ProfilePage />} />
+                
+                {/* 홈화면 */}
+                <Route path="/home" element={<HomePage />} /> 
+                <Route path="/home/friends" element={<FriendPage />} />
+                <Route path="/home/collection" element={<CollectPage />} />
             </Routes>
         </BrowserRouter>
     );

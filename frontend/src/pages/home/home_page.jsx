@@ -1,9 +1,10 @@
 // 메인 페이지 화면
 import ProfileCard from "../../components/home/profile";
 import SideWidget from "../../components/home/menu/side_widget";
-import styles from "../../styles/pages/home_page.module.css";
 import DashBoard from "../../components/home/menu/dash_board";
 import StartButton from "../../components/home/start_button";
+
+import styles from "../../styles/pages/home_page.module.css";
 import { Canvas } from '@react-three/fiber';
 import Test3d from "../../components/home/background_3d/space_scence"
 
@@ -30,7 +31,7 @@ function HomePage() {
           </div>
 
           <div className={styles.footer}>
-            <StartButton/> {/*운동동시작 버튼*/}
+            <StartButton/> {/*운동시작 버튼*/}
           </div>
         </div>
 

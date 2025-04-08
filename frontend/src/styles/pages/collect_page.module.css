@@ -1,0 +1,120 @@
+@keyframes moveing {
+    0% {
+      transform: translateY(0px);
+    }
+    50% {
+      transform: translateY(-10px);
+    }
+    100% {
+      transform: translateY(0px);
+    }
+  }
+
+.collectPage {
+    position: relative;
+    background-image: url("../../assets/images/etc/basic_background.png");
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 100vw;
+    height: 100vh;
+}
+
+/*도감 이미지*/
+.collectBook {
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 85%;
+
+    animation: moveing 2s ease-in-out infinite;
+}
+  
+.collectBook img:first-child {
+    width: 100%;
+}
+
+/*취소 버튼*/
+.collectCancel {
+    position: absolute;
+    top: 12%;
+    right: 12%;
+    transform: translate(50%, -50%);
+    width: 5vw;
+
+    cursor: pointer;
+}
+
+/*도감 왼쪽(이미지, 이름, 설명)*/
+.momdelImg{
+    position: absolute;
+    background-color: rgb(214, 208, 214);
+    top: 20.5%;
+    left: 19%;
+    width: 20%;
+    height: 25%;
+}
+.modelName{
+    position: absolute;
+    top: 56%;
+    left: 15%;
+
+    color: #513030;
+    font-size: 1.5vw;
+    font-weight: bold;
+    filter: blur(0.5px);
+}
+
+.modelDescription{
+    width: 28%;
+    height: 15%;
+
+    /* 스크롤 */
+    overflow-wrap: break-word;
+    white-space: normal;
+    overflow-y: auto; 
+
+
+    position: absolute;
+    top: 69%;
+    left: 15%;
+
+    color: #513030;
+    font-size: 1.2vw;
+    filter: blur(0.5px);
+}
+ 
+/*도감 오른쪽(Grid)*/
+.collectBox{
+    position: absolute;
+    
+    top: 18%;
+    left: 52%;
+    width: 37%;
+    height: 69%;
+
+    /* 스크롤 */
+    overflow-wrap: break-word;
+    white-space: normal;
+    overflow-y: auto;
+    
+    /* 4*10 */
+    display: grid;
+    grid-template-columns: repeat(4, 1fr); 
+    grid-template-rows: repeat(10, 1fr); 
+    gap: 16px;
+    padding: 10px;
+
+}
+
+.collectBox img{
+    width: 100%;
+    height: auto;
+    object-fit: contain;
+    display: block;
+    
+    cursor: pointer;
+}

@@ -6,15 +6,17 @@ import styles from '../../../styles/components/side_widget.module.css';
 
 // 팝업창
 import SettingModal from './setting_modal';
+import AlarmModal from './alarm_modal';
 
 function SideWidget() {
   const [openModal, setOpenModal] = useState(false);
+  const [openModal2, setOpenModal2] = useState(false);
   return (
     <div className={styles.sideWidget}>
       <div className={styles.alarmBox}>
         <img src= {mail} onClick={
-          () => setOpenModal(true) }/>
-          {openModal ?<SettingModal openModal={openModal} setOpenModal={setOpenModal}/> : null}
+          () => setOpenModal2(true) }/>
+          {openModal2 ?<AlarmModal openModal={openModal2} setOpenModal={setOpenModal2}/> : null}
       </div>
 
       <div className={styles.settingBox}>
