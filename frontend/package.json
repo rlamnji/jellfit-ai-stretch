@@ -46,6 +46,9 @@
     ]
   },
   "devDependencies": {
-    "electron": "^35.1.2"
+    "autoprefixer": "^10.4.21",
+    "electron": "^35.1.2",
+    "postcss": "^8.5.3",
+    "tailwindcss": "3"
   }
 }
