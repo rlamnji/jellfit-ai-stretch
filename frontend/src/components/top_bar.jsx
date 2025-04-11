@@ -3,10 +3,10 @@ import SoundBtn from '../components/buttons/sound_btn';
 
 function TopBar(){
     return (
-        <div className="topBar">
-        <BackBtn />
-        <SoundBtn />
-    </div>
+        <div class="w-full h-14 flex justify-between ">
+            <BackBtn />
+            <SoundBtn />
+        </div>
     );
 }
 export default TopBar;
