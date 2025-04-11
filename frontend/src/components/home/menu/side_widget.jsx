@@ -11,19 +11,17 @@ import AlarmModal from './alarm_modal';
 function SideWidget() {
   const [openModal, setOpenModal] = useState(false);
   const [openModal2, setOpenModal2] = useState(false);
+  
   return (
     <div className={styles.sideWidget}>
-      <div className={styles.alarmBox}>
-        <img src= {mail} onClick={
+        <img src= {mail} className={styles.alarmBox} onClick={
           () => setOpenModal2(true) }/>
           {openModal2 ?<AlarmModal openModal={openModal2} setOpenModal={setOpenModal2}/> : null}
-      </div>
 
-      <div className={styles.settingBox}>
-        <img src= {setting} onClick={
+        <img src= {setting} className={styles.settingBox} onClick={
           () => setOpenModal(true) }/>
           {openModal ?<SettingModal openModal={openModal} setOpenModal={setOpenModal}/> : null}
-      </div>
+
       
     </div>
   );

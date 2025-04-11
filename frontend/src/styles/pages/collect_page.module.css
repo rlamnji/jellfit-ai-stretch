@@ -12,8 +12,8 @@
 
 .collectPage {
     position: relative;
-    background-image: url("../../assets/images/etc/basic_background.png");
-
+    background-image: url("../../assets/images/etc/basic_background2.png");
+    background-size: cover;
     display: flex;
     flex-direction: column;
     align-items: center;

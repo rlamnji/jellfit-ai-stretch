@@ -1,3 +1,4 @@
+
 @keyframes moveing {
   0% {
     transform: translateY(0px);
@@ -11,17 +12,18 @@
 }
 
 .profileCard{
-  position:relative;
-  display: flex;
-  background-color: beige;
-  width: 25vh;
-  padding: 5vh;
 
 }
 
-.profileImage img{
+.profileImage2{
   position:absolute;
-  width: 30%;
+  width: 300vw; 
+  max-width: 600px;
+
+}
+
+.profileImage{
+  width: 500px;
 }
 
 .profileContent{
