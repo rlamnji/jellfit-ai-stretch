@@ -1,4 +1,4 @@
-// 친구 요청청 컴포넌트
+// 친구 요청 컴포넌트
 import { useNavigate } from 'react-router-dom';
 import styles from '../../../src/styles/components/friends.module.css';
 
