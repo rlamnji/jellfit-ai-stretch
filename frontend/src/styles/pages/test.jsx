@@ -1,1 +1,0 @@
-import a from "../../assets/images/etc/background_basic.png";

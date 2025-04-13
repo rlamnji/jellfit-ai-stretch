@@ -1,7 +1,7 @@
 // 친구 페이지
-import FriendList from '../../components/friends/friend_list';
-import FriendSearch from '../../components/friends/friend_search';
-import FriendRequest from '../../components/friends/friend_request';
+import FriendList from '../../../components/friends/friend_list';
+import FriendSearch from '../../../components/friends/friend_search';
+import FriendRequest from '../../../components/friends/friend_request';
 import { useState } from 'react';
 
 function FriendPage() {

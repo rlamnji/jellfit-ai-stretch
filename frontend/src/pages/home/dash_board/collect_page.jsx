@@ -1,11 +1,10 @@
 // 도감 페이지
 // tailwindcss 사용
 import { useNavigate } from 'react-router-dom';
-import collectBox from '../../assets/images/icons/home/collect_box.png';
-import collectBook from '../../assets/images/icons/home/collect_book.png';
-import collectCancel from '../../assets/images/icons/home/collect_cancel.png';
-import backgroundImg from '../../assets/images/etc/basic_background2.png';
-import styles from '../../styles/pages/collect_page.module.css';
+import collectBox from '../../../assets/images/icons/home/collect_box.png';
+import collectBook from '../../../assets/images/icons/home/collect_book.png';
+import collectCancel from '../../../assets/images/icons/home/collect_cancel.png';
+import backgroundImg from '../../../assets/images/etc/basic_background2.png';
 
 function CollectPage() {
    const navigate = useNavigate();
