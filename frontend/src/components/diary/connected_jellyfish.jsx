@@ -1,11 +1,12 @@
+import img from "../../assets/images/etc/character.png";
 function ConnectedJellyfish(){
-    canGetJellyfishTime = '4분 3초';
-    jellyfishName = '한입 베어물은 해파리';
-    jellyfishDetail = `앞으로 ${canGetJellyfishTime}<br/>더 하면 소통 가능해요`;
+    const canGetJellyfishTime = '4분 3초';
+    const jellyfishName = '한입 베어물은 해파리';
+    const jellyfishDetail = `앞으로 ${canGetJellyfishTime} 더 하면 소통 가능해요`;
     return(
-        <div>
+        <div className="flex items-center ">
             <div className="jellyfishImg">
-                <img src="../../assets/images/etc/character.png" alt="해파리사진" />
+                <img src={img} alt="해파리사진" />
             </div>
             <div className="jellyfishInfo">
                 <div className="jellyfishName">{jellyfishName}</div>
