@@ -1,4 +1,3 @@
-// 더 건들라했다가 망함
 import { useGLTF } from '@react-three/drei';
 import { useEffect, useRef, Suspense } from 'react';
 import { useFrame } from '@react-three/fiber';

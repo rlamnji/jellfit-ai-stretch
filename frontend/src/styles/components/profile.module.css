@@ -11,21 +11,6 @@
   }
 }
 
-.profileCard{
-
-}
-
-.profileImage2{
-  position:absolute;
-  width: 300vw; 
-  max-width: 600px;
-
-}
-
-.profileImage{
-  width: 500px;
-}
-
 .profileContent{
   position:absolute;
   left: 10%;
