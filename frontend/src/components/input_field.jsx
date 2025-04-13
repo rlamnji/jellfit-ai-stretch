@@ -7,9 +7,9 @@ function InputField({id, title, type, placeholder, onTextChange}){
         onTextChange(e.target.value);
     }
     return (
-        <div>
-            <div>{title}</div>
-            <input id={id} value={text} type={type} placeholder={placeholder} onChange={onChange} />
+        <div className="z-10">
+            <div className="font-semibold text-xl text-input-text-color">{title}</div>
+            <input className='w-[280px] h-[40px] flex justify-center items-center mt-2 mb-4 pl-2 rounded-[8px] caret-black'id={id} value={text} type={type} placeholder={placeholder} onChange={onChange} />
         </div>
     );
 }
