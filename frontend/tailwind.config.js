@@ -13,9 +13,23 @@ module.exports = {
       },
       backgroundImage: {
         'space' : "url('./assets/images/etc/space.png')"
-      }
+      },
+      keyframes: {
+        moveing: {
+          '0%': { transform: 'translateY(0px)' },
+          '50%': { transform: 'translateY(-10px)' },
+          '100%': { transform: 'translateY(0px)' },
+        },
+      },
+      animation: {
+        moveing: 'moveing 2s ease-in-out infinite',
+      },
+
     }
   },
   plugins: [],
 }
+
+
+
 

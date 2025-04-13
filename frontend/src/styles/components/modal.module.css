@@ -1,28 +1,54 @@
-/*모달창 css*/
-.Overlay{
+.Overlay {
     position: fixed;
-    width: 100%;
-    height: 100%;
-    top: 0;
-    bottom: 0;
-    left: 0;
-    right: 0;
+    inset: 0;
     background: rgba(0, 0, 0, 0.4);
     z-index: 9999;
-}
-
-.setting{
-    background-color: #ffffff;
-    width: 250px;
-    height: 300px;
-    border: 1px solid #cccccc;
-    border-radius: 20px;
-    padding: 20px;
+  
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+  
+  /* 모달 전체 박스 */
+  .setModalBox {
     position: relative;
-    box-shadow: 0 3px 6px rgba(0, 0, 0, 0.16), 0 3px 6px rgba(0, 0, 0, 0.23);
-    position: fixed;
-    z-index: 100;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
+    width: 90vw;
+    max-width: 800px;
+    aspect-ratio: 795 / 959;
+    border-radius: 20px;
+    overflow: hidden;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
+    background: white;
+  }
+  
+  /* 환경설정 이미지 */
+  .setModal img{
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    display: block;
+  }
+
+  /* 닫기 버튼 */
+  .setCancel {
+    position: absolute;
+    top: 2%;
+    right: 2%;
+    background: none;
+    border: none;
+    padding: 0;
+    cursor: pointer;
+    z-index: 1000;
+  }
+  
+  .setCancel img {
+    cursor: pointer;
+    width: 6vw;
+    max-width: 40px;
+    min-width: 24px;
+    height: auto;
+  }
+  
+.detailBox img{
+    width: 100px;
 }
