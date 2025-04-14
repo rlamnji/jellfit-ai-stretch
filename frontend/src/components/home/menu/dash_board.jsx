@@ -14,7 +14,7 @@ function DashBoard() {
       <div className="flex flex-col gap-[3vw]">
         <img className="w-[200px] cursor-pointer animate-[moveing_3s_ease-in-out_infinite] transition-transform duration-200 hover:animate-none hover:-translate-y-[5px] hover:scale-[1.02]" src= {friends} onClick={()=>navigate('/home/friends')}/>
         <img className="w-[200px] cursor-pointer animate-[moveing_3s_ease-in-out_infinite] transition-transform duration-200 hover:animate-none hover:-translate-y-[5px] hover:scale-[1.02]" src= {collections} onClick={()=>navigate('/home/collection')}/>
-        <img className="w-[200px] cursor-pointer animate-[moveing_3s_ease-in-out_infinite] transition-transform duration-200 hover:animate-none hover:-translate-y-[5px] hover:scale-[1.02]" src= {exercise} />          
+        <img className="w-[200px] cursor-pointer animate-[moveing_3s_ease-in-out_infinite] transition-transform duration-200 hover:animate-none hover:-translate-y-[5px] hover:scale-[1.02]" src= {exercise} onClick={()=>navigate('/diary')} />          
       </div>
       
     </div>
