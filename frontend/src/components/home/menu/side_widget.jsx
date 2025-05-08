@@ -14,7 +14,8 @@ function SideWidget() {
     <div className="pr-5 pt-4">
         <img src= {setting} className="w-[50px] cursor-pointer" onClick={
           () => setOpenModal(true) }/>
-          {openModal ?<SettingModal openModal={openModal} setOpenModal={setOpenModal}/> : null}
+          {openModal ?<SettingModal openModal={openModal} setOpenModal={setOpenModal}
+          /> : null}
     </div>
   );
 }

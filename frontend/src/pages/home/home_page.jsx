@@ -1,5 +1,7 @@
 // 메인 페이지 화면
 // tailwind css 사용
+import { useEffect } from 'react';
+
 import ProfileCard from "../../components/home/profile";
 import SideWidget from "../../components/home/menu/side_widget";
 import DashBoard from "../../components/home/menu/dash_board";
@@ -9,7 +11,9 @@ import { Canvas } from '@react-three/fiber';
 import Test3d from "../../components/home/background_3d/space_scence"
 
 
+
 function HomePage() {
+
   return (
     <div className="relative w-screen h-screen overflow-hidden">
         <Canvas className="pointer-events-auto absolute top-0 left-0 w-full h-full z-[-1] bg-[radial-gradient(circle,_#6D83B2,_#221f36)]" camera={{ position: [0,0,-60], fov: 100}}>
@@ -36,9 +40,6 @@ function HomePage() {
           </div>
           
         </div>
-
-
-
 
     </div>
   );
