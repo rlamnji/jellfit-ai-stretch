@@ -3,29 +3,40 @@ import { useEffect, useRef, useState } from 'react';
 import volumeOn from '../../assets/images/icons/volume_max.png';
 import volumeOff from '../../assets/images/icons/volume_x.png';
 import track from '../../assets/sounds/track1.mp3';
+import backgroundMusic from '../../assets/sounds/track1.mp3';
+
+import { SoundProvider, useSound } from '../../context/sound_context';
+import { playAudio, stopAudio } from '../../utils/sound';
 
 function SoundBtn(){
-    const audio = useRef(null);
-    const [isPlaying, setIsPlaying] = useState(false);
+    const {isPlaying, setIsPlaying} = useSound();
 
     useEffect(() =>{
         const savedSound = localStorage.getItem('isPlaying');
-        setIsPlaying(savedSound === 'true');
+        if (savedSound !== null) {
+            setIsPlaying(savedSound === 'true');
+        }
     },[]);
 
+    const handleClose = () =>{
+        setIsPlaying(prev => !prev);
+    }
+
     useEffect(() => {
-        if(audio.current){
-            audio.current.muted = isPlaying;
+        localStorage.setItem('isPlaying', isPlaying.toString());
+        // 이미지가 true일 때만 소리재생
+        if(!isPlaying){
+            playAudio(backgroundMusic);
+        }else{
+            stopAudio();
         }
-        localStorage.setItem('isPlaying', isPlaying);
     },[isPlaying]);
 
     return(
         <div class="w-8 h-8 m-4">
-            <audio ref={audio} src={track} autoPlay loop />
-            <button onClick={() => setIsPlaying((prev) => !prev)}>
-                <img src={isPlaying ? volumeOff : volumeOn} alt="사운드버튼" />
-            </button>
+                <button onClick={() => handleClose()}>
+                    <img src={isPlaying ? volumeOff : volumeOn} alt="사운드버튼" />
+                </button>
         </div>
     );
 }

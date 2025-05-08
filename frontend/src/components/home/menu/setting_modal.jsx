@@ -2,16 +2,19 @@
 // tailwind 적용
 import setModal from '../../../assets/images/icons/setting_content.png';
 import setCancel  from '../../../assets/images/icons/cancel.png';
-import { useEffect, useRef, useState } from 'react';
+import { useEffect} from 'react';
+import { useReminder } from '../../../context/reminder_context';
+import { useSound } from '../../../context/sound_context';
+import { playAudio, stopAudio } from '../../../utils/sound';
 
+import backgroundMusic from '../../../assets/sounds/track1.mp3';
 import DropDown from './drop_down';
 
 
 function SettingModal ({setOpenModal}){
-    const [toggledSound, setToggledSound] = useState(false) // 배경음
-    const [toggledAlarm, setToggledAlarm] = useState(false) // 푸시 알람
 
-    //const [alarmTime, setAlarmTime] = useState('선택') // 알람주기
+    const {toggledAlarm, setToggledAlarm}  = useReminder(); // 푸시 알람 상태관리
+    const {toggledSound, setToggledSound} = useSound(); // 배경음
 
     // 초기값 불러오기
     useEffect(() => {
@@ -24,7 +27,18 @@ function SettingModal ({setOpenModal}){
         if (savedAlarm !== null) {
             setToggledAlarm(savedAlarm === 'true');
         }
+
     }, []);
+
+    useEffect(()=>{
+        // 배경음이 true일 때만 소리재생
+        if(toggledSound){
+            playAudio(backgroundMusic);
+        }else{
+            stopAudio();
+        }
+
+    },[toggledSound]);
 
     // x 버튼 클릭 시 현재 상태 저장
     const handleClose = () => {
