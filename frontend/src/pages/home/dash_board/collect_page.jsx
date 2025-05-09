@@ -4,7 +4,10 @@ import { useNavigate } from 'react-router-dom';
 import collectBox from '../../../assets/images/icons/home/collect_box.png';
 import collectBook from '../../../assets/images/icons/home/collect_book.png';
 import collectCancel from '../../../assets/images/icons/home/collect_cancel.png';
+import collectJellyfish from '../../../assets/images/icons/home/collect_left_box.png';
 import backgroundImg from '../../../assets/images/etc/basic_background2.png';
+
+import test from '../../../assets/images/icons/home/user_profile_1.png';
 
 import BackBtn from '../../../components/buttons/back_btn';
 import SoundBtn from '../../../components/buttons/sound_btn';
@@ -25,7 +28,7 @@ function CollectPage() {
             <SoundBtn/>
          </div>
 
-         <div className="relative bg-cover bg-center bg-no-repeat flex flex-col items-center justify-center translate-y-[-1vh]">
+         <div className="relative flex flex-col items-center justify-center translate-y-[-1vh]">
 
 
          <div className="relative flex justify-center items-center w-[83%] animate-[moveing_2s_ease-in-out_infinite]">
@@ -35,24 +38,37 @@ function CollectPage() {
             {/* 닫기 버튼 */}
             <img
                src={collectCancel}
-               className="absolute top-[12%] right-[12%] translate-x-1/2 -translate-y-1/2 w-[5vw] cursor-pointer"
+               className="absolute top-[14%] right-[12%] translate-x-1/2 -translate-y-1/2 w-[5vw] cursor-pointer"
                onClick={() => navigate('/home')}
             />
 
             {/* 왼쪽 콘텐츠 */}
-            <div className="absolute bg-gray-200 top-[20.5%] left-[19%] w-[20%] h-[25%]">
-               여기에 해파리 이미지
+            {/* 빈그리드 클릭 시, 해파리 있는 그리드 클릭 시 */}
+            <div className="absolute top-[23.5%] left-[22%] w-[14%] h-[14%]">
+               <img src={test}/>
             </div>
-            <div className="absolute top-[56%] left-[15%] text-[#513030] text-[1.5vw] font-bold blur-[0.5px]">
+
+            <div className="absolute top-[23.5%] left-[18%] w-[23%] h-[20%] bg-[#E5E5E5] opacity-80 rounded-xl border-2 flex items-center justify-center">
+               <div className='flex flex-col items-center justify-center'>
+               <div className="text-[10px]"> 목돌리기 n번만 더 하면 얻을 수 있어요!</div>
+               <div className="text-[10px]"> * 현재 진행 횟수: 3 / 5</div>
+               </div>
+
+            </div>
+
+            <div className="absolute top-[53%] left-[15%] text-[#513030] text-[1.5vw] font-bold blur-[0.5px]">
                한 입 먹힌 해파리(DB)
             </div>
-            <div className="absolute top-[69%] left-[15%] w-[28%] h-[15%] text-[#513030] text-[1.2vw] blur-[0.5px] overflow-y-auto break-words whitespace-normal">
-               DB에 있는 설명 ! 너무 길면 스크롤 되게 했음!!
+            <div className="absolute top-[63%] left-[15%] w-[28%] h-[11%] text-[#513030] text-[1.2vw] blur-[0.5px] overflow-y-auto break-words whitespace-normal">
+               DB에 있는 설명 ! 너무 길면 스크롤 되게 했음
+            </div>
+            <div className="absolute top-[79%] left-[15%] w-[28%] h-[15%] text-[#513030] text-[1.2vw] blur-[0.5px] overflow-y-auto break-words whitespace-normal">
+               목돌리기
             </div>
 
             {/* 오른쪽 도감 박스 */}
-            <div className="absolute top-[18%] left-[52%] w-[37%] h-[69%] overflow-y-auto grid grid-cols-4 gap-4 p-4 auto-rows-auto">
-               {Array.from({ length: 40 }).map((_, i) => (
+            <div className="absolute top-[20%] left-[52%] w-[37%] h-[66%] overflow-y-auto grid grid-cols-4 gap-4 p-4 auto-rows-auto">
+               {Array.from({ length: 50 }).map((_, i) => (
                   <img key={i} src={collectBox} className="w-full object-contain block cursor-pointer" />
                ))}
             </div>

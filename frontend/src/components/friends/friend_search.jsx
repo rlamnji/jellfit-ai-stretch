@@ -1,8 +1,9 @@
 // 친구 검색 컴포넌트
 // tailwind css 사용
-import { useNavigate } from 'react-router-dom';
+import { useState } from 'react';
 import BackBtn from '../buttons/back_btn';
 import SoundBtn from '../buttons/sound_btn';
+import axios from 'axios';
 
 // 이미지
 import background from '../../assets/images/etc/basic_background2.png';
@@ -12,6 +13,27 @@ import cancelBtn from '../../assets/images/icons/friends/friends_cancel2.png';
 
 
 function FriendSearch({ setSelectedTab }) {
+
+  const [nickname, setNickname] = useState('');
+
+  // 친구 요청 전송
+  const handleSendRequest = () => {
+
+    if (!nickname.trim()) {
+      alert('닉네임을 입력하세요');
+      return;
+    }
+
+    /*axios.post('/api/friends/request', {
+      requester_id: 110,       // 사용자 번호
+      nickname: 'nickname'       // 상대 닉네임
+    })
+    .then(res => alert(res.data.message))
+    .catch(err => console.error(err));*/
+
+    console.log('친구 이름 ', nickname);
+  }
+
 
   return (
     <div>
@@ -76,13 +98,15 @@ function FriendSearch({ setSelectedTab }) {
               type="text"
               placeholder="닉네임을 입력하세요"
               className="text-[30px] h-[100px] w-[500px] px-20 py-10 border bg-white opacity-30 rounded-full"
+              value = {nickname}
+              onChange={(e) => setNickname(e.target.value)}
             />
           </div>
 
           {/* 버튼 영역 */}
           <div className="flex flex-row space-x-10 z-[1]  justify-between items-end">
-            <img src={sendBtn} className="w-[150px] h-[60px] cursor-pointer"/>
-            <img src={cancelBtn} className="w-[150px] h-[60px] cursor-pointer"/>
+            <img src={sendBtn} className="w-[150px] h-[60px] cursor-pointer" onClick={()=>handleSendRequest()}/>
+            <img src={cancelBtn} className="w-[150px] h-[60px] cursor-pointer" onClick={()=>setNickname('')}/>
           </div>
         </div>
 

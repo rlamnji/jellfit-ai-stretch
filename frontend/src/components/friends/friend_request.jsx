@@ -1,6 +1,7 @@
 // 친구 요청 컴포넌트
 // tailwind css 사용
-import { useNavigate } from 'react-router-dom';
+import { useEffect, useState } from 'react';
+//import axios from 'axios';
 import BackBtn from '../buttons/back_btn';
 import SoundBtn from '../buttons/sound_btn';
 
@@ -12,6 +13,44 @@ import cancelBtn from '../../assets/images/icons/friends/friends_cancel.png';
 import testImg from '../../assets/images/test.jpg'
 
 function FriendRequest({ setSelectedTab }) {
+
+  //const [requestList, setRequestList] = useState([]);
+
+  // 요청 목록 불러오기
+  useEffect(() =>{
+    /*axois.get('/friends/request')
+      .then(res => {
+        console.log(res.data);
+        setRequestList(res.data);
+      })
+      .catch(err => console.log(err));*/
+  });
+
+  // 수락
+  const handleAccept = () =>{
+    /*axois.post('/friends/accept', null, {
+      params: {
+        friendId: 1 , // 수락할 친구의 ID
+      }})
+      .then(() =>{
+        setRequestList(prev => prev.filter(user => user.userNum !== userNum));
+      })
+      .catch(err=> console.log(err));*/
+    console.log('수락 버튼 클릭');
+  };
+
+  // 거절
+  // userNum : 요청한 사용자 번호(FK)
+  const handleReject = () =>{
+    /*axios.post('/api/friends/reject', { requesterId: userNum })
+    .then(() => {
+      setRequestList(prev => prev.filter(user => user.userNum !== userNum));
+    })
+    .catch(error => {
+      console.error('거절 실패:', error);
+    });*/
+    console.log('삭제 버튼 클릭');
+  };
 
   return (
     <div>
@@ -72,8 +111,8 @@ function FriendRequest({ setSelectedTab }) {
               <div className="text-[20px] opacity-50">닉네임</div>
               <div className="font-bold text-[24px]">해파리가되</div>
             </div>
-            <img src={checkBtn} className="cursor-pointer w-[50px]"/>
-            <img src={cancelBtn} className="cursor-pointer w-[50px]"/>
+            <img src={checkBtn} className="cursor-pointer w-[50px]" onClick={()=>(handleAccept())}/>
+            <img src={cancelBtn} className="cursor-pointer w-[50px]" onClick={()=>handleReject()}/>
           </div>
 
         </div>

@@ -6,6 +6,8 @@ import profileImg from '../../assets/images/icons/home/user_profile_1.png';
 import ProfileModal from './user_profile_modal';
 import { useState } from 'react';
 
+//import axios from 'axios';
+
 function UserProfile(){
     const [modal, setOpenModal] = useState(false);
 
@@ -16,6 +18,20 @@ function UserProfile(){
         intro: '한줄소개입니다',
         profileImg: profileImg,
     };
+
+    const handleLogout = () => {
+        /*axios.post('/auth/logout', {}, {
+            headers: {
+              Authorization: `Bearer ${token}`
+            }
+          }).then(() => {
+            // 토큰 삭제 후 페이지 이동
+            localStorage.removeItem('token');
+            navigate('/login');
+          });*/
+
+          console.log('로그아웃 버튼 클릭');
+    }
 
     return (
        
@@ -40,7 +56,7 @@ function UserProfile(){
 
                     {/* 프로필 수정 버튼 */}
                     <div className="ml-[430px] h-[90px]">
-                        <div className='flex justify-end text-[15px] text-[#552F2F] underline pb-8 cursor-pointer'>로그아웃</div>
+                        <div className='flex justify-end text-[15px] text-[#552F2F] underline pb-8 cursor-pointer' onClick={()=>handleLogout()}>로그아웃</div>
                         <div className='flex w-[200px] h-[50px] bg-[#552F2F] rounded-2xl justify-center items-center cursor-pointer'  onClick={()=>{setOpenModal(true)}}>
                             <div className='text-[20px] text-white text-center'>프로필 수정</div>
                         </div>

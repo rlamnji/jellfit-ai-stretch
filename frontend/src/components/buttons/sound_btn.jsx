@@ -1,11 +1,11 @@
 // 사운드 버튼(BGM)
-import { useEffect, useRef, useState } from 'react';
+import { useEffect } from 'react';
+import { useLocation } from 'react-router-dom';
 import volumeOn from '../../assets/images/icons/volume_max.png';
 import volumeOff from '../../assets/images/icons/volume_x.png';
-import track from '../../assets/sounds/track1.mp3';
 import backgroundMusic from '../../assets/sounds/track1.mp3';
 
-import { SoundProvider, useSound } from '../../context/sound_context';
+import { useSound } from '../../context/sound_context';
 import { playAudio, stopAudio } from '../../utils/sound';
 
 function SoundBtn(){
