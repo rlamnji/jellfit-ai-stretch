@@ -46,12 +46,12 @@ function CameraCapture() {
       }
     }, "image/jpeg");
   };
-  
-  // 일정 간격으로 프레임 전송
-  //   useEffect(() => {
-  //     const interval = setInterval(sendFrame, 2000); // 2초마다 전송
-  //     return () => clearInterval(interval);
-  //   }, []);
+
+  // 3. 일정 간격으로 프레임 전송
+  useEffect(() => {
+    const interval = setInterval(sendFrame, 2000); // 2초마다 전송
+    return () => clearInterval(interval); // 컴포넌트 언마운트 시 정리
+  }, []);
 
   return (
     <div className="w-full flex flex-col items-center py-4">
@@ -69,14 +69,6 @@ function CameraCapture() {
         height="480"
         className="hidden"
       />
-
-      {/* 🔘 수동 캡처 버튼 */}
-      <button
-        onClick={sendFrame}
-        className="mt-4 px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg shadow"
-      >
-        캡처해서 서버로 전송
-      </button>
     </div>
   );
 }
