@@ -2,7 +2,7 @@
 // tailwind css 사용
 // 수정필요 (커서 안먹음, 한줄소개 스크롤 안됨)
 import profileImg from '../../assets/images/icons/home/profile_user.png';
-import test from './test.jpg';
+import test from '../../assets/images/test.jpg'
 import { useNavigate } from 'react-router-dom';
 
 function ProfileCard() {
