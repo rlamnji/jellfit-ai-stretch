@@ -1,10 +1,12 @@
 // 자세 캘리브레이션 페이지
 // 상단 컴포
 // 카메라 컴포
+import CameraScreen from "../../components/camera/camera_screen";
+
 function CalibrationPage(){
     return (
         <div>
-            <div className='w-full h-screen bg-space flex flex-col items-center '>
+            <div className='w-full h-screen flex flex-col items-center '>
                 <div className='header w-fit h-fit p-1 text-[#552F2F] text-[50px] mt-14'>
                     초기 자세 캘리브레이션
                 </div>
@@ -22,6 +24,7 @@ function CalibrationPage(){
                     </div>
 
                     {/* 카메라 <CameraComponent />컴포넌트 */}
+                    <CameraScreen/>
                 </div>
             </div>
         </div>
