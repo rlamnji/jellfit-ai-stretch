@@ -5,6 +5,8 @@
   "main": "electron/main.js",
   "homepage": "./",
   "dependencies": {
+    "@mediapipe/camera_utils": "^0.3.1675466862",
+    "@mediapipe/pose": "^0.5.1675469404",
     "@react-three/drei": "^10.0.6",
     "@react-three/fiber": "^9.1.2",
     "@testing-library/dom": "^10.4.0",

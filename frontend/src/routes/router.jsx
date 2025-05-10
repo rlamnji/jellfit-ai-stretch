@@ -11,6 +11,7 @@ import UserProfilePage from '../pages/home/user_profile_page';
 import GuideByBodyPage from "../pages/guide/guide_by_body";
 import GuideBySituationPage from "../pages/guide/guide_by_situation";
 import DiaryPage from "../pages/diary/diary_page";
+import CalibrationPage from "../pages/join/calibration_page";
 
 function Router() {
     return (
@@ -21,6 +22,7 @@ function Router() {
                 <Route path="/login" element={<LoginPage />} />
                 <Route path="/join" element={<JoinPage />} />
                 <Route path="/condition" element={<ConditionPage />} />
+                <Route path="/condition/:id" element={<CalibrationPage />} />
                 
                 {/* 홈화면 */}
                 <Route path="/home" element={<HomePage />} /> 

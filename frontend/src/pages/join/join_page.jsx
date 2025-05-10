@@ -43,7 +43,7 @@ function JoinPage (){
                         ${isValid ? 'bg-button-color' : 'bg-disabled-button-color cursor-not-allowed'}`}
                     >
                         <Link
-                            to={isValid ? '/' : '#'}
+                            to={isValid ? '/condition/:id' : '#'}
                             className={`font-semibold text-white text-xl ${isValid ? '' : 'pointer-events-none'}`}
                             onClick={(e) => {
                                 if (!isValid){
