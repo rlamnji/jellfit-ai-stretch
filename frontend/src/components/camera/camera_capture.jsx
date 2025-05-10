@@ -107,6 +107,41 @@ function CameraCapture() {
   }, [step, isCameraOn]);
 
 
+  // 프레임 캡처해서 서버로 전송
+  const sendFrame = async () => {
+    const canvas = canvasRef.current;
+    const video = videoRef.current;
+    if (!canvas || !video) return;
+
+    const ctx = canvas.getContext("2d");
+
+    // 캡처
+    ctx.setTransform(1, 0, 0, 1, 0, 0); // transform 초기화
+    ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+    // 이미지 서버로 전송
+    canvas.toBlob(async (blob) => {
+      const formData = new FormData();
+      formData.append("file", blob, "frame.jpg");
+
+    try {
+      console.log("📤 이미지 전송 시작...");
+      const response = await fetch("http://localhost:8000/analyze", {
+        method: "POST",
+        body: formData,
+      });
+
+      if (!response.ok) {
+        throw new Error(`서버 응답 실패: ${response.status}`);
+      }
+
+      const result = await response.json();
+      console.log("서버 응답:", result);
+    } catch (err) {
+      console.error("서버 전송 실패:", err);
+    }
+    }, "image/jpeg");
+  };
 
   useEffect(() => {
     if (!videoRef.current) return;
@@ -122,30 +157,53 @@ function CameraCapture() {
       minTrackingConfidence: 0.5,
     });
 
-    // posture 한 번만 실행
-    let postureDetected = false;
+    let postureStartTime = null;
+    let postureSuccess = false;
+
+    let tposeStartTime = null;
+    let tposeSuccess = false;
 
     pose.onResults((results) => {
       if (!results.poseLandmarks) return;
 
       const getY = (idx) => results.poseLandmarks[idx]?.y ?? 0;
 
-      if (step === "posture") {
+      // 정자세: 3초 이상 연속 유지시 -> 캡쳐
+      if (step === "posture" && !postureSuccess) {
         const isAligned =
           Math.abs(getY(11) - 0.66) < 0.07 &&
           Math.abs(getY(12) - 0.66) < 0.07;
 
-        if (isAligned && !postureDetected) {
-          postureDetected = true; // 한 번만 실행
-          console.log("✅ 정자세 일치!");
-          setTimeout(() => {
-            console.log("➡️ T자 자세로 전환");
-            setStep("tpose");
-          }, 2000);
+        if (isAligned) {
+          if (!postureStartTime) {
+            postureStartTime = Date.now(); // 처음 감지된 시간 저장
+          } else {
+
+            const elapsed = Date.now() - postureStartTime;
+            const seconds = Math.floor(elapsed / 1000);
+            console.log(`정자세 유지 중: ${seconds}초`);
+
+            if (elapsed >= 3000) {
+              console.log("정자세 3초 유지 성공!");
+              sendFrame();
+              postureSuccess = true;
+
+              setTimeout(() => {
+                console.log("T자 자세로 전환");
+                setStep("tpose");
+              }, 2000);
+            }
+          }
+        } else {
+          if (postureStartTime) {
+            console.log("정자세 흐트러짐! 시간 초기화");
+          }
+          postureStartTime = null;
         }
       }
 
-      if (step === "tpose") {
+      // T자 자세: 3초 이상 연속 유지시 -> 캡쳐
+      if (step === "tpose" && !tposeSuccess) {
         const isAligned =
           Math.abs(getY(11) - 0.55) < 0.07 &&
           Math.abs(getY(12) - 0.55) < 0.07 &&
@@ -153,43 +211,33 @@ function CameraCapture() {
           Math.abs(getY(16) - 0.55) < 0.07;
 
         if (isAligned) {
-          console.log("✅ T자 자세 일치!");
-          console.log("✅ 자세 캘리브레이션 종료");
+          if (!tposeStartTime) {
+            tposeStartTime = Date.now(); // 처음 감지된 시간 저장
+          } else {
+
+            const elapsed = Date.now() - tposeStartTime;
+            const seconds = Math.floor(elapsed / 1000);
+            console.log(`T자 자세 유지 중: ${seconds}초`);
+
+            if (elapsed >= 3000) {
+              console.log("T자 자세 3초 유지 성공!");
+              sendFrame();
+              tposeSuccess = true;
+
+              setTimeout(() => {
+                console.log("캘리브레이션 종료");
+              }, 2000);
+            }
+          }
+        } else {
+          if (tposeStartTime) {
+            console.log("T자 자세 흐트러짐! 시간 초기화");
+          }
+          tposeStartTime = null;
         }
+
       }
     });
-
-
-
-     // 2. 프레임 캡처해서 서버로 전송
-  /*const sendFrame = async () => {
-    const canvas = canvasRef.current;
-    const video = videoRef.current;
-    if (!canvas || !video) return;
-
-    const ctx = canvas.getContext("2d");
-
-    // ✅ 좌우 반전 없이 원본 방향으로 캡처
-    ctx.setTransform(1, 0, 0, 1, 0, 0); // transform 초기화
-    ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
-
-    // 이미지 서버로 전송
-    canvas.toBlob(async (blob) => {
-      const formData = new FormData();
-      formData.append("file", blob, "frame.jpg");
-
-      try {
-        const response = await fetch("http://localhost:8000/analyze", {
-          method: "POST",
-          body: formData,
-        });
-        const result = await response.json();
-        console.log("✅ 서버 응답:", result);
-      } catch (err) {
-        console.error("❌ 서버 전송 실패:", err);
-      }
-    }, "image/jpeg");
-  };*/
 
 
     const cam = new Camera(videoRef.current, {
