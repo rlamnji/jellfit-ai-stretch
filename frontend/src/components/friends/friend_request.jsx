@@ -18,7 +18,7 @@ function FriendRequest({ setSelectedTab }) {
 
   // 요청 목록 불러오기
   useEffect(() =>{
-    /*axois.get('/friends/request')
+    /*axois.get('/friends/requests')
       .then(res => {
         console.log(res.data);
         setRequestList(res.data);
@@ -28,7 +28,7 @@ function FriendRequest({ setSelectedTab }) {
 
   // 수락
   const handleAccept = () =>{
-    /*axois.post('/friends/accept', null, {
+    /*axois.put('/friends/accept', null, {
       params: {
         friendId: 1 , // 수락할 친구의 ID
       }})
@@ -42,7 +42,7 @@ function FriendRequest({ setSelectedTab }) {
   // 거절
   // userNum : 요청한 사용자 번호(FK)
   const handleReject = () =>{
-    /*axios.post('/api/friends/reject', { requesterId: userNum })
+    /*axios.delete('/friends/reject', { requesterId: userNum })
     .then(() => {
       setRequestList(prev => prev.filter(user => user.userNum !== userNum));
     })
