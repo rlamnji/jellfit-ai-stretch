@@ -3,21 +3,18 @@ import jellyfishMenu from "../../assets/images/icons/jellyfish_list.png";
 import { useEffect, useState } from "react";
 import Stretching from "../../components/stretching/stretching";
 import SelectedStretching from "../../components/stretching/selected_stretching";
+import { useNavigate } from "react-router-dom";
 
 
-function SelectGuidePage(){
-    //필요한 기능
-    //1. 카테고리 선택하면 그에 맞는 스트레칭 자세 불러오는 기능.
-    //카테고리를 누르면 그에 맞는 데이터를 불러오는 함수.
-    //클래스로 만들기. (완)
-    //2. 스트레칭 자세 선택하면 담기는 기능
+function SelectGuidePage({ setStretchingOrder }) {
     
-    //3. 랜덤 선택해지는 기능
-    //4. 시작하기 버튼 누르면 담긴 스트레칭 데이터 보내는 기능
+    //랜덤 선택해지는 기능 (미완성)
+  
     const [mainCategory, setMainCategory] = useState('신체부위');
     const [subCategory, setSubCategory] = useState('목');
     const [stretchingList, setStretchingList] = useState([]); 
     const [selectedStretchingList, setSelectedStretchingList] = useState([]);
+    const navigate = useNavigate();
 
     const subCategories = {
         '신체부위' : ['목', '어깨', '팔/손목', '등/허리'],
@@ -136,12 +133,17 @@ function SelectGuidePage(){
         setSelectedStretchingList((prev) => prev.filter((item) => item.id !== id));
     };
     const handleStartbuttonClick = (selectedStretchingList) =>{
-        console.log(selectedStretchingList);
         //시작하기 버튼 클릭했을 때 담긴 스트레칭 리스트를 서버에 보내는 기능
-        
-
-        //1. 담긴 스트레칭 리스트를 서버에 보내기.
-        //2. 서버에서 받은 스트레칭 리스트를 화면에 출력하기.
+        //1. 스트레칭 리스트에서 id만 뽑아서 배열로 만들기.
+        if(selectedStretchingList.length === 0){
+            alert("스트레칭을 담아주세요.");
+            return;
+        } else {
+            const selectedStretchingIds = selectedStretchingList.map((stretching) => stretching.id);
+            console.log(selectedStretchingIds); //ok
+            setStretchingOrder(selectedStretchingIds); //동적 라우터 생성.
+            navigate(`/guide/video/${selectedStretchingIds[0]}`); //첫번째 스트레칭 가이드 영상 화면으로 이동.
+        }
     }
     return(
         <div className="w-full h-screen bg-[#E5D2D2]">
@@ -151,7 +153,7 @@ function SelectGuidePage(){
                 <div className="mb-1 text-lg text-[#895555]">원하는 스트레칭을 골라 담아보세요</div>
                 <div className="text-lg text-[#895555]">담은 순서대로 스트레칭 가이드가 진행돼요</div>
             </div>
-            <div className="contentBox flex lg:w-[90%]] h-[480px] ml-12 mr-12 p-4  bg-white opacity-88 rounded-3xl">
+            <div className="contentBox flex lg:w-[90%]] h-[480px] ml-12 mr-12 p-4  bg-[#fcfafa] rounded-3xl">
                 <button className="w-[28px] h-[24px]">
                     <img src={jellyfishMenu} alt="잠긴 해파리 리스트 볼 수 있는 메뉴" />
                 </button>
@@ -178,18 +180,8 @@ function SelectGuidePage(){
                             {showSubCategories()}    
                         </ul>
                     </div>
-                    {/* 아래 ul을 getStretchingData()가 출력해줘야 함. */}
-                    <ul className="stretchingList">
+                    <ul className="stretchingList flex">
                         {showStretchingList(stretchingList)} 
-                        {/* 서버 연결하면 아래 li태그 코드 지우기.
-                        <li>
-                            <Stretching 
-                                stretching={{
-                                    name:"옆구리늘리기",
-                                    imageURL :"/images/stretching/ygrnrg.png"
-                                    }} onClick={handleStrechingSelect}
-                            />                  
-                        </li> */}
                     </ul>
                 </div>
                 <div className="selectedPart w-[30%]">

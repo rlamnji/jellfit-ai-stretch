@@ -1,13 +1,15 @@
 import { useRef, useEffect } from "react";
 
-function CameraCapture() {
+function CameraCapture({ handleIsStretching, sendFrameTime }) {
   const videoRef = useRef(null);
-  const canvasRef = useRef(null);
+  const canvasRef = useRef(null); // canvasRef 초기화
+  const streamRef = useRef(null); // 스트림을 저장할 ref
 
   // 1. 카메라 연결
   useEffect(() => {
     navigator.mediaDevices.getUserMedia({ video: true })
       .then((stream) => {
+        streamRef.current = stream; // 스트림 저장
         if (videoRef.current) {
           videoRef.current.srcObject = stream;
         }
@@ -15,6 +17,14 @@ function CameraCapture() {
       .catch((err) => {
         console.error("❌ 카메라 연결 실패:", err);
       });
+
+    // 컴포넌트 언마운트 시 스트림 정리
+    return () => {
+      if (streamRef.current) {
+        streamRef.current.getTracks().forEach((track) => track.stop());
+        console.log("✅ 카메라 스트림 정지");
+      }
+    };
   }, []);
 
   // 2. 프레임 캡처해서 서버로 전송
@@ -35,12 +45,15 @@ function CameraCapture() {
       formData.append("file", blob, "frame.jpg");
 
       try {
-        const response = await fetch("http://localhost:8000/analyze", {
+        const res = await fetch("/analyze", {
           method: "POST",
           body: formData,
         });
-        const result = await response.json();
-        console.log("✅ 서버 응답:", result);
+        if(res.ok){
+          const { isStretching } = await res.json();
+          console.log("✅ 서버 응답:", data);
+          handleIsStretching(isStretching);
+        }
       } catch (err) {
         console.error("❌ 서버 전송 실패:", err);
       }
@@ -49,8 +62,8 @@ function CameraCapture() {
 
   // 3. 일정 간격으로 프레임 전송
   useEffect(() => {
-    const interval = setInterval(sendFrame, 2000); // 2초마다 전송
-    return () => clearInterval(interval); // 컴포넌트 언마운트 시 정리
+    const interval = setInterval(sendFrame, sendFrameTime); // 0.3초마다 전송
+    return () => clearInterval(interval); // 컴포넌트 언마운트 시 정리 (안되는 듯?..)
   }, []);
 
   return (
@@ -64,7 +77,7 @@ function CameraCapture() {
 
       {/* 👻 서버 전송용 캔버스 (사용자에겐 숨김) */}
       <canvas
-        ref={canvasRef}
+        ref={canvasRef} // canvasRef 연결
         width="640"
         height="480"
         className="hidden"
