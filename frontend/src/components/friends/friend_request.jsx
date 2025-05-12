@@ -1,7 +1,7 @@
 // 친구 요청 컴포넌트
 // tailwind css 사용
 import { useEffect, useState } from 'react';
-//import axios from 'axios';
+import axios from 'axios';
 import BackBtn from '../buttons/back_btn';
 import SoundBtn from '../buttons/sound_btn';
 
@@ -50,6 +50,17 @@ function FriendRequest({ setSelectedTab }) {
       console.error('거절 실패:', error);
     });*/
     console.log('삭제 버튼 클릭');
+  };
+
+  // 백엔드 연동 테스트 ==> 됨
+  const test = () => {
+    axios.get('http://127.0.0.1:8000/characters')
+      .then(res => {
+        console.log(res.data);
+      })
+      .catch(error => {
+        console.error('거절 실패:', error);
+      });
   };
 
   return (
@@ -112,7 +123,7 @@ function FriendRequest({ setSelectedTab }) {
               <div className="font-bold text-[24px]">해파리가되</div>
             </div>
             <img src={checkBtn} className="cursor-pointer w-[50px]" onClick={()=>(handleAccept())}/>
-            <img src={cancelBtn} className="cursor-pointer w-[50px]" onClick={()=>handleReject()}/>
+            <img src={cancelBtn} className="cursor-pointer w-[50px]" onClick={()=>{handleReject(); test();}}/>
           </div>
 
         </div>

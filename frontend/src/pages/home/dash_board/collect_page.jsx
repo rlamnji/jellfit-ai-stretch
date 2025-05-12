@@ -32,7 +32,8 @@ function CollectPage() {
          try{
             const [allRes, userRes, stretchRes] = await Promise.all([
                axios.get("/characters"), // 전체 캐릭터 목록
-               axios.get("/characters/my-characters") // 사용자가 가진 캐릭터 목록(아이디만)
+               axios.get("/characters/my-characters"), // 사용자가 가진 캐릭터 목록(아이디만)
+               axios.get("/stretches") // 전체 자세세 목록
             ]);
             setCharacterMap(allRes.data);
             setCharacterUserGetMap(useRes.data);
