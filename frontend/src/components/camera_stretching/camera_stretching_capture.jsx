@@ -51,7 +51,7 @@ function CameraStretchingCapture({ handleIsStretching, sendFrameTime }) {
         });
         if(res.ok){
           const { isStretching } = await res.json();
-          console.log("✅ 서버 응답:", data);
+          console.log("✅ 서버 응답:", isStretching);
           handleIsStretching(isStretching);
         }
       } catch (err) {

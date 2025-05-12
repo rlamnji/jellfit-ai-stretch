@@ -1,5 +1,4 @@
 import { BrowserRouter, Route, Routes } from "react-router-dom";
-// import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { useState } from "react";
 import LoginPage from '../pages/login/login_page';
 import HomePage from '../pages/home/home_page';
@@ -20,7 +19,8 @@ function Router() {
     return (
         <BrowserRouter>
             <Routes>
-                <Route path="/" element={<SelectGuidePage setStretchingOrder={setStretchingOrder}/>} />
+                <Route path="/" element={<LoginPage />} />
+
                 {/* 로그인과 회원가입 */}
                 <Route path="/login" element={<LoginPage />} />
                 <Route path="/join" element={<JoinPage />} />
@@ -47,7 +47,7 @@ function Router() {
                     path="/guide/userStretching/:stretchingId"
                     element={<SelfStretchPage stretchingOrder={stretchingOrder}/>} 
                 />
-                <Route path="/guide/complete" element={<GuideCompletePage />}
+                <Route path="/guide/complete" element={<GuideCompletePage />} /> 
                     
             
                     

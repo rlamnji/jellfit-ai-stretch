@@ -1,4 +1,4 @@
-import CameraStretchingScreen from "../../components/camera/camera_stretching_screen";
+import CameraStretchingScreen from "../../components/camera_stretching/camera_stretching_screen";
 import TopBar from "../../components/top_bar";
 import { useParams, useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
