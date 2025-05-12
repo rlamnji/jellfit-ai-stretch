@@ -1,4 +1,4 @@
-function CameraConsent({ onAllow }) {
+function CameraCaliConsent({ onAllow }) {
     const requestCameraAccess = async () => {
       try {
         const stream = await navigator.mediaDevices.getUserMedia({ video: true });
@@ -23,5 +23,5 @@ function CameraConsent({ onAllow }) {
     );
   }
   
-  export default CameraConsent;
+  export default CameraCaliConsent;
   

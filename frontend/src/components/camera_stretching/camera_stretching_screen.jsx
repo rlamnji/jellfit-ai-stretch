@@ -1,19 +1,19 @@
 import { useState } from "react";
-import CameraConsent from "./camera_consent";
-import CameraCapture from "./camera_capture";
+import CameraStretchingConsent from "./camera_consent";
+import CameraStretchingCapture from "./camera_capture";
 
-function CameraScreen({ handleIsStretching, sendFrameTime }) {
+function CameraStretchingScreen({ handleIsStretching, sendFrameTime }) {
   const [allowed, setAllowed] = useState(false);
 
   return (
     <>
       {allowed ? (
-        <CameraCapture handleIsStretching={handleIsStretching} sendFrameTime={sendFrameTime}/>
+        <CameraStretchingCapture handleIsStretching={handleIsStretching} sendFrameTime={sendFrameTime}/>
       ) : (
-        <CameraConsent onAllow={() => setAllowed(true)} />
+        <CameraStretchingConsent onAllow={() => setAllowed(true)} />
       )}
     </>
   );
 }
 
-export default CameraScreen;
+export default CameraStretchingScreen;

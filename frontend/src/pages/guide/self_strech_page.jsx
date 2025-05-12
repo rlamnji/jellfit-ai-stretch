@@ -1,6 +1,6 @@
-import CameraScreen from "../../components/camera/camera_screen";
+import CameraStretchingScreen from "../../components/camera/camera_stretching_screen";
 import TopBar from "../../components/top_bar";
-import { Link, useParams, useNavigate } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 
 //좌우 여부 DB에 추가해서 해야하나?
@@ -90,7 +90,7 @@ function SelfStretchPage({ stretchingOrder }) {
             <div>반복 횟수</div>
             <div>{currentRepeat} / {stretching.repeatCount}</div>
             {/* 해당 화면을 벗어날 때 카메라가 꺼지도록 코드 수정해야 함. */}
-            <CameraScreen handleIsStretching={handleIsStretching} sendFrameTime={sendFrameTime}/>
+            <CameraStretchingScreen handleIsStretching={handleIsStretching} sendFrameTime={sendFrameTime}/>
             {/* <div className="videoArea w-[90%] h-[80%] border"></div> */}
         </div>
     );

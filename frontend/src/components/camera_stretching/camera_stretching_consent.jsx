@@ -1,4 +1,4 @@
-function CameraConsent({ onAllow }) {
+function CameraStretchingConsent({ onAllow }) {
   const requestCameraAccess = async () => {
     try {
       const devices = await navigator.mediaDevices.enumerateDevices();
@@ -32,4 +32,4 @@ function CameraConsent({ onAllow }) {
   );
 }
 
-export default CameraConsent;
+export default CameraStretchingConsent;

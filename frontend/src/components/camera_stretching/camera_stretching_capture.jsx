@@ -1,6 +1,6 @@
 import { useRef, useEffect } from "react";
 
-function CameraCapture({ handleIsStretching, sendFrameTime }) {
+function CameraStretchingCapture({ handleIsStretching, sendFrameTime }) {
   const videoRef = useRef(null);
   const canvasRef = useRef(null); // canvasRef 초기화
   const streamRef = useRef(null); // 스트림을 저장할 ref
@@ -86,4 +86,4 @@ function CameraCapture({ handleIsStretching, sendFrameTime }) {
   );
 }
 
-export default CameraCapture;
+export default CameraStretchingCapture;

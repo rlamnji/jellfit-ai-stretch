@@ -1,19 +1,19 @@
 import { useState } from "react";
-import CameraConsent from "./camera_consent";
-import CameraCapture from "./camera_capture";
+import CameraCaliConsent from "./camera_consent";
+import CameraCaliCapture from "./camera_capture";
 
-function CameraScreen() {
+function CameraCaliScreen() {
   const [allowed, setAllowed] = useState(false);
 
   return (
     <>
       {allowed ? (
-        <CameraCapture />
+        <CameraCaliCapture />
       ) : (
-        <CameraConsent onAllow={() => setAllowed(true)} />
+        <CameraCaliConsent onAllow={() => setAllowed(true)} />
       )}
     </>
   );
 }
 
-export default CameraScreen;
+export default CameraCaliScreen;

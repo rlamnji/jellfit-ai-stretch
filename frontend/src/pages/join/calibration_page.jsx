@@ -1,7 +1,7 @@
 // 자세 캘리브레이션 페이지
 // 상단 컴포
 // 카메라 컴포
-import CameraScreen from "../../components/camera/camera_screen";
+import CameraCaliScreen from "../../components/camera/camera_cali_screen";
 
 function CalibrationPage(){
     return (
@@ -24,7 +24,7 @@ function CalibrationPage(){
                     </div>
 
                     {/* 카메라 <CameraComponent />컴포넌트 */}
-                    <CameraScreen/>
+                    <CameraCaliScreen/>
                 </div>
             </div>
         </div>
