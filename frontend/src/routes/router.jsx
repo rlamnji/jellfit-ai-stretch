@@ -13,6 +13,7 @@ import SelectGuidePage from "../pages/guide/select_guide_page";
 import SelfStretchPage from "../pages/guide/self_strech_page";
 import WatchGuidePage from "../pages/guide/watch_guide_page";
 import GuideCompletePage from "../pages/guide/guide_complete_page";
+import CalibrationPage from "../pages/join/calibration_page";
 
 function Router() {
     const [stretchingOrder, setStretchingOrder] = useState([]);
@@ -24,6 +25,7 @@ function Router() {
                 <Route path="/login" element={<LoginPage />} />
                 <Route path="/join" element={<JoinPage />} />
                 <Route path="/condition" element={<ConditionPage />} />
+                <Route path="/condition/:id" element={<CalibrationPage />} />
                 
                 {/* 홈화면 */}
                 <Route path="/home" element={<HomePage />} /> 
@@ -47,7 +49,6 @@ function Router() {
                 />
                 <Route path="/guide/complete" element={<GuideCompletePage />}
                     
-                {/* 자 이제 각 컴포넌트가 페이지 이동을 잘 할 수 있도록 코드 짜야 함. */}
             
                     
                 {/* 일지 화면 */}   
