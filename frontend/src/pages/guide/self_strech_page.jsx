@@ -25,6 +25,8 @@ function SelfStretchPage({ stretchingOrder }) {
     useEffect(() => {
         async function fetchStretchingData() {
             const data = await getStretchingData(stretchingId);
+            console.log("지금확인해야할 것")
+            console.log(data);
             setStretching(data);
         }
         fetchStretchingData();
@@ -32,15 +34,15 @@ function SelfStretchPage({ stretchingOrder }) {
     
     // 시간 다 채우면 반복 횟수 + 1
     useEffect(() => {
-        if (currentStretchingTime >= stretching.time) {
+        if (stretching && currentStretchingTime >= stretching.time) {
             setCurrentStretchingTime(0); // 시간 초기화
             setCurrentRepeat(prev => prev + 1); // 반복 횟수 증가
         }
-    }, [currentStretchingTime, stretching.time]);
+    }, [currentStretchingTime, stretching]);
 
     // 반복 횟수 다 채우면 완료 또는 다음으로 이동.
     useEffect(() => {
-        if (currentRepeat >= stretching.repeatCount) {
+        if (stretching && currentRepeat >= stretching.repeatCount) {
             console.log("스트레칭 종료 또는 다음으로 이동");
 
             // 스트레칭 완료
@@ -51,7 +53,7 @@ function SelfStretchPage({ stretchingOrder }) {
                 navigate(`/guide/userStretching/${nextStretchingId}`);
             }
         }
-    }, [currentRepeat, stretching.repeatCount]); 
+    }, [currentRepeat, stretching]); 
     
 
     async function getStretchingData(stretchingId) {

@@ -20,30 +20,31 @@ function LoginPage(){
     };
     //여기서부터 서버 연결 코드
     const handleLogin = (e) =>{
-        if (!isValid){
-            e.preventDefault();
-        };
-        const res = sendUserLoginData(id, password);
-        const { accessToken } = res.json();
-        if(res.ok){
-            sessionStorage.setItem("accessToken", accessToken); //엑세스토큰 저장.
-            navigate("/home");
-        } else if(res.status === 400){
-            alert("아이디 또는 비밀번호를 잘못 입력했습니다.");
-        };
+        navigate("/home");
+        // if (!isValid){
+        //     e.preventDefault();
+        // };
+        // const res = sendUserLoginData(id, password);
+        // const { accessToken } = res.json();
+        // if(res.ok){
+        //     sessionStorage.setItem("accessToken", accessToken); //엑세스토큰 저장.
+        //     navigate("/home");
+        // } else if(res.status === 400){
+        //     alert("아이디 또는 비밀번호를 잘못 입력했습니다.");
+        // };
     };
-    const sendUserLoginData = (id, password) =>{
-        fetch("/auth/login", {
-            method : "POST",
-            headers : {
-                "Content-Type" : "application/json"
-            },
-            body : JSON.stringify({
-                id : id,
-                password : password
-            })
-        });
-    };
+    // const sendUserLoginData = (id, password) =>{
+    //     fetch("/auth/login", {
+    //         method : "POST",
+    //         headers : {
+    //             "Content-Type" : "application/json"
+    //         },
+    //         body : JSON.stringify({
+    //             id : id,
+    //             password : password
+    //         })
+    //     });
+    // };
 
     return (
         <div className='w-full h-screen bg-space flex flex-col items-center'>
