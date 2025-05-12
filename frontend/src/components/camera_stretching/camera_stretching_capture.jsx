@@ -45,7 +45,7 @@ function CameraStretchingCapture({ handleIsStretching, sendFrameTime }) {
       formData.append("file", blob, "frame.jpg");
 
       try {
-        const res = await fetch("/analyze", {
+        const res = await fetch("http://localhost:8000/guide/analyze", {
           method: "POST",
           body: formData,
         });
