@@ -14,28 +14,21 @@ function WatchGuidePage(){
     }, [stretchingId]);
 
     async function getStretchingData(stretchingId) {
-        const mockData = {
-            name: "손목 돌리기",
-            videoURL: "https://www.youtube.com/embed/-0nB9SlxzO4",
-            time:0,
-            repeatCount:5
-        };
-        return mockData;
 
-        // 서버와 연결 시 아래 코드 사용
-        // const res = await fetch(`/guide/stretching/${stretchingId}`, {
-        //     method: 'GET',
-        //     headers: {
-        //         'Content-Type': 'application/json',
-        //     },
-        // });
-        // if (res.ok) {
-        //     const { stretching } = await res.json();
-        //     return stretching;
-        // } else {
-        //     console.error('스트레칭이 없습니다.');
-        //     return null;
-        // }
+        const res = await fetch(`http://localhost:8000/guide/stretching/${stretchingId}`, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+        });
+        if (res.ok) {
+            const stretching = await res.json();
+            console.log(stretching);
+            return stretching;
+        } else {
+            console.error('스트레칭이 없습니다.');
+            return null;
+        }
     }
     if (!stretching) {
         return <div>데이터를 불러오고 있습니다...</div>; // 데이터가 로드될 때까지 로딩 화면 표시
