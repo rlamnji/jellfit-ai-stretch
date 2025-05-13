@@ -1,14 +1,16 @@
 import InputField from '../../components/input_field';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { useState } from 'react';
 import imgLogo from '../../assets/images/etc/logo_title.png';
 import imgCloudLeft from '../../assets/images/etc/cloud_left.png';
 import imgCloudRight from '../../assets/images/etc/cloud_right.png';
 
 function LoginPage(){
+
     const [id, setId] = useState('');
     const [password, setPassword] = useState('');
     const isValid = id.length >= 1 && password.length >= 1;
+    const navigate = useNavigate();
 
     const handleIdInput = (value) => {
         setId(value);
@@ -16,6 +18,33 @@ function LoginPage(){
     const handlePasswordInput = (value) => {
         setPassword(value);
     };
+    //여기서부터 서버 연결 코드
+    const handleLogin = (e) =>{
+        navigate("/home");
+        // if (!isValid){
+        //     e.preventDefault();
+        // };
+        // const res = sendUserLoginData(id, password);
+        // const { accessToken } = res.json();
+        // if(res.ok){
+        //     sessionStorage.setItem("accessToken", accessToken); //엑세스토큰 저장.
+        //     navigate("/home");
+        // } else if(res.status === 400){
+        //     alert("아이디 또는 비밀번호를 잘못 입력했습니다.");
+        // };
+    };
+    // const sendUserLoginData = (id, password) =>{
+    //     fetch("/auth/login", {
+    //         method : "POST",
+    //         headers : {
+    //             "Content-Type" : "application/json"
+    //         },
+    //         body : JSON.stringify({
+    //             id : id,
+    //             password : password
+    //         })
+    //     });
+    // };
 
     return (
         <div className='w-full h-screen bg-space flex flex-col items-center'>
@@ -28,27 +57,22 @@ function LoginPage(){
                     <InputField id='id' title='아이디' type='text' placeholder='' onTextChange={handleIdInput} />
                     <InputField id='password' title='비밀번호' type='password' placeholder='' onTextChange={handlePasswordInput} />
                     
-                    <div className='findContainer w-[280px] mt-2 flex justify-end'>
+                    {/* <div className='findContainer w-[280px] mt-2 flex justify-end'>
                         <Link className='text-input-text-color text-sm'>아이디 찾기</Link>
                         <div className='ml-1 mr-1 text-input-text-color text-sm'>|</div>
                         <Link className='text-input-text-color text-sm'>비밀번호 찾기</Link>
-                    </div>
+                    </div> */}
 
                     <div
                         className={`loginBtn w-[266px] h-[60px] mt-10 mb-4 flex justify-center items-center rounded-[40px] 
                         ${isValid ? 'bg-button-color' : 'bg-disabled-button-color cursor-not-allowed'}`}
                     >
-                        <Link
-                            to={isValid ? '/home' : '#'}
+                        <button
                             className={`font-semibold text-white text-xl ${isValid ? '' : 'pointer-events-none'}`}
-                            onClick={(e) => {
-                                if (!isValid){
-                                    e.preventDefault();
-                                }
-                            }}
+                            onClick={handleLogin}
                         >
                             로그인
-                        </Link>
+                        </button>
                     </div>
                 </div>
 

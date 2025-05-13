@@ -1,5 +1,5 @@
 import InputField from '../../components/input_field';
-import { Link } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { useState } from 'react';
 import imgLogo from '../../assets/images/etc/logo_title.png';
 import imgCloudLeft from '../../assets/images/etc/cloud_left.png';
@@ -7,6 +7,8 @@ import imgCloudRight from '../../assets/images/etc/cloud_right.png';
 
 
 function JoinPage (){
+    const navigate = useNavigate();
+
     const [id, setId] = useState('');
     const [password, setPassword] = useState('');
     const [passwordConfirm, setPasswordConfirm] = useState('');
@@ -25,6 +27,40 @@ function JoinPage (){
     const handleNicknameInput = (value) =>{
         setNickname(value);
     }
+
+    // 여기서부터 서버 연결하면 주석 해제.
+    const sendUserJoinData = async (id, password, nickname) =>{
+        // fetch("/auth/join", {
+        //     method : "POST",
+        //     headers : {
+        //         "Content-Type" : "application/json"
+        //     },
+        //     body : JSON.stringify({
+        //         id : id,
+        //         password : password,
+        //         nickname : nickname
+        //     })
+        // });
+        // return res;
+        return id;
+    }
+    const handleJoin = (e) => {
+        if (!isValid){
+            e.preventDefault();
+        }
+        const userCode = sendUserJoinData(id, password, nickname);
+        console.log(userCode); //이거 id로 깔끔하게 나와야 함.
+        navigate(`/condition/${userCode}`); // 회원가입 완료 후 캘리브레이션 페이지로 이동.
+        // if(res.ok){
+            // const userCode = sendUserJoinData(id, password, nickname);
+            // console.log(userCode); //이거 id로 깔끔하게 나와야 함.
+            // navigate(`/condition/${resId}`); //로그인 페이지로 이동.
+        // } else {
+        //     alert("회원가입에 실패했습니다."); //에러 처리 나중에 수정.
+        // }
+
+    };
+
     return (
         <div className='w-full h-screen bg-space flex flex-col items-center'>
             <div className='header w-fit h-fit p-1'>
@@ -42,17 +78,12 @@ function JoinPage (){
                         className={`loginBtn w-[266px] h-[60px] mt-10 mb-4 flex justify-center items-center rounded-[40px] 
                         ${isValid ? 'bg-button-color' : 'bg-disabled-button-color cursor-not-allowed'}`}
                     >
-                        <Link
-                            to={isValid ? '/condition/:id' : '#'}
+                        <button
                             className={`font-semibold text-white text-xl ${isValid ? '' : 'pointer-events-none'}`}
-                            onClick={(e) => {
-                                if (!isValid){
-                                    e.preventDefault();
-                                }
-                            }}
+                            onClick={() => {handleJoin(id, isValid)}}
                         >
                             완료
-                        </Link>
+                        </button>
                     </div>
                 </div>
 
@@ -63,3 +94,4 @@ function JoinPage (){
     );
 }
 export default JoinPage;
+

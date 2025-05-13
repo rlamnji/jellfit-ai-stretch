@@ -50,7 +50,7 @@ function StartButton() {
             )}
 
           {/* 가이드모드 아이콘 */}
-          <Link to="/guide/body">
+          <Link to="/guide/select">
             <img src={guideModeBtn} className="flex items-end w-[150px] mt-4  transition-transform duration-200 animate-[moveingCopy_3s_ease-in-out_infinite] cursor-pointer hover:animate-none hover:-translate-y-[5px] hover:scale-[1.02]" alt="가이드모드" />
           </Link>
         </div>

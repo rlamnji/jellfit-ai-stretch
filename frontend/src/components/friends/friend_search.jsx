@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import BackBtn from '../buttons/back_btn';
 import SoundBtn from '../buttons/sound_btn';
-import axios from 'axios';
+// import axios from 'axios';
 
 // 이미지
 import background from '../../assets/images/etc/basic_background2.png';

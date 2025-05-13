@@ -3,7 +3,7 @@ import { useRef, useEffect, useState } from "react";
 import { Pose } from "@mediapipe/pose";
 import { Camera } from "@mediapipe/camera_utils";
 
-function CameraCapture() {
+function CameraCaliCapture() {
   const videoRef = useRef(null);
   const canvasRef = useRef(null);
   const guideCanvasRef = useRef(null);
@@ -307,4 +307,4 @@ function CameraCapture() {
   );
 }
 
-export default CameraCapture;
+export default CameraCaliCapture;
