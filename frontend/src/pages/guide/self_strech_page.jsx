@@ -1,96 +1,142 @@
-import CameraStretchingScreen from "../../components/camera_stretching/camera_stretching_screen";
-import TopBar from "../../components/top_bar";
-import { useParams, useNavigate } from "react-router-dom";
-import { useEffect, useState } from "react";
+    import CameraStretchingScreen from "../../components/camera_stretching/camera_stretching_screen";
+    import TopBar from "../../components/top_bar";
+    import { useParams, useNavigate } from "react-router-dom";
+    import { useEffect, useState } from "react";
 
-//좌우 여부 DB에 추가해서 해야하나?
-//좌우 여부에 대한 것 아직 반영 안함. 추후 구현 해야 함.
-function SelfStretchPage({ stretchingOrder }) {
+    function SelfStretchPage({ stretchingOrder }) {
     const navigate = useNavigate();
     const { stretchingId } = useParams();
     const [stretching, setStretching] = useState(null);
 
-    const sendFrameTime = 300; //0.3초마다 프레임 전송
+    const sendFrameTime = 300; // 0.3초마다 프레임 전송
     const [currentStretchingTime, setCurrentStretchingTime] = useState(0);
     const [isStretching, setIsStretching] = useState(false);
-
     const [currentRepeat, setCurrentRepeat] = useState(0);
 
     const handleIsStretching = (isStretching) => {
-        setIsStretching(isStretching); //지금 스트레칭 중인지 여부 확인.
+        setIsStretching(isStretching);
+
         if (isStretching) {
+        if (stretching?.time != null) {
             setCurrentStretchingTime((prev) => prev + sendFrameTime);
+        } else if (stretching?.repeatCount != null) {
+            setCurrentRepeat((prev) => prev + 1);
+        }
         }
     };
+
     useEffect(() => {
         async function fetchStretchingData() {
-            const data = await getStretchingData(stretchingId);
-            console.log("지금확인해야할 것")
-            console.log(data);
-            setStretching(data);
+        const data = await getStretchingData(stretchingId);
+        console.log("스트레칭 응답 데이터:", data);
+        setStretching(data);
         }
         fetchStretchingData();
     }, [stretchingId]);
-    
-    // 시간 다 채우면 반복 횟수 + 1
+
+    // 시간이 다 되었을 경우 반복 증가
     useEffect(() => {
-        if (stretching && currentStretchingTime >= stretching.time) {
-            setCurrentStretchingTime(0); // 시간 초기화
-            setCurrentRepeat(prev => prev + 1); // 반복 횟수 증가
+        if (stretching && stretching.time != null && stretching.repeatCount != null) {
+        if (currentStretchingTime >= stretching.time) {
+            setCurrentStretchingTime(0);
+            setCurrentRepeat((prev) => prev + 1);
+        }
         }
     }, [currentStretchingTime, stretching]);
 
-    // 반복 횟수 다 채우면 완료 또는 다음으로 이동.
+    // 다음 페이지 이동 조건 처리
     useEffect(() => {
-        if (stretching && currentRepeat >= stretching.repeatCount) {
-            console.log("스트레칭 종료 또는 다음으로 이동");
+        if (!stretching) return;
 
-            // 스트레칭 완료
-            if (stretchingId === stretchingOrder[stretchingOrder.length - 1]) {
-                navigate('/guide/complete');
-            } else {
-                const nextStretchingId = stretchingOrder[stretchingOrder.indexOf(stretchingId) + 1];
-                navigate(`/guide/userStretching/${nextStretchingId}`);
-            }
+        const isRepeatFinished =
+        stretching.repeatCount != null && currentRepeat >= stretching.repeatCount;
+
+        const isTimeFinished =
+        stretching.repeatCount == null &&
+        stretching.time != null &&
+        currentStretchingTime >= stretching.time;
+
+        if (isRepeatFinished || isTimeFinished) {
+        console.log("스트레칭 종료 또는 다음으로 이동");
+
+        if (stretchingId === stretchingOrder[stretchingOrder.length - 1]) {
+            navigate("/guide/complete");
+        } else {
+            const nextStretchingId =
+            stretchingOrder[stretchingOrder.indexOf(stretchingId) + 1];
+            navigate(`/guide/userStretching/${nextStretchingId}`);
         }
-    }, [currentRepeat, stretching]); 
-    
+        }
+    }, [currentRepeat, currentStretchingTime, stretching]);
 
     async function getStretchingData(stretchingId) {
-
         const res = await fetch(`http://localhost:8000/guide/stretching/${stretchingId}`, {
-            method: 'GET',
-            headers: {
-                'Content-Type': 'application/json',
-            },
+        method: "GET",
+        headers: {
+            "Content-Type": "application/json",
+        },
         });
+
         if (res.ok) {
-            const stretching = res.json();
-            console.log('스트레칭 데이터:', stretching);
-            return stretching;
+        const data = await res.json();
+        return data;
         } else {
-            console.error('스트레칭이 없습니다.');
-            return null;
+        console.error("스트레칭 데이터를 가져오지 못했습니다.");
+        return null;
         }
     }
+
     if (!stretching) {
-        return <div>데이터를 불러오고 있습니다...</div>; // 데이터가 로드될 때까지 로딩 화면 표시
+        return <div>데이터를 불러오고 있습니다...</div>;
     }
-    return(
+
+    return (
         <div className="w-full h-screen flex flex-col items-center bg-space">
-            <TopBar />
-            <div>{stretching.name}</div>
-            <div>현재 시간 / 전체 시간</div>
-            <div> 00 : {Math.floor(currentStretchingTime)} / 00 : {stretching.time}</div>
-            <div>반복 횟수</div>
-            <div>{currentRepeat} / {stretching.repeatCount}</div>
-            {/* 해당 화면을 벗어날 때 카메라가 꺼지도록 코드 수정해야 함. */}
-            <CameraStretchingScreen handleIsStretching={handleIsStretching} sendFrameTime={sendFrameTime}/>
-            {/* <div className="videoArea w-[90%] h-[80%] border"></div> */}
+        <TopBar />
+        <div className="text-xl font-bold mt-4">{stretching.name}</div>
+
+        {stretching.time != null && (
+            <>
+            <div className="mt-4">현재 시간 / 전체 시간</div>
+            <div>
+                00 : {Math.floor(currentStretchingTime / 1000)} / 00 :{" "}
+                {stretching.time}
+            </div>
+            </>
+        )}
+
+        {stretching.repeatCount != null && (
+            <>
+            <div className="mt-4">반복 횟수</div>
+            <div>
+                {currentRepeat} / {stretching.repeatCount}
+            </div>
+            </>
+        )}
+
+        <CameraStretchingScreen
+            handleIsStretching={handleIsStretching}
+            sendFrameTime={sendFrameTime}
+        />
+
+        {/* ✅ 임시용 버튼 */}
+                <button
+            className="mt-4 px-4 py-2 bg-gray-600 text-white rounded hover:bg-gray-700"
+            onClick={() => {
+                const currentIdx = stretchingOrder.indexOf(Number(stretchingId));
+
+                if (currentIdx === stretchingOrder.length - 1) {
+                navigate("/guide/complete");
+                } else {
+                const nextStretchingId = stretchingOrder[currentIdx + 1];
+                navigate(`/guide/video/${nextStretchingId}`); // ✅ 가이드 영상으로 바로 이동
+                }
+            }}
+            >
+            다음으로 넘어가기 (임시)
+            </button>
         </div>
     );
-}
-export default SelfStretchPage;
+    }
 
-
-    
+    export default SelfStretchPage;

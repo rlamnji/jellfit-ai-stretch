@@ -2,7 +2,7 @@ import TopBar from "../../components/top_bar";
 import { Link, useParams } from "react-router-dom";
 import { useEffect, useState } from "react";
 // 동적으로 불러오는 영상이기 때문에, 영상 주소를 props로 받아서 사용해야 함. (미완성)
-function WatchGuidePage(){
+function WatchGuidePage({ stretchingOrder }){
     const { stretchingId } = useParams();
     const [stretching, setStretching] = useState(null);
     useEffect(() => {
