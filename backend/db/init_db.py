@@ -1,3 +1,6 @@
+import sys, os
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
+
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from db.models import Base, User, Category, Pose, Routine, RoutinePose, Character
@@ -17,15 +20,48 @@ db.add(User(user_id=1, username="테스터1", id="temp001", password="1234", int
 db.add(User(user_id=2, username="테스터2", id="temp002", password="5678"))
 db.add(User(user_id=3, username="테스터3", id="temp003", password="9101112"))
 
+
 db.add(Category(category_id=1, name="목"))
 db.add(Category(category_id=2, name="어깨"))
-db.add(Category(category_id=3, name="팔"))
+db.add(Category(category_id=3, name="팔/손목"))
+db.add(Category(category_id=4, name="등/허리"))
+db.add(Category(category_id=5, name="가슴"))
 
-db.add(Pose(pose_id=1, name="연습", duration=2, count=2, category_id=1))
-db.add(Pose(pose_id=2, name="목 돌리기", duration=5, count=4, video_url="https://example.com/video.mp4", thumbnail_url="https://example.com/thumb.jpg", category_id=1))
-db.add(Pose(pose_id=3, name="팔 돌리기", duration=10, count=4, category_id=2))
-db.add(Pose(pose_id=4, name="어깨 늘리기", duration=10, count=2, category_id=2))
-db.add(Pose(pose_id=5, name="손목 늘리기", duration=5, count=4, category_id=3))
+db.add(Pose(pose_id=6, name="손목돌리기", duration=None, count=5,
+            video_url="https://www.youtube.com/shorts/-0nB9SlxzO4",
+            thumbnail_url="/images/stretching/smdrg",
+            category_id=3))  # 팔/손목
+
+db.add(Pose(pose_id=7, name="팔꿈치굽혀서옆구리늘리기", duration=10, count=1,
+            video_url="https://www.youtube.com/watch?v=RobdPJZAXdM",
+            thumbnail_url="/images/stretching/pkcghsygnrrg",
+            category_id=4))  # 등/허리
+
+db.add(Pose(pose_id=8, name="T자가슴열기", duration=10, count=None,
+            video_url="https://www.youtube.com/shorts/G-1VPhV0Yhl",
+            thumbnail_url=None,
+            category_id=5))  # 가슴
+
+db.add(Pose(pose_id=9, name="Y자가슴열기", duration=10, count=None,
+            video_url="https://www.youtube.com/shorts/G-1VPhV0Yhl",
+            thumbnail_url=None,
+            category_id=5))  # 가슴
+
+db.add(Pose(pose_id=10, name="손걸고잡아당기기", duration=5, count=None,
+            video_url="https://www.youtube.com/shorts/8q3lHCP3E7g",
+            thumbnail_url=None,
+            category_id=2))  # 어깨
+
+db.add(Pose(pose_id=11, name="팔앞으로쭉뻗기", duration=5, count=3,
+            video_url="https://www.youtube.com/shorts/ye8pe1j5OeQ",
+            thumbnail_url="/images/stretching/paprjpg",
+            category_id=4))  # 등/허리
+
+db.add(Pose(pose_id=12, name="팔뻗고옆구리늘리기", duration=10, count=None,
+            video_url=None,
+            thumbnail_url=None,
+            category_id=4))  # 등/허리
+
 
 db.add(Routine(routine_id=1, user_id=1, image_url="https://example.com/routine1.jpg"))
 db.add(Routine(routine_id=2, user_id=2))
