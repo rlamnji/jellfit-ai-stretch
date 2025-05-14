@@ -52,17 +52,6 @@ function FriendRequest({ setSelectedTab }) {
     console.log('삭제 버튼 클릭');
   };
 
-  // 백엔드 연동 테스트 ==> 됨
-  const test = () => {
-    axios.get('http://127.0.0.1:8000/characters')
-      .then(res => {
-        console.log(res.data);
-      })
-      .catch(error => {
-        console.error('거절 실패:', error);
-      });
-  };
-
   return (
     <div>
       <img
@@ -123,7 +112,7 @@ function FriendRequest({ setSelectedTab }) {
               <div className="font-bold text-[24px]">해파리가되</div>
             </div>
             <img src={checkBtn} className="cursor-pointer w-[50px]" onClick={()=>(handleAccept())}/>
-            <img src={cancelBtn} className="cursor-pointer w-[50px]" onClick={()=>{handleReject(); test();}}/>
+            <img src={cancelBtn} className="cursor-pointer w-[50px]" onClick={()=>{handleReject()}}/>
           </div>
 
         </div>
