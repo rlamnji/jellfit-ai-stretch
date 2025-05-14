@@ -25,18 +25,7 @@ class StretchTracker:
         self.counts = { 'left': 0, 'right': 0 }
 
     def extract_landmarks(self, frame: Dict) -> Dict[str, float]:
-        """
-        프론트엔드에서 전달된 랜드마크 프레임에서 필요한 feature 계산
-        frame: {idx: (x,y,z)} 형태의 dict
-        returns: eye_level_diff, shoulder_level_diff 등
-        """
-        # 예: frame[5][1] 은 왼쪽 눈 y, frame[2][1] 은 오른쪽 눈 y
-        eye_diff = frame[5][1] - frame[2][1]
-        shoulder_diff = frame[12][1] - frame[11][1]
-        return {
-            'eye_level_diff': eye_diff,
-            'shoulder_level_diff': shoulder_diff
-        }
+        return 0
 
     def detect_direction(self, feats: Dict[str, float]) -> str:
         """
