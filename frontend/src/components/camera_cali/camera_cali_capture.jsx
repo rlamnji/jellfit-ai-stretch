@@ -1,9 +1,11 @@
 // 자세 측정
 import { useRef, useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { Pose } from "@mediapipe/pose";
 import { Camera } from "@mediapipe/camera_utils";
 
 function CameraCaliCapture() {
+  const navigate = useNavigate();
   const videoRef = useRef(null);
   const canvasRef = useRef(null);
   const guideCanvasRef = useRef(null);
@@ -61,13 +63,29 @@ function CameraCaliCapture() {
     }
   };
 
+  // 페이지이동 테스트 (인식 X)
+  useEffect(() => {
+  if (isCameraOn) {
+    const timer = setTimeout(() => {
+      stopCamera();
+      alert("캘리브레이션 종료 (임시 테스트)");
+      navigate("/login");
+    }, 5000);
+
+    return () => clearTimeout(timer); // 컴포넌트 언마운트 시 정리
+  }
+}, [isCameraOn]);
 
   // 가이드선 그리기
   useEffect(() => {
     const guideCanvas = guideCanvasRef.current;
-    const ctx = guideCanvas.getContext("2d");
+    if (!guideCanvas) return;
+      const ctx = guideCanvas.getContext("2d");
+    if (!ctx) return;
+    
 
     const drawGuide = () => {
+      if (!guideCanvas || !ctx) return;
       ctx.clearRect(0, 0, guideCanvas.width, guideCanvas.height);
       if (!isCameraOn) return; 
 
@@ -171,8 +189,8 @@ function CameraCaliCapture() {
       // 정자세: 3초 이상 연속 유지시 -> 캡쳐
       if (step === "posture" && !postureSuccess) {
         const isAligned =
-          Math.abs(getY(11) - 0.66) < 0.07 &&
-          Math.abs(getY(12) - 0.66) < 0.07;
+          Math.abs(getY(11) - 0.66) < 0.08 &&
+          Math.abs(getY(12) - 0.66) < 0.08;
 
         if (isAligned) {
           if (!postureStartTime) {
@@ -205,10 +223,10 @@ function CameraCaliCapture() {
       // T자 자세: 3초 이상 연속 유지시 -> 캡쳐
       if (step === "tpose" && !tposeSuccess) {
         const isAligned =
-          Math.abs(getY(11) - 0.55) < 0.07 &&
-          Math.abs(getY(12) - 0.55) < 0.07 &&
-          Math.abs(getY(15) - 0.55) < 0.07 &&
-          Math.abs(getY(16) - 0.55) < 0.07;
+          Math.abs(getY(11) - 0.55) < 0.08 &&
+          Math.abs(getY(12) - 0.55) < 0.08 &&
+          Math.abs(getY(15) - 0.55) < 0.08 &&
+          Math.abs(getY(16) - 0.55) < 0.08;
 
         if (isAligned) {
           if (!tposeStartTime) {
@@ -225,7 +243,8 @@ function CameraCaliCapture() {
               tposeSuccess = true;
 
               setTimeout(() => {
-                console.log("캘리브레이션 종료");
+                alert("캘리브레이션 종료");
+                navigate("/login");
               }, 2000);
             }
           }
@@ -258,8 +277,18 @@ function CameraCaliCapture() {
           ref={videoRef}
           autoPlay
           playsInline
-          className="absolute top-0 left-0 w-full h-full rounded-xl transform scale-x-[-1]"
+          className={`absolute top-0 left-0 w-full h-full rounded-xl transform scale-x-[-1] 
+            ${
+            isCameraOn
+              ? ""
+              : "border-2 border-gray-500 rounded-md border-dashed opacity-40"
+          }`}
         />
+          {!isCameraOn && (
+            <div className="absolute top-[250px] left-1/2 -translate-x-1/2 bg-black px-3 py-1 text-[30px] text-gray-500 opacity-40 rounded-xl">
+              카메라 접근이 비활성화 되어 있습니다!
+            </div>
+          )}
         <canvas
           ref={guideCanvasRef}
           width="1200"
