@@ -1,0 +1,60 @@
+landmarks: [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22]
+
+features:
+  # 양손 맞잡은 거리 (손목15 ↔ 손목16)
+  - name: hand_clasp_distance
+    type: distance
+    points: [15, 16]
+  
+  # 팔을 위로 뻗었는지 확인 (어깨-팔꿈치-손목 각도)
+  - name: left_arm_vertical_angle
+    type: angle
+    points: [11, 13, 15]  # 왼쪽 어깨-팔꿈치-손목
+  - name: right_arm_vertical_angle
+    type: angle
+    points: [12, 14, 16]  # 오른쪽 어깨-팔꿈치-손목
+
+  # 눈 레벨 차이 (왼쪽 눈 - 오른쪽 눈)
+  - name: eye_level_diff
+    type: delta_y
+    points: [5, 2]  # 왼쪽 눈(5) - 오른쪽 눈(2)
+  
+  # 어깨 레벨 차이 (왼쪽 어깨 - 오른쪽 어깨)
+  - name: shoulder_level_diff
+    type: delta_y
+    points: [12, 11]  # 왼쪽 어깨(12) - 오른쪽 어깨(11)
+
+thresholds:
+  # 손을 맞잡은 상태 확인
+  max_hand_clasp_distance: 0.5
+  
+  # 팔을 위로 뻗었는지 확인
+  min_left_arm_vertical_angle: 150   # 150도 이상이면 거의 수직
+  min_right_arm_vertical_angle: 150
+  
+  # 개발용 설정 (테스트 데이터가 2초 정도라서)
+  min_hold_duration_sec: 2
+  
+  # 실제 사용자 평가용 설정
+  # min_hold_duration_sec: 10  # 사용자가 10초 동안 자세를 유지해야 함
+
+cycles:
+  type: hold
+  count: 1
+
+# 방향 판단 로직
+direction:
+  left:
+    eye_level_diff: 
+      sign: negative  # 음수면 왼쪽
+      threshold: 0  # 최소 레벨 차이
+    shoulder_level_diff:
+      sign: negative
+      threshold: 0.03
+  right:
+    eye_level_diff:
+      sign: positive  # 양수면 오른쪽
+      threshold: 0
+    shoulder_level_diff:
+      sign: positive
+      threshold: 0.03
