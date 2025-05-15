@@ -1,11 +1,11 @@
 import CameraStretchingScreen from "../../components/camera_stretching/camera_stretching_screen";
 import TopBar from "../../components/top_bar";
+import SoundBtn from "../../components/buttons/sound_btn";
 import { useParams, useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
+import arrowLeft from '../../assets/images/icons/arrow_left.png';
 
-import StretchingModal from "../../components/stretching/modal/stretch_complete_modal";
-import CharacterModal from "../../components/stretching/modal/character_get_modal";
-import StretchQuitModal from "../../components/stretching/modal/stretch_quit_modal";
+import ModalManager from "../../components/stretching/modal/modal_manager";
 
 //좌우 여부 DB에 추가해서 해야하나?
 //좌우 여부에 대한 것 아직 반영 안함. 추후 구현 해야 함.
@@ -20,8 +20,9 @@ function SelfStretchPage({ stretchingOrder }) {
 
     const [currentRepeat, setCurrentRepeat] = useState(0);
 
-    // 모달창 테스트
-    const [showCompleteModal, setShowCompleteModal] = useState(false);
+    // (05.16_rlamnji) 모달창 관련
+    const [modalType, setModalType] = useState(null); // "complete", "getJelly", "confirmQuit"
+    const [hasJelly, setHasJelly] = useState(false);
 
     const handleIsStretching = (isStretching) => {
         setIsStretching(isStretching); //지금 스트레칭 중인지 여부 확인.
@@ -92,7 +93,14 @@ function SelfStretchPage({ stretchingOrder }) {
     }
     return(
         <div className="w-full h-screen flex flex-col items-center bg-space">
-            <TopBar />
+
+        {/*<TopBar/> ==> (05.16_rlamnji) 뒤로가기 컴포에 아예 Link가 있어서 setModalType 설정이 안되더라고!*/}
+         <div className='w-full h-14 flex justify-between'>      
+            <img src={arrowLeft} className="w-8 h-8 m-4 cursor-pointer" 
+                onClick={() => {setModalType('confirmQuit'); }} />
+            <SoundBtn />
+         </div>
+
             <div>{stretching.name}</div>
             <div>현재 시간 / 전체 시간</div>
             <div> 00 : {Math.floor(currentStretchingTime)} / 00 : {stretching.time}</div>
@@ -102,13 +110,12 @@ function SelfStretchPage({ stretchingOrder }) {
             <CameraStretchingScreen handleIsStretching={handleIsStretching} sendFrameTime={sendFrameTime}/>
             {/* <div className="videoArea w-[90%] h-[80%] border"></div> */}
 
-            {/* 모달창 테스트 코드 */}
-            {/* 스트레칭 수행 완료 시 ----> 완료 모달창 */}
-            {/* 스트레칭 수행 완료 시 && 해파리 획득 조건 만족 ----> 완료 모달창 & 해파리 획득 모달창*/}
-            {/* 스트레칭 수행 미완료 시 || 중도포기  ----> '그만두시겠겠습니까?' 모달창 */}
+
+            {/* (05.16_rlamnji) 모달창 */}
             {/*<StretchingModal />*/}
             {/*<CharacterModal />*/}
-            <StretchQuitModal/>
+            {/*<StretchQuitModal/>*/}
+            <ModalManager modalType={modalType} setModalType={setModalType} />
             
         </div>
     );

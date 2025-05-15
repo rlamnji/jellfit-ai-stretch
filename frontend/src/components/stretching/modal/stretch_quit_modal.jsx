@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import stretchModal from '../../../assets/images/icons/setting_content.png';
 import charaterGroup from '../../../assets/model/character_group.png';
 
-function StretchQuitModal(){
+function StretchQuitModal({onClose}){
     const navigator = useNavigate();
 
     return(
@@ -31,7 +31,7 @@ function StretchQuitModal(){
                 </div>
                 <div className="flex flex-row absolute bottom-10 left-1/2 -translate-x-1/2 z-[1000] text-center items-center gap-3">
                     <div className='bg-[#D9D5D3] rounded-2xl text-black font-bold p-2 text-[30px] w-[250px] cursor-pointer'
-                                    onClick={()=>navigator('/home')}
+                                    onClick={()=>onClose()}
                     >계속하기</div>
                                         <div className='bg-[#343434] rounded-2xl text-white font-bold p-2 text-[30px] w-[250px] cursor-pointer'
                                     onClick={()=>navigator('/home')}

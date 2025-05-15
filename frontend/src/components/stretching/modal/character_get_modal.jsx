@@ -6,6 +6,14 @@ import stretchModal from '../../../assets/images/icons/setting_content.png'
 function CharacterModal(){
     const navigator = useNavigate();
 
+    // 바뀌는 데이터 (해파리 이미지, 이름, 설명) 
+    // ==> 여기서 캐릭터번호 조회해서 사용자테이블(사용자캐릭터번호, 사용자번호(FK), 캐릭터번호(FK) post)
+    
+    // 필요 api
+    // 1. 헐 헷갈린다. 캐릭터 획득 기준 횟수랑(캐릭터랑 연결된 자세의 횟수) 내가 한 횟수랑 비교
+    // 맞으면 캐릭터 db에서 데이터 조회
+    // 그 후 사용자 테이블에 post
+
     return(
         <div className="fixed top-0 left-0 w-screen h-screen bg-black bg-opacity-60 z-[9999888] flex justify-center items-center pointer-events-auto">
             <div className="relative overflow-hidden">
@@ -18,6 +26,7 @@ function CharacterModal(){
                     </div>
                     <div className='bg-[#9299A4] w-[500px] h-[1px] mt-6'></div>
                 </div>
+                
                 
                 <div className="abolute z-[1000]">
                     <div className="flex absolute top-52 left-1/2 -translate-x-1/2 p-2 rounded-xl">
