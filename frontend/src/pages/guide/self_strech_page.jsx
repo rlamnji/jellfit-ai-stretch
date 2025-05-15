@@ -3,6 +3,10 @@ import TopBar from "../../components/top_bar";
 import { useParams, useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 
+import StretchingModal from "../../components/stretching/modal/stretch_complete_modal";
+import CharacterModal from "../../components/stretching/modal/character_get_modal";
+import StretchQuitModal from "../../components/stretching/modal/stretch_quit_modal";
+
 //좌우 여부 DB에 추가해서 해야하나?
 //좌우 여부에 대한 것 아직 반영 안함. 추후 구현 해야 함.
 function SelfStretchPage({ stretchingOrder }) {
@@ -15,6 +19,9 @@ function SelfStretchPage({ stretchingOrder }) {
     const [isStretching, setIsStretching] = useState(false);
 
     const [currentRepeat, setCurrentRepeat] = useState(0);
+
+    // 모달창 테스트
+    const [showCompleteModal, setShowCompleteModal] = useState(false);
 
     const handleIsStretching = (isStretching) => {
         setIsStretching(isStretching); //지금 스트레칭 중인지 여부 확인.
@@ -94,6 +101,15 @@ function SelfStretchPage({ stretchingOrder }) {
             {/* 해당 화면을 벗어날 때 카메라가 꺼지도록 코드 수정해야 함. */}
             <CameraStretchingScreen handleIsStretching={handleIsStretching} sendFrameTime={sendFrameTime}/>
             {/* <div className="videoArea w-[90%] h-[80%] border"></div> */}
+
+            {/* 모달창 테스트 코드 */}
+            {/* 스트레칭 수행 완료 시 ----> 완료 모달창 */}
+            {/* 스트레칭 수행 완료 시 && 해파리 획득 조건 만족 ----> 완료 모달창 & 해파리 획득 모달창*/}
+            {/* 스트레칭 수행 미완료 시 || 중도포기  ----> '그만두시겠겠습니까?' 모달창 */}
+            {/*<StretchingModal />*/}
+            {/*<CharacterModal />*/}
+            <StretchQuitModal/>
+            
         </div>
     );
 }
