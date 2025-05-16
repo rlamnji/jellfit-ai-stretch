@@ -17,7 +17,7 @@ function SelectGuidePage({ setStretchingOrder }) {
     const navigate = useNavigate();
 
     const subCategories = {
-        '신체부위' : ['목', '어깨', '팔/손목', '등/허리'],
+        '신체부위' : ['목', '어깨', '팔/손목', '등/허리', '가슴'],
         '상황' : ['자기 전', '일어나서', '작업 하기 전', '식사 후'],
         '내 스트레칭' : ['']
     };
@@ -43,6 +43,7 @@ function SelectGuidePage({ setStretchingOrder }) {
     }
     useEffect(() =>{
         async function fetchData() {
+            console.log(`서버로 전송할 카테고리: ${subCategory}`); //ok
             const stretchingList = await getStretchingData(subCategory); //배열로 받음.
             setStretchingList(stretchingList);
         }
@@ -50,49 +51,25 @@ function SelectGuidePage({ setStretchingOrder }) {
     }, [subCategory]);
 
     const getStretchingData = async (categoryName) => {
-        // 카테고리별 목업 데이터
-        const mockData = {
-            '팔/손목': [
-                {
-                    id: 1,
-                    name: "손목 돌리기",
-                    imageURL: "/images/stretching/smdrg.png",
-                    videoURL: "https://www.youtube.com/shorts/-0nB9SlxzO4",
-                },
-            ],
-            '등/허리': [
-                {
-                    id: 2,
-                    name: "팔꿈치 굽혀서 옆구리 늘리기",
-                    imageURL: "/images/stretching/pkcghsygrnrg.png",
-                    videoURL: "https://www.youtube.com/watch?v=RobdPJZAxdM",
-                },
-                {
-                    id: 3,
-                    name: "팔 앞으로 쭉 뻗기",
-                    imageURL: "/images/stretching/paprjpg.png",
-                    videoURL: "https://www.youtube.com/shorts/ye8pe1j5OeQ",
-                }
-            ],
-        };
-        return mockData[categoryName] || []; //없으면 빈 배열 반환.
-        //서버완성되면 mockData 지우고 이거 쓰면 됨.
-        // const res = fetch('/guide/select', {
-        //     method : 'POST',
-        //     headers : {
-        //         'content-type' : 'application/json'
-        //     },
-        //     body: JSON.stringify({
-        //         categoryName: subCategory,
-        //     })
-        // });
-        // if(res.ok){
-        //     const { stretchingList } = await res.json(); //스트레칭 id, name, imageURL, videoURL이 담긴 리스트.
-        //     return stretchingList;
-        // }else{
-        //     console.error('스트레칭이 없습니다.'); //에러처리 코드가 이게 맞는지 모르겠음. 수정 필요. (0504)
-            
-        // }
+        // 서버완성되면 mockData 지우고 이거 쓰면 됨.
+        const res = await fetch('http://localhost:8000/guide/select', {
+            method : 'POST',
+            headers : {
+                'content-type' : 'application/json'
+            },
+            body: JSON.stringify({
+                categoryName: categoryName,
+            })
+        });
+
+        if(res.ok){
+            const stretchingList = await res.json(); //스트레칭 id, name, imageURL, videoURL이 담긴 리스트.
+            console.log('스트레칭 리스트:', stretchingList); 
+            return stretchingList;
+        }else{
+            console.error('스트레칭이 없습니다.'); //에러처리 코드가 이게 맞는지 모르겠음. 수정 필요. (0504)
+            return [];
+        }
     }
     const showStretchingList = (stretchingList) => { 
         return stretchingList.map((stretching) => (
