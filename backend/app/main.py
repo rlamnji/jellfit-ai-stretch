@@ -4,6 +4,7 @@ from app.get import get_poses, get_characters
 from app.post import post_poses
 from app.auth import login
 from app.get_image import get_stretching_image
+from app.friends import add_friend, search_friends
 
 app = FastAPI()
 
@@ -21,3 +22,5 @@ app.include_router(get_characters.router, tags=["Character"])
 app.include_router(post_poses.router, tags=["Pose_Analyze"])
 app.include_router(login.router)
 app.include_router(get_stretching_image.router)
+app.include_router(add_friend.router)
+app.include_router(search_friends.router)
