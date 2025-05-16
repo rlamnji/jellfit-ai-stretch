@@ -13,6 +13,53 @@ import testImg from '../../assets/images/test.jpg'
 
 function FriendList({ setSelectedTab }) {
 
+  // 예시 친구 관계 (1번 사용자가 2번, 3번 사용자와 친구 관계인 상황)
+    const friends = [
+      {
+        received_id: 1,
+        request_id: 2,
+        accept: true
+      },
+      {
+        received_id: 3,
+        request_id: 1,
+        accept: true
+      },
+    ];
+
+    const user = [
+    { // 나
+      user_num : 1,
+      name : '해파리',
+      info : '한줄소개 테스트'
+    },
+    { // 친구
+      user_num : 2,
+      name : '친구임',
+      info : '테스트테스트'
+    },
+    { // 친구2
+      user_num : 3,
+      name : '친구임33',
+      info : '테스트테스트33'
+    },
+  ];
+  
+
+  // 내가 1이라 가정
+  const myId = 1;
+
+  // 친구 테이블에서 수락여부가 true인 애들만 조회
+  const acceptedFriends = friends.filter(f => f.accept === true);
+
+  // true인 친구의 상세 정보 조회
+  const friendDetails = acceptedFriends.map(f => {
+    const friendId = f.request_id === myId ? f.received_id : f.request_id;
+    return user.find(u => u.user_num === friendId);
+  });
+
+
+
   return (
     <div>
       <img
@@ -25,8 +72,6 @@ function FriendList({ setSelectedTab }) {
         <BackBtn/>
         <SoundBtn/>
       </div>
-
-
 
       <div className="w-full flex justify-center mt-[10px] relative z-[2]">
         <div className="flex">
@@ -69,42 +114,39 @@ function FriendList({ setSelectedTab }) {
         
         {/* 스크롤 가능한 유저 전체 박스 */}
         <div className="w-[2800px] h-[500px] mt-[10%] flex flex-col justify-start items-center overflow-y-auto gap-[20px]">
-          
-        <div className=" z-[1] w-full max-w-[1000px] min-h-[150px] flex items-center justify-around px-6 py-4 rounded-xl gap-6 text-[#522B2B]">
-            {/* 유저 이미지 */}
-            <img src={testImg} className="w-[100px] h-[100px] rounded-full object-cover" />
+            {friendDetails.map((friend,i)=>{
+              return (
+                <div key={i} className=" z-[1] w-full max-w-[1000px] min-h-[150px] flex items-center justify-around px-6 py-4 rounded-xl gap-6 text-[#522B2B]">
+                  {/* 유저 이미지 */}
+                  <img src={testImg} className="w-[100px] h-[100px] rounded-full object-cover" />
 
-            {/* 닉네임 */}
-            <div className="flex flex-col items-start">
-              <div className="text-[14px] opacity-50">닉네임</div>
-              <div className="font-bold text-[18px]">ㄹㅇ유저이름</div>
-            </div>
+                  {/* 닉네임 */}
+                  <div className="flex flex-col items-start">
+                    <div className="text-[14px] opacity-50">닉네임</div>
+                    <div className="font-bold text-[18px]">{friend.name}</div>
+                  </div>
 
-            {/* 운동기록 */}
-            <div className="flex flex-col items-center">
-              <div className="text-[14px] opacity-50 mb-1">운동기록</div>
-              <img src={workLog} className="w-[80px] cursor-pointer" />
-            </div>
+                  {/* 운동기록 */}
+                  <div className="flex flex-col items-center">
+                    <div className="text-[14px] opacity-50 mb-1">운동기록</div>
+                    <img src={workLog} className="w-[80px] cursor-pointer" />
+                  </div>
 
-            {/* 한줄소개 */}
-            <div className="flex flex-col items-center w-[250px] max-h-[100px] overflow-y-auto">
-              <div className="text-[14px] opacity-50 mb-1">한줄소개</div>
-              <div className="text-[16px] text-[#7E6161] break-words text-center">
-                한줄소개입니다
+                  {/* 한줄소개 */}
+                  <div className="flex flex-col items-center w-[250px] max-h-[100px] overflow-y-auto">
+                    <div className="text-[14px] opacity-50 mb-1">한줄소개</div>
+                    <div className="text-[16px] text-[#7E6161] break-words text-center">
+                      {friend.info}
+                    </div>
+                  </div>
+
+                  {/* 삭제 버튼 */}
+                  <img src={deleteBtn} className="w-[60px] cursor-pointer" />
               </div>
-            </div>
-
-            {/* 삭제 버튼 */}
-            <img src={deleteBtn} className="w-[60px] cursor-pointer" />
-          </div>
-
-          
+              )
+            })}
         </div>
-
-        
-
       </div>
-  
     </div>
   );
 }

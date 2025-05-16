@@ -25,10 +25,15 @@ module.exports = {
           '50%': { transform: 'translateY(-10px)' },
           '100%': { transform: 'translateY(0px)' },
         },
+        flash: {
+          '0%, 100%': { opacity: '1' },
+          '50%': { opacity: '0' },
+        }
       },
       animation: {
-        moveing: 'moveing 2s ease-in-out infinite',
+        moveing: 'moveing 2s ease-in-out infinite', // 위 아래로 움직임
         moveingCopy: 'moveingCopy 2s ease-in-out infinite', // 애니메이션 충돌 방지용
+        flash : 'flash 2s infinite', // 깜빡임
       },
 
     }

@@ -2,7 +2,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from app.get import get_poses, get_characters
 from app.post import post_poses
-# from app.auth import login //임시!
+# from app.auth import login 
 from app.get_image import get_stretching_image
 from app.guide import select_poses, get_stretching
 

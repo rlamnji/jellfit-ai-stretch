@@ -16,22 +16,67 @@ function FriendSearch({ setSelectedTab }) {
 
   const [nickname, setNickname] = useState('');
 
+  // 예시 데이터
+  const user = [
+    {
+      user_num : 1,
+      name : '해파리',
+      info : '한줄소개 테스트'
+    },
+    {
+      user_num : 2,
+      name : '친구임',
+      info : '테스트테스트'
+    },
+  ];
+
   // 친구 요청 전송
-  const handleSendRequest = () => {
+  // 해당 사용자가 존재 하는 지 여부 검사 후
+  // 친구 테이블에 등록 (Post) 수락여부 none인 상태로
+  // 내 닉네임 검색했을 땐?
+  // 중복 요청 했을 땐?
+  const handleSendRequest = async () => {
+
+    // 요청한 닉네임이 존재하는 사용자 인지
+    const isHaved = user.some(c => c.name === nickname);
 
     if (!nickname.trim()) {
       alert('닉네임을 입력하세요');
       return;
     }
 
-    /*axios.post('/api/friends/request', {
-      requester_id: 110,       // 사용자 번호
-      nickname: 'nickname'       // 상대 닉네임
-    })
-    .then(res => alert(res.data.message))
-    .catch(err => console.error(err));*/
+    if(isHaved){
+      alert("존재하는 사용자입니다");
+      console.log('친구 이름 ', nickname);
+    }else{
+      alert("존재하지 않는 사용자임!!")
+    }
 
-    console.log('친구 이름 ', nickname);
+    /*try{
+      // 닉네임으로 사용자 검색
+      const searchRes = await axios.get(`users/search?nickname=${nickname}`);
+      // 친구의 사용자.번호 저장
+      const receiver_id = searchRes.data.user_id;
+
+      // 친구 요청 보내기
+      await axios.post('/friends', {
+        requester_id: 110,       // (나) 사용자 번호
+        receiver_id: receiver_id, // (친구) 사용자 번호
+        status: 'none' // 수락 여부
+      });
+
+      alert(`${nickname}님에게 친구 요청을 보냈습니다`);
+
+    }catch (err){
+      if (err.response?.status === 404) {
+        alert('존재하지 않는 사용자입니다');
+      } else {
+        console.error('친구 요청 오류', err);
+        alert('요청 중 오류가 발생했습니다');
+      }
+    }*/
+
+    
   }
 
 

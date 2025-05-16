@@ -24,4 +24,7 @@ example.py 의 내용을 참고하여 db.sqlite3 파일 사용법을 확인할 �
 pip install python-multipart
 
 FastAPI는 UploadFile, File(...)을 통해 폼데이터를 받을 때
-python-multipart라는 외부 라이브러리에 의존해서 필수 패키지를 설치해야한다고 함 (내가 설치했으니까 따로 또 안 해도 되겠징?)
+python-multipart라는 외부 라이브러리에 의존해서 필수 패키지를 설치해야한다고 함 나중에 requirements.txt에 추가합쉬당
+
+## 5.14 오류
+pip install pillow 설치해야하는듯? 나중에 requirements.txt에 추가합쉬당

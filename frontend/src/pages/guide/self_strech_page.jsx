@@ -1,9 +1,17 @@
-    import CameraStretchingScreen from "../../components/camera_stretching/camera_stretching_screen";
-    import TopBar from "../../components/top_bar";
-    import { useParams, useNavigate } from "react-router-dom";
-    import { useEffect, useState } from "react";
 
-    function SelfStretchPage({ stretchingOrder }) {
+import CameraStretchingScreen from "../../components/camera_stretching/camera_stretching_screen";
+import TopBar from "../../components/top_bar";
+import SoundBtn from "../../components/buttons/sound_btn";
+import { useParams, useNavigate } from "react-router-dom";
+import { useEffect, useState } from "react";
+import arrowLeft from '../../assets/images/icons/arrow_left.png';
+
+import ModalManager from "../../components/stretching/modal/modal_manager";
+
+//좌우 여부 DB에 추가해서 해야하나?
+//좌우 여부에 대한 것 아직 반영 안함. 추후 구현 해야 함.
+function SelfStretchPage({ stretchingOrder }) {
+
     const navigate = useNavigate();
     const { stretchingId } = useParams();
     const [stretching, setStretching] = useState(null);
@@ -12,6 +20,10 @@
     const [currentStretchingTime, setCurrentStretchingTime] = useState(0);
     const [isStretching, setIsStretching] = useState(false);
     const [currentRepeat, setCurrentRepeat] = useState(0);
+
+    // (05.16_rlamnji) 모달창 관련
+    const [modalType, setModalType] = useState(null); // "complete", "getJelly", "confirmQuit"
+    const [hasJelly, setHasJelly] = useState(false);
 
     const handleIsStretching = (isStretching) => {
         setIsStretching(isStretching);
@@ -92,7 +104,22 @@
 
     return (
         <div className="w-full h-screen flex flex-col items-center bg-space">
-        <TopBar />
+
+        {/*<TopBar/> ==> (05.16_rlamnji) 뒤로가기 컴포에 아예 Link가 있어서 setModalType 설정이 안되더라고!*/}
+         <div className='w-full h-14 flex justify-between'>      
+            <img src={arrowLeft} className="w-8 h-8 m-4 cursor-pointer" 
+                onClick={() => {setModalType('confirmQuit'); }} />
+            <SoundBtn />
+         </div>
+
+
+            {/* (05.16_rlamnji) 모달창 */}
+            {/*<StretchingModal />*/}
+            {/*<CharacterModal />*/}
+            {/*<StretchQuitModal/>*/}
+            <ModalManager modalType={modalType} setModalType={setModalType} />
+
+        
         <div className="text-xl font-bold mt-4">{stretching.name}</div>
 
         {stretching.time != null && (
@@ -135,6 +162,7 @@
             >
             다음으로 넘어가기 (임시)
             </button>
+
         </div>
     );
     }
