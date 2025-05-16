@@ -5,7 +5,10 @@ from passlib.context import CryptContext
 from jose import jwt
 from datetime import datetime, timedelta, timezone
 import os
-from pydantic import BaseModel
+from dotenv import load_dotenv
+
+load_dotenv(dotenv_path=os.path.join(os.path.dirname(__file__), '../../.env'))
+
 
 from db.database import get_db
 from db.models import User
@@ -35,5 +38,7 @@ def login(form_data: OAuth2PasswordRequestForm = Depends(), db: Session = Depend
                             detail="ID 또는 비밀번호가 잘못되었습니다.",
                             headers={"WWW-Authenticate": "Bearer"})
 
-    access_token = create_access_token(data={"sub": user.user_id})
+    access_token = create_access_token(data={"sub": user.id})
+    print("SECRET_KEY:", SECRET_KEY)
+    print("access_token", access_token)
     return {"access_token": access_token, "token_type": "bearer"}

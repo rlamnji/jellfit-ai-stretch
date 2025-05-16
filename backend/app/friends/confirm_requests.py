@@ -1,7 +1,8 @@
-from fastapi import APIRouter, Depends, Query
+from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
 from db.models import Friend, User
 from db.database import get_db
+from dependencies import get_current_user  # 추가
 from typing import List
 from pydantic import BaseModel
 
@@ -16,7 +17,12 @@ class FriendRequestResponse(BaseModel):
         orm_mode = True
 
 @router.get("/requests", response_model=List[FriendRequestResponse])
-def get_friend_requests(current_user_id: int = Query(...), db: Session = Depends(get_db)):
+def get_friend_requests(
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user)  # access token 기반 로그인 유저
+):
+    current_user_id = current_user.user_id
+
     # 1. 받은 친구요청 중 수락하지 않은 요청 조회
     pending_requests = db.query(Friend).filter(
         Friend.receiver_id == current_user_id,

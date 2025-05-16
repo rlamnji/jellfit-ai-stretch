@@ -27,6 +27,7 @@ def get_current_user(token: str = Depends(oauth2_scheme), db: Session = Depends(
     
     try:
         print("Token received:", token)
+        print("SECRET_KEY:", SECRET_KEY)
         payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
         print("Decoded payload:", payload)
         user_id: str = payload.get("sub")

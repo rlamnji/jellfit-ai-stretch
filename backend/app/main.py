@@ -2,9 +2,9 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from app.get import get_poses, get_characters
 from app.post import post_poses
-from app.auth import login
+from app.auth import login, signup
 from app.get_image import get_stretching_image
-from app.friends import add_friend, search_friends
+from app.friends import add_friend, search_friends, accept, reject, confirm_requests
 
 app = FastAPI()
 
@@ -21,6 +21,10 @@ app.include_router(get_poses.router, tags=["Pose"])
 app.include_router(get_characters.router, tags=["Character"]) 
 app.include_router(post_poses.router, tags=["Pose_Analyze"])
 app.include_router(login.router)
+app.include_router(signup.router)
 app.include_router(get_stretching_image.router)
 app.include_router(add_friend.router)
 app.include_router(search_friends.router)
+app.include_router(accept.router)
+app.include_router(reject.router)
+app.include_router(confirm_requests.router)
