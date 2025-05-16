@@ -1,7 +1,7 @@
 // 친구 요청 컴포넌트
 // tailwind css 사용
 import { useEffect, useState } from 'react';
-import axios from 'axios';
+//import axios from 'axios';
 import BackBtn from '../buttons/back_btn';
 import SoundBtn from '../buttons/sound_btn';
 

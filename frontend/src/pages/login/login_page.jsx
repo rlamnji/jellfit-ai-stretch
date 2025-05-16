@@ -18,33 +18,38 @@ function LoginPage(){
     const handlePasswordInput = (value) => {
         setPassword(value);
     };
+
     //여기서부터 서버 연결 코드
-    const handleLogin = (e) =>{
-        navigate("/home");
-        // if (!isValid){
-        //     e.preventDefault();
-        // };
-        // const res = sendUserLoginData(id, password);
-        // const { accessToken } = res.json();
-        // if(res.ok){
-        //     sessionStorage.setItem("accessToken", accessToken); //엑세스토큰 저장.
-        //     navigate("/home");
-        // } else if(res.status === 400){
-        //     alert("아이디 또는 비밀번호를 잘못 입력했습니다.");
-        // };
+    const handleLogin = async (e) => {
+        e.preventDefault(); // 폼 제출 기본 동작 방지
+
+        try {
+            const formData = new URLSearchParams();
+            formData.append("username", id);
+            formData.append("password", password);
+
+            const res = await fetch("http://localhost:8000/auth/login/", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/x-www-form-urlencoded",
+                },
+                body: formData.toString(),
+            });
+
+            if (res.ok) { // 토큰 저장
+                const { access_token } = await res.json();
+                sessionStorage.setItem("accessToken", access_token);
+                navigate("/home");
+            } else if (res.status === 401) {
+                alert("아이디 또는 비밀번호가 잘못되었습니다.");
+            } else {
+                alert("로그인 중 알 수 없는 오류가 발생했습니다.");
+            }
+        } catch (error) {
+            console.error("로그인 오류:", error);
+            alert("서버 연결에 실패했습니다.");
+        }
     };
-    // const sendUserLoginData = (id, password) =>{
-    //     fetch("/auth/login", {
-    //         method : "POST",
-    //         headers : {
-    //             "Content-Type" : "application/json"
-    //         },
-    //         body : JSON.stringify({
-    //             id : id,
-    //             password : password
-    //         })
-    //     });
-    // };
 
     return (
         <div className='w-full h-screen bg-space flex flex-col items-center'>
