@@ -2,8 +2,8 @@
 // tailwindcss 사용
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
-import backModeBtn from '../../assets/images/icons/home/background_mode.png';
-import guideModeBtn from '../../assets/images/icons/home/guide_mode.png';
+import backModeBtn from '../../../assets/images/icons/home/background_mode.png';
+import guideModeBtn from '../../../assets/images/icons/home/guide_mode.png';
 
 function StartButton() {
 

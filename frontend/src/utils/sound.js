@@ -1,5 +1,6 @@
 // 버튼 효과음
 import clickSound from '../assets/sounds/click_sound1.mp3';
+import { getGlobalToggledSound } from '../context/sound_context';
 
 // 재생/정지를 동일한 오디오 인스턴스에 대해 수행하게 하기 위해 
 let audioInstance = null;
@@ -27,7 +28,9 @@ export const stopAudio = (src) => {
 
 // 클릭 사운드
 export const playClickSound = () => {
-    const audio = new Audio(clickSound);
-    audio.play();
+  if (!getGlobalToggledSound()) return;
+  const audio = new Audio(clickSound);
+  audio.volume = 0.6;
+  audio.play().catch(console.error);
 };
   
