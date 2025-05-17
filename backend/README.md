@@ -7,7 +7,7 @@ pip install -r requirements.txt
 uvicorn app.main:app --reload
 
 ## 데이터베이스 생성(/backend 폴더에서 실행)
-python -m db.init_db  
+python -m db.init_db
 -> db.sqlite3 파일 생성됨
 
 ## 데이터베이스 더미 데이터 넣기

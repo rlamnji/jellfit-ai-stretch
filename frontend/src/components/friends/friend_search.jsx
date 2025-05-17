@@ -3,7 +3,6 @@
 import { useState } from 'react';
 import BackBtn from '../buttons/back_btn';
 import SoundBtn from '../buttons/sound_btn';
-// import axios from 'axios';
 
 // 이미지
 import background from '../../assets/images/etc/basic_background2.png';
@@ -16,68 +15,76 @@ function FriendSearch({ setSelectedTab }) {
 
   const [nickname, setNickname] = useState('');
 
-  // 예시 데이터
-  const user = [
-    {
-      user_num : 1,
-      name : '해파리',
-      info : '한줄소개 테스트'
-    },
-    {
-      user_num : 2,
-      name : '친구임',
-      info : '테스트테스트'
-    },
-  ];
-
-  // 친구 요청 전송
-  // 해당 사용자가 존재 하는 지 여부 검사 후
-  // 친구 테이블에 등록 (Post) 수락여부 none인 상태로
-  // 내 닉네임 검색했을 땐?
-  // 중복 요청 했을 땐?
+  // 닉네임 검색 후 친구요청 전송
   const handleSendRequest = async () => {
-
-    // 요청한 닉네임이 존재하는 사용자 인지
-    const isHaved = user.some(c => c.name === nickname);
-
+  
     if (!nickname.trim()) {
       alert('닉네임을 입력하세요');
       return;
     }
 
-    if(isHaved){
-      alert("존재하는 사용자입니다");
-      console.log('친구 이름 ', nickname);
-    }else{
-      alert("존재하지 않는 사용자임!!")
+    // accessToken 가져오기
+    const accessToken = sessionStorage.getItem('accessToken');
+    if (!accessToken) {
+      alert('로그인이 필요합니다');
+      return;
     }
 
-    /*try{
-      // 닉네임으로 사용자 검색
-      const searchRes = await axios.get(`users/search?nickname=${nickname}`);
-      // 친구의 사용자.번호 저장
-      const receiver_id = searchRes.data.user_id;
+    // (/search)가 부분문자열 검색인듯 한글자라도 맞으면 다 맞다고 나옴
+    try {
+      // 닉네임 검색
+      // 현재 searchRes 응답 : 배열형태
+      const searchRes = await fetch(`http://localhost:8000/users/search?nickname=${nickname}`);
 
-      // 친구 요청 보내기
-      await axios.post('/friends', {
-        requester_id: 110,       // (나) 사용자 번호
-        receiver_id: receiver_id, // (친구) 사용자 번호
-        status: 'none' // 수락 여부
-      });
-
-      alert(`${nickname}님에게 친구 요청을 보냈습니다`);
-
-    }catch (err){
-      if (err.response?.status === 404) {
-        alert('존재하지 않는 사용자입니다');
-      } else {
-        console.error('친구 요청 오류', err);
-        alert('요청 중 오류가 발생했습니다');
+      if (searchRes.status === 404) {
+        alert(`'${nickname}' 님은 존재하지 않습니다.`);
+        return;
       }
-    }*/
 
-    
-  }
+      const accessToken = sessionStorage.getItem('accessToken');
+      console.log('accessToken:', accessToken);
+
+      if (!searchRes.ok) {
+        throw new Error('서버 오류');
+      }
+
+      const data = await searchRes.json();
+
+      if (data.length > 0) {
+        alert(`'${nickname}' 님은 존재하는 사용자입니다.`);
+        console.log('검색 결과:', data);
+
+        // 친구의 user_id 저장
+        const receiver_id = data[0].user_id;
+        
+        // 친구 요청 보내기
+        const requestRes = await fetch('http://localhost:8000/friends',{
+          method:'POST',
+          headers:{
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${accessToken}`, 
+          },
+          body: JSON.stringify({receiver_id}),
+        });
+
+        const result = await requestRes.json();
+        console.log("친구요청 결과", result);
+
+        if(requestRes.ok){
+          alert(`${nickname}님에게 친구 요청을 보냈습니다`);
+        }else{
+          alert(`요청 실패: ${result.detail || '알 수 없는 오류'}`);
+        }
+
+      } else {
+        alert(`'${nickname}' 님은 존재하지 않습니다.`);
+      }
+
+    } catch (err) {
+      console.error('오류:', err);
+      alert('오류가 발생했습니다.');
+    }
+  };
 
 
   return (

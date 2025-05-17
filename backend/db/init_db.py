@@ -5,6 +5,10 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from db.models import Base, User, Category, Pose, Routine, RoutinePose, Character
 
+# 테스트(삭제예정)
+from passlib.context import CryptContext
+pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+
 # SQLite 기준
 engine = create_engine("sqlite:///./db/db.sqlite3", echo=True)
 
@@ -16,8 +20,8 @@ Base.metadata.create_all(bind=engine)
 # 더미 데이터 삽입
 db = SessionLocal()
 
-db.add(User(user_id=1, username="테스터1", id="temp001", password="1234", introduction="Hello!"))
-db.add(User(user_id=2, username="테스터2", id="temp002", password="5678"))
+db.add(User(user_id=1,username="테스터1",id="temp001",password=pwd_context.hash("1234"), introduction="Hello!"))
+db.add(User(user_id=2, username="테스터2", id="temp002", password=pwd_context.hash("5678"), introduction="안녕하세요요"))
 db.add(User(user_id=3, username="테스터3", id="temp003", password="9101112"))
 
 
