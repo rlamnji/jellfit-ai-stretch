@@ -2,7 +2,6 @@
 // tailwind css 사용
 
 // 현재 선택된 value 의 시간으로 백그라운드 창 띄우기
- // 배경음 상태관리랑 브금이랑 묶어야겠덩덩
  
 import React, { useState, useEffect } from 'react';
 import Dropdown from 'react-dropdown';
@@ -15,44 +14,54 @@ function DropDown() {
   
   const options = ['선택','3초', '15초', '20초', '30초'];
   const defaultOption = options[0];
-  const [selected, setSelected] = useState(defaultOption);
 
-  const { toggledAlarm, setReminderDelay } = useReminder();
+  const { toggledAlarm, reminderDelay, setReminderDelay } = useReminder();
 
-  const handleChange = (option) => {
-    console.log('선택된 값:', option.value);
-    console.log('알림 상태:', toggledAlarm ? '켜짐' : '꺼짐');
-    setSelected(option.value);
+  const getSelectedOption = () => {
+    if (!reminderDelay) return defaultOption;
+    const seconds = reminderDelay / 1000;
+    return `${seconds}초`;
   };
 
-  useEffect(() => {
-    const minutesOrSeconds = parseInt(selected.match(/\d+/)?.[0], 10);
-    if (!minutesOrSeconds) return;
+  const handleChange = (option) => {
+    const selected = option.value;
+    const num = parseInt(selected.match(/\d+/)?.[0], 10);
 
-    const isSeconds = selected.includes('초');
-    const delay = isSeconds ? minutesOrSeconds * 1000 : minutesOrSeconds * 60 * 1000;
+    if (!num) return;
 
-    setReminderDelay(delay);
+    let delay = 0;
 
-    if (toggledAlarm) {
-      console.log('알림이 켜져 있습니다. 알림을 시작합니다.');
-      console.log('알림 주기:', delay, 'ms');
-      startReminder(delay);
-      
+    if (selected.includes('초')) {
+      delay = num * 1000;
+    } else if (selected.includes('분')) {
+      delay = num * 60 * 1000;
     } else {
-      console.log('알림이 꺼짐.');
+      console.warn('지원되지 않는 단위입니다:', selected);
       return;
     }
 
+    setReminderDelay(delay);
+  };
+
+  useEffect(() => {
+    if (!reminderDelay) return;
+
+    if (toggledAlarm) {
+      console.log('알림 시작 - 주기:', reminderDelay, 'ms');
+      startReminder(reminderDelay);
+    } else {
+      console.log('알림 꺼짐');
+    }
+
     return () => stopRepeatingReminder();
-  }, [selected, toggledAlarm]);
+  }, [reminderDelay, toggledAlarm]);
 
   return (
     <div className="flex flex-col items-start text-[14px] font-semibold text-[#333] w-[150px] mx-auto z-[50]">
       <Dropdown
         options={options}
         onChange={handleChange}
-        value={selected}
+        value={getSelectedOption()}
         placeholder="선택하세요"
         className="w-full"
         controlClassName="bg-[#FFF1D5] border-none rounded-full px-4 py-2 text-[14px] text-[#552F2F] shadow-md"

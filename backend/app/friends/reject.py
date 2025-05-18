@@ -12,9 +12,12 @@ class RejectRequest(BaseModel):
 
 @router.post("/reject")
 def reject_friend_request(request: RejectRequest, db: Session = Depends(get_db), current_user: int = Depends(get_current_user)):
+    
+    current_user_id = current_user.user_id
+    
     friend = db.query(Friend).filter(
         Friend.requester_id == request.requester_id,
-        Friend.receiver_id == current_user,
+        Friend.receiver_id == current_user_id,
         Friend.accepted == False
     ).first()
 

@@ -9,6 +9,10 @@ from passlib.context import CryptContext
 # 비밀번호 해싱을 위한 패스리브 컨텍스트
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
+# 테스트(삭제예정)
+from passlib.context import CryptContext
+pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+
 # SQLite 기준
 engine = create_engine("sqlite:///./db/db.sqlite3", echo=True)
 
@@ -23,6 +27,7 @@ db = SessionLocal()
 db.add(User(user_id=1, username="테스터1", id="temp001", password=pwd_context.hash("1234"), introduction="Hello!"))
 db.add(User(user_id=2, username="테스터2", id="temp002", password=pwd_context.hash("5678")))
 db.add(User(user_id=3, username="테스터3", id="temp003", password=pwd_context.hash("9101112")))
+
 
 
 db.add(Category(category_id=1, name="목"))

@@ -5,7 +5,7 @@ import { useState } from 'react';
 import setting from '../../../assets/images/icons/settings.png';
 
 // 팝업창
-import SettingModal from './setting_modal';
+import SettingModal from '../settings/setting_modal';
 
 function SideWidget() {
   const [openModal, setOpenModal] = useState(false);

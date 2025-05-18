@@ -1,15 +1,11 @@
 // 환경설정 팝업창
 // tailwind 적용
-import setModal from '../../../assets/images/icons/setting_content.png';
-import setCancel  from '../../../assets/images/icons/cancel.png';
 import { useEffect} from 'react';
 import { useReminder } from '../../../context/reminder_context';
 import { useSound } from '../../../context/sound_context';
-import { playAudio, stopAudio } from '../../../utils/sound';
-
-import backgroundMusic from '../../../assets/sounds/track1.mp3';
 import DropDown from './drop_down';
-
+import setModal from '../../../assets/images/icons/setting_content.png';
+import setCancel  from '../../../assets/images/icons/cancel.png';
 
 function SettingModal ({setOpenModal}){
 
@@ -18,27 +14,13 @@ function SettingModal ({setOpenModal}){
 
     // 초기값 불러오기
     useEffect(() => {
-        const savedSound = localStorage.getItem('toggledSound');
         const savedAlarm = localStorage.getItem('toggledAlarm');
         
-        if (savedSound !== null) {
-            setToggledSound(savedSound === 'true');
-        }
         if (savedAlarm !== null) {
             setToggledAlarm(savedAlarm === 'true');
         }
 
     }, []);
-
-    useEffect(()=>{
-        // 배경음이 true일 때만 소리재생
-        if(toggledSound){
-            playAudio(backgroundMusic);
-        }else{
-            stopAudio();
-        }
-
-    },[toggledSound]);
 
     // x 버튼 클릭 시 현재 상태 저장
     const handleClose = () => {
@@ -46,8 +28,6 @@ function SettingModal ({setOpenModal}){
         localStorage.setItem('toggledAlarm', toggledAlarm.toString());
         setOpenModal(false);
     };
-
-
 
     return (
         <div className="fixed top-0 left-0 w-screen h-screen bg-black bg-opacity-60 z-[9999888] flex justify-center items-center pointer-events-auto">

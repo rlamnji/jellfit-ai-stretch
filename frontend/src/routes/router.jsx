@@ -6,7 +6,7 @@ import JoinPage from '../pages/join/join_page';
 import ConditionPage from '../pages/condition/condition_page';
 import FriendPage from '../pages/home/dash_board/friend_page';
 import CollectPage from '../pages/home/dash_board/collect_page';
-import UserProfilePage from '../pages/home/user_profile_page';
+import UserProfilePage from '../pages/user/user_profile_page';
 import DiaryPage from "../pages/diary/diary_page";
 import SelectGuidePage from "../pages/guide/select_guide_page";
 import SelfStretchPage from "../pages/guide/self_strech_page";
