@@ -1,16 +1,29 @@
 // 자율모드, 가이드모드 시작 버튼
 // tailwindcss 사용
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import backModeBtn from '../../../assets/images/icons/home/background_mode.png';
 import guideModeBtn from '../../../assets/images/icons/home/guide_mode.png';
+import BackgroundModal from './background_mode_modal';
 
 function StartButton() {
 
-  const [hovered, setHovered] = useState(null)
+  const [hovered, setHovered] = useState(null);
+  const [openModal, setOpenModal] = useState(false);
+
+  const [showPopup, setShowPopup] = useState(false);
+  //const [cameraStarted, setCameraStarted] = useState(false);
+
+  // 로그아웃 연결 시 추가
+  /*useEffect(() => {
+    const stored = localStorage.getItem("showPopup");
+    const shouldShowPopup = stored === "true";
+    setShowPopup(shouldShowPopup); // false일 경우도 자동 반영됨
+  }, []);*/
 
 
   return (
+    
     <div className="flex justify-center items-center content-between mb-10 mr-20 relative">
         <div onMouseEnter={()=>setHovered('background')} onMouseLeave={()=>setHovered(null)} className='relative'>
 
@@ -27,10 +40,18 @@ function StartButton() {
                         border-t-8 border-t-[#585858]"></div>
             </div>
           )}
+          
 
           {/* 자세교정 모드 아이콘(백그라운드) */}
-          <img src={backModeBtn} className=" w-[150px] mt-4 mr-20 transition-transform duration-200 animate-[moveing_3s_ease-in-out_infinite] cursor-pointer hover:animate-none hover:-translate-y-[5px] hover:scale-[1.02]" alt="자율모드" />
+          <img src={backModeBtn} className=" w-[150px] mt-4 mr-20 transition-transform duration-200 animate-[moveing_3s_ease-in-out_infinite] cursor-pointer hover:animate-none hover:-translate-y-[5px] hover:scale-[1.02]" alt="자율모드" 
+            onClick={
+            () => {showPopup ?  console.log("카메라 시작") : setOpenModal(true)} }/>
+          
+            {openModal ?<BackgroundModal setOpenModal={setOpenModal} showPopup={showPopup} setShowPopup={setShowPopup} /*cameraStarted={cameraStarted} setCameraStarted={setCameraStarted}*/
+            /> : null}
+        
         </div>
+        
 
 
         <div onMouseEnter={()=>setHovered('guide')} onMouseLeave={()=>setHovered(null)} className='relative'>

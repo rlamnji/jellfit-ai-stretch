@@ -42,7 +42,7 @@ function FriendList({ setSelectedTab }) {
       });
   }, []);
 
-  // 친구 삭제
+  // 친구 삭제 api 호출 추가해야함
 
   return (
     <div>

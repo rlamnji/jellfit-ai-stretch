@@ -42,10 +42,6 @@ function HomePage() {
 
         <div className="relative z-[1] flex flex-col h-full">
 
-          <div className="bg-transparent fixed bottom-[20px] right-[20px] z-10">
-              <StartButton/> {/*운동시작 버튼*/}
-          </div>
-
           <div className="bg-transparent fixed top-[220px] left-0 z-10">
                 <DashBoard /> {/*왼쪽 위젯(친구,도감,일지)*/}
           </div>
@@ -54,11 +50,12 @@ function HomePage() {
               <ProfileCard /> {/*프로필*/}
           </div>
 
-
           <div className="bg-transparent fixed top-0 right-0 z-10">
-          
             <SideWidget /> {/*사이드바 위젯*/}
-          
+          </div>
+
+          <div className="bg-transparent fixed bottom-[20px] right-[20px] z-10">
+              <StartButton/> {/*운동시작 버튼*/}
           </div>
           
         </div>
