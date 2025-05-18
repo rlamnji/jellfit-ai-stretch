@@ -7,6 +7,13 @@ from app.get_image import get_stretching_image
 from app.friends import add_friend, search_friends, accept, reject, confirm_requests
 from app.guide import select_poses, get_stretching
 
+
+#디버깅
+from fastapi import FastAPI, Depends
+from sqlalchemy.orm import Session
+from db.database import get_db
+from db.models import User
+
 app = FastAPI()
 
 # CORS 설정
@@ -32,3 +39,8 @@ app.include_router(reject.router)
 app.include_router(confirm_requests.router)
 app.include_router(select_poses.router)
 app.include_router(get_stretching.router)
+
+# 디버깅
+@app.get("/test/users")
+def test_get_users(db: Session = Depends(get_db)):
+    return db.query(User).all()

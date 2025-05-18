@@ -14,42 +14,77 @@ import testImg from '../../assets/images/test.jpg'
 
 function FriendRequest({ setSelectedTab }) {
 
-  //const [requestList, setRequestList] = useState([]);
+  const [requestList, setRequestList] = useState([]);
 
   // 요청 목록 불러오기
-  useEffect(() =>{
-    /*axois.get('/friends/requests')
-      .then(res => {
-        console.log(res.data);
-        setRequestList(res.data);
+  useEffect(() => {
+    const accessToken = sessionStorage.getItem('accessToken');
+
+    fetch('http://localhost:8000/friends/requests',{
+      method:'GET',
+      headers:{
+        'Authorization': `Bearer ${accessToken}`,
+      },
+    })
+
+      .then((res) => {
+        if (!res.ok) {
+          throw new Error('Network response was not ok');
+        }
+        return res.json();
       })
-      .catch(err => console.log(err));*/
-  });
+      .then((data) => {
+        console.log(data);
+        setRequestList(data);
+      })
+      .catch((error) => {
+        console.error('Fetch error:', error);
+      });
+  }, []);
+
 
   // 수락
-  const handleAccept = () =>{
-    /*axois.put('/friends/accept', null, {
-      params: {
-        friendId: 1 , // 수락할 친구의 ID
-      }})
-      .then(() =>{
-        setRequestList(prev => prev.filter(user => user.userNum !== userNum));
-      })
-      .catch(err=> console.log(err));*/
-    console.log('수락 버튼 클릭');
+  const handleAccept = (requesterId) =>{
+    const accessToken = sessionStorage.getItem("accessToken");
+    
+    fetch('http://localhost:8000/friends/accept',{
+      method:'POST',
+      headers:{
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${accessToken}`
+      },
+      body: JSON.stringify({ requester_id: requesterId })
+    })
+    .then((data)=>{
+      console.log(data.message);
+      setRequestList(prev => prev.filter(user => user.user_id !== requesterId));
+    })
+    .catch((error) => {
+      console.error('친구 요청 수락 중 오류:', error);
+    });
+  
   };
 
+
   // 거절
-  // userNum : 요청한 사용자 번호(FK)
-  const handleReject = () =>{
-    /*axios.delete('/friends/reject', { requesterId: userNum })
-    .then(() => {
-      setRequestList(prev => prev.filter(user => user.userNum !== userNum));
+  const handleReject = (requesterId) =>{
+
+    const accessToken = sessionStorage.getItem("accessToken");
+    fetch('http://localhost:8000/friends/reject',{
+      method:'POST',
+      headers:{
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${accessToken}`
+      },
+      body: JSON.stringify({ requester_id: requesterId })
     })
-    .catch(error => {
-      console.error('거절 실패:', error);
-    });*/
-    console.log('삭제 버튼 클릭');
+    .then((data)=>{
+      console.log(data.message);
+      setRequestList(prev => prev.filter(user => user.user_id !== requesterId));
+    })
+    .catch((error) => {
+      console.error('친구 요청 거절 중 오류:', error);
+    });
   };
 
   return (
@@ -105,21 +140,21 @@ function FriendRequest({ setSelectedTab }) {
         {/* 스크롤 가능한 유저 전체 박스 */}
         <div className="w-[2800px] h-[500px] mt-[10%] flex flex-col justify-start items-center  overflow-y-auto gap-[20px]">
           {/* 유저 박스 1 */}
-          <div className="z-[1] w-full max-w-[1000px] min-h-[150px] flex items-center justify-around px-6 py-4 rounded-xl gap-6 text-[#522B2B]">
-            <img src={testImg} className="w-[100px] h-[100px] rounded-full object-cover" />
-            <div className="flex flex-col items-start ml-28 mr-44">
-              <div className="text-[20px] opacity-50">닉네임</div>
-              <div className="font-bold text-[24px]">해파리가되</div>
-            </div>
-            <img src={checkBtn} className="cursor-pointer w-[50px]" onClick={()=>(handleAccept())}/>
-            <img src={cancelBtn} className="cursor-pointer w-[50px]" onClick={()=>{handleReject()}}/>
-          </div>
-
+            {requestList.map((user, index) => {
+              return (
+                <div key={index} className="z-[1] w-full max-w-[1000px] min-h-[150px] flex items-center justify-around px-6 py-4 rounded-xl gap-6 text-[#522B2B]">
+                  <img src={testImg} className="w-[100px] h-[100px] rounded-full object-cover" />
+                  <div className="flex flex-col items-start ml-28 mr-44">
+                    <div className="text-[20px] opacity-50">닉네임</div>
+                    <div className="font-bold text-[24px]">{user.username}</div>
+                  </div>
+                  <img src={checkBtn} className="cursor-pointer w-[50px]" onClick={() => handleAccept(user.user_id)} />
+                  <img src={cancelBtn} className="cursor-pointer w-[50px]" onClick={() => handleReject(user.user_id)} />
+                </div>
+              );
+            })}
         </div>
-
-
       </div>
-      
     </div>
   );
 }

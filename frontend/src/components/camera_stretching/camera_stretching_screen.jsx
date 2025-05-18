@@ -17,3 +17,5 @@ function CameraStretchingScreen({ handleIsStretching, sendFrameTime }) {
 }
 
 export default CameraStretchingScreen;
+
+

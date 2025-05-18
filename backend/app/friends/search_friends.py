@@ -68,13 +68,15 @@ def recommend_users(
         if f.receiver_id != current_user_id:
             friend_ids.add(f.receiver_id)
 
+    friend_users = db.query(User).filter(User.user_id.in_(friend_ids)).all()
+    
     # 2. 자신 + 친구 제외한 유저 목록
-    candidates = db.query(User).filter(
-        ~User.user_id.in_(friend_ids),
-        User.user_id != current_user_id
-    ).all()
+    #candidates = db.query(User).filter(
+    #    ~User.user_id.in_(friend_ids),
+    #    User.user_id != current_user_id
+    #).all()
 
     # 3. 랜덤으로 최대 5명 추천
-    recommended = random.sample(candidates, min(5, len(candidates)))
+    #recommended = random.sample(candidates, min(5, len(candidates)))
 
-    return recommended
+    return friend_users
