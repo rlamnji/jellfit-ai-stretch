@@ -9,9 +9,6 @@ from passlib.context import CryptContext
 # 비밀번호 해싱을 위한 패스리브 컨텍스트
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
-# 테스트(삭제예정)
-from passlib.context import CryptContext
-pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 # SQLite 기준
 engine = create_engine("sqlite:///./db/db.sqlite3", echo=True)
