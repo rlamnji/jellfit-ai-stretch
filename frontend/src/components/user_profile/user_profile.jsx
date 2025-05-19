@@ -1,23 +1,16 @@
 // 상세프로필 수정 (상단 프로필 확인)
 // 이미지
 import friendsContent from '../../assets/images/icons/detail_user_content.png';
-//import testImg from '../../assets/images/test.jpg'
 import profileImg from '../../assets/images/icons/home/user_profile_1.png'; 
 import ProfileModal from './user_profile_modal';
 import { useState } from 'react';
-
-//import axios from 'axios';
+import { useLocation } from 'react-router-dom';
 
 function UserProfile(){
     const [modal, setOpenModal] = useState(false);
 
-    // 예시 데이터
-    const userData = {
-        nickname: '닉네임',
-        userId:'adfsdsgs123',
-        intro: '한줄소개입니다',
-        profileImg: profileImg,
-    };
+    const location = useLocation();
+    const userData = location.state?.userData;
 
     const handleLogout = () => {
         /*axios.post('/auth/logout', {}, {
@@ -45,12 +38,12 @@ function UserProfile(){
 
                         <div className='flex flex-col text-start pl-8'>
                         <div className='flex flex-row items-center gap-6'>
-                            <div className='text-[35px] text-[#522B2B] font-bold'>{userData.nickname}</div>
+                            <div className='text-[35px] text-[#522B2B] font-bold'>{userData?.username}</div>
                             
                         </div>
 
-                        <div className='text-[22px] text-[#7E6161]'>{userData.userId}</div>
-                        <div className='text-[24px] text-[#7E6161]'>{userData.intro}</div>
+                        <div className='text-[22px] text-[#7E6161]'>{userData?.id}</div>
+                        <div className='text-[24px] text-[#7E6161]'>{userData?.introduction}</div>
                         </div>
                     </div>
 
