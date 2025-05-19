@@ -6,8 +6,6 @@ import profileImg_1 from '../../assets/images/icons/home/user_profile_1.png';
 import profileImg_2 from '../../assets/images/icons/home/user_profile_2.png';
 import { useState } from 'react';
 
-// className={`w-[100px] h-[100px] rounded-full object-cover cursor-pointer ${isVisible ? 'opacity-100' : 'opacity-30 pointer-events-none'}`}
-
 function ProfileModal({data, onClose}){
 
     const [isVisible, setIsVisible] = useState(false);

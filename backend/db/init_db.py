@@ -22,8 +22,8 @@ Base.metadata.create_all(bind=engine)
 db = SessionLocal()
 
 db.add(User(user_id=1, username="테스터1", id="temp001", password=pwd_context.hash("1234"), introduction="Hello!"))
-db.add(User(user_id=2, username="테스터2", id="temp002", password=pwd_context.hash("5678")))
-db.add(User(user_id=3, username="테스터3", id="temp003", password=pwd_context.hash("9101112")))
+db.add(User(user_id=2, username="테스터2", id="temp002", password=pwd_context.hash("5678") , introduction="한줄소개입니다!"))
+db.add(User(user_id=3, username="테스터3", id="temp003", password=pwd_context.hash("9101112"), introduction="테스트한줄소개개"))
 
 
 
