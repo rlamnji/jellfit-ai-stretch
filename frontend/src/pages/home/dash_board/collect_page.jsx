@@ -2,7 +2,7 @@
 // tailwindcss 사용
 import { useNavigate } from 'react-router-dom';
 import { useEffect, useState } from 'react';
-//import axios from 'axios';
+
 // 컴포넌트
 import BackBtn from '../../../components/buttons/back_btn';
 import SoundBtn from '../../../components/buttons/sound_btn';
@@ -11,40 +11,59 @@ import collectBox from '../../../assets/images/icons/home/collect_box.png';
 import collectBook from '../../../assets/images/icons/home/collect_book.png';
 import collectCancel from '../../../assets/images/icons/home/collect_cancel.png';
 import backgroundImg from '../../../assets/images/etc/basic_background2.png';
-import test from '../../../assets/images/icons/home/user_profile_1.png';
 
 function CollectPage() {
 
    const navigate = useNavigate();
    // 전체 캐릭터
-   // const [characterMap, setCharacterMap] = useState([]);
+   const [characterMap, setCharacterMap] = useState([]);
    // 사용자가 가진 캐릭터 id
-   // const [characterUserGetMap, setCharacterUserGetMap] = useState([]);
+   const [characterUserGetMap, setCharacterUserGetMap] = useState([]);
    // 자세
-   // const [stretchMap, setStretchMap] = useState([]);
+   //const [stretchMap, setStretchMap] = useState([]);
    // 현재 선택된 id 번호
    const [selectedCharacterId, setSelectedCharacterId] = useState(null);
 
    // api
    // 최초 렌더링 시 전체 캐릭터와 내 캐릭터 get
-   /*useEffect(()=>{
-      const fetchData = async () =>{
-         try{
-            const [allRes, userRes, stretchRes] = await Promise.all([
-               axios.get("/characters"), // 전체 캐릭터 목록
-               axios.get("/characters/my-characters"), // 사용자가 가진 캐릭터 목록(아이디만)
-               axios.get("/stretches") // 전체 자세세 목록
-            ]);
-            setCharacterMap(allRes.data);
-            setCharacterUserGetMap(useRes.data);
-            setStretchMap(stretchRes.data);
-         } catch(err){
-            console.log("API 호출 오류", err);
-         }
-      };
+   useEffect(() => {
+   const fetchData = async () => {
+      try {
+         const token = sessionStorage.getItem("accessToken"); 
+         console.log("토큰" ,token)
 
-      fetchData();
-   },[]);*/
+         const [allRes, userRes/*,stretchRes*/] = await Promise.all([
+         fetch("http://localhost:8000/characters"),
+         fetch("http://localhost:8000/characters/my-characters", {
+            headers: {
+               Authorization: `Bearer ${token}`,
+            }
+         }),
+         //fetch(`http://localhost:8000/guide/stretching/${stretchingId}`),
+         ]);
+
+         if (!allRes.ok || !userRes.ok /*|| !stretchRes.ok*/) {
+         throw new Error("하나 이상의 요청이 실패했습니다.");
+         }
+
+         const allData = await allRes.json();
+         const userData = await userRes.json();
+         //const stretchData = await stretchRes.json();
+
+         setCharacterMap(allData);
+         setCharacterUserGetMap(userData);
+         //setStretchMap(stretchData);
+      } catch (err) {
+         console.log("API 호출 오류", err);
+      }
+   };
+
+   fetchData();
+   }, []);
+
+   console.log("보유",characterUserGetMap);
+   
+
 
    // 그리드에 캐릭터 번호 매핑 (캐릭터 자리 지정)
    const gridCharacterMap = [
@@ -65,84 +84,13 @@ function CollectPage() {
       setSelectedCharacterId(character_id)
    }
 
-   // 테스트 데이터(전체 캐릭터 테이블이라 가정)
-   const characterMap = [
-   {
-      character_id: 1, // 캐릭터 번호
-      name: "테스트 해파리1", // 캐릭터 이름
-      getItem: 4, // 캐릭터 획득 횟수
-      description: "테스트1", // 캐릭터 설명
-      stretchName: 1, // 자세번호
-      url: "/images/models/jelly32.png" // 캐릭터 이미지
-   },
-   {
-      character_id: 2,
-      name: "테스트 해파리2",
-      getItem: 1,
-      description: "테스트2",
-      stretchName: 2,
-      url: "/images/models/jelly45.png"
-   },
-   {
-      character_id: 3,
-      name: "테스트 해파리3",
-      getItem: 2,
-      description: "테스트3",
-      stretchName: 3,
-      url: "/images/models/jelly1.png"
-   },
-   {
-      character_id: 22,
-      name: "테스트 해파리22",
-      getItem: 3,
-      description: "테스트22",
-      stretchName: 4,
-      url: "/images/models/jelly42.png"
-   },
-   ];
 
-   // 테스트 데이터(사용자 획득 테이블이라 가정)
-   const characterUserGetMap = [
-   {
-      character_id: 3,
-   },
-   {
-      character_id: 1,
-   },
-      {
-      character_id: 2,
-   },
-      {
-      character_id: 22,
-   }
-   ];
-
-   // 테스트 데이터 (자세 테이블이라 가정)
-   const stretchMap = [
-      {
-         s_id: 1, // 자세 번호
-         name: "목", // 자세 이름
-      },
-      {
-         s_id: 2, // 자세 번호
-         name: "어깨", // 자세 이름
-      },
-      {
-         s_id: 3, // 자세 번호
-         name: "등", // 자세 이름
-      },
-      {
-         s_id: 4, // 자세 번호
-         name: "허리", // 자세 이름
-      },
-   ];
-
-   // 전체 캐릭터 테이블에 있는 애냐 없는 애냐 (변수명 변경 시급)
+   // selectedCharacterId를 기반으로 전체 캐릭터 리스트에서 해당 캐릭터 정보 찾기
    const fullCharacter = characterMap.find(c => c.character_id === selectedCharacterId);
-   // 사용자 획득 테이블에 있냐 없냐(T/F) (변수명 변경 시급)
+   // characterUserGetMap에 선택된 캐릭터 ID가 있는지 여부 (획득 여부 판단)
    const isUnlocked = characterUserGetMap.some(c => c.character_id === selectedCharacterId);
    // 캐릭터 스트레칭 자세번호와 자세 아이디가 일치하는 애가 있냐 (변수명 변경 시급)
-   const stretchInfo = stretchMap.find(s => s.s_id === fullCharacter?.stretchName);
+   //const stretchInfo = stretchMap.find(s => s.s_id === fullCharacter?.stretchName);
 
     return (
       <div className='relative w-screen h-screen overflow-hidden'>
@@ -177,11 +125,11 @@ function CollectPage() {
                {selectedCharacterId && (
                   <div>
                      {isUnlocked ? 
-                     <img src={fullCharacter?.url} className='absolute top-[23.5%] left-[22%] w-[14%] h-[20%] object-contain'></img> :             
+                     <img src={fullCharacter?.image_url} className='absolute top-[23.5%] left-[22%] w-[14%] h-[20%] object-contain'></img> :             
                      
                      <div className="absolute top-[23.5%] left-[18%] w-[23%] h-[20%] bg-[#E5E5E5] opacity-80 rounded-xl border-2 flex items-center justify-center">
                         <div className='flex flex-col items-center justify-center'>
-                           <div className="text-[10px]"> {stretchInfo?.name} n번만 더 하면 얻을 수 있어요!</div>
+                           <div className="text-[10px]"> 바뀌는값 n번만 더 하면 얻을 수 있어요!</div>
                            <div className="text-[10px]"> * 현재 진행 횟수: 3 / 5</div>  {/* 횟수 수정 필요 */}
                         </div>
                      </div>
@@ -203,7 +151,7 @@ function CollectPage() {
             </div>
             <div className="absolute top-[79%] left-[15%] w-[28%] h-[15%] text-[#513030] text-[1.2vw] blur-[0.5px] overflow-y-auto break-words whitespace-normal">
                {selectedCharacterId && (
-               <span>{stretchInfo?.name}</span>
+               <span>바뀌는값</span>
                )}
             </div>
 
@@ -223,7 +171,7 @@ function CollectPage() {
 
                      {isUnlocked && fullCharacter && (
                      <img
-                        src={fullCharacter.url}
+                        src={fullCharacter.image_url}
                         className="absolute top-1/2 left-1/2 w-4/5 h-4/5 object-contain -translate-x-1/2 -translate-y-1/2 pointer-events-none"
                      />
                      )}
