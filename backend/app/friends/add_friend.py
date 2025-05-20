@@ -39,14 +39,6 @@ def send_friend_request(
         raise HTTPException(status_code=404, detail="Receiver not found")
 
     # 중복 요청/이미 친구 여부 확인
-    #existing = db.query(Friend).filter(
-    #    Friend.requester_id == current_user.user_id,
-    #    Friend.receiver_id == receiver.user_id
-    #).first()
-    #if existing:
-    #    raise HTTPException(status_code=400, detail="Friend request already exists or already friends")
-
-    # 중복 요청/이미 친구 여부 확인
     existing = db.query(Friend).filter(
         or_(
             and_(

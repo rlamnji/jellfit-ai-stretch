@@ -4,7 +4,7 @@ from app.get import get_poses, get_characters, get_user
 from app.post import post_poses
 from app.auth import login, signup
 from app.get_image import get_stretching_image
-from app.friends import add_friend, search_friends, accept, reject, confirm_requests
+from app.friends import add_friend, delete_friend, search_friends, accept, reject, confirm_requests
 from app.guide import select_poses, get_stretching
 from app.update import update_user
 
@@ -34,6 +34,7 @@ app.include_router(login.router)
 app.include_router(signup.router)
 app.include_router(get_stretching_image.router)
 app.include_router(add_friend.router)
+app.include_router(delete_friend.router)
 app.include_router(search_friends.router)
 app.include_router(accept.router)
 app.include_router(reject.router)

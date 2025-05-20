@@ -2,14 +2,18 @@
 import DetailModal from '../../assets/images/icons/detail_user_modal.png';
 import setCancel from '../../assets/images/icons/cancel.png';
 import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 
-function ProfileModal({data, onClose, onUpdate}){
+function ProfileModal({data, onClose}){
+
+    const navigator = useNavigate();
 
     const profileImg_1 = "/images/profile/profile_1.png";
     const profileImg_2 = "/images/profile/profile_2.png";
 
     const [username, setUsername] = useState(data?.username || "");
     const [introduction, setIntroduction] = useState(data?.introduction || "");
+    const [isVisible, setIsVisible] = useState(false);
 
     useEffect(() => {
         if (data) {
@@ -35,24 +39,19 @@ function ProfileModal({data, onClose, onUpdate}){
             body: JSON.stringify(body),
         })
             .then((res) => {
-                if (res.ok) alert("프로필 정보가 저장되었습니다");
-                else if(!res.ok) throw new Error("저장 실패");
+                if (res.ok){ 
+                    alert("프로필 정보가 저장되었습니다"); 
+                    navigator('/home');
+                }else if(!res.ok){
+                    throw new Error("저장 실패");
+                }
                 return res.json();
-            })
-            .then((updatedUser) => {
-                console.log("서버 응답:", updatedUser);
-                onUpdate(updatedUser);
-                onClose();
             })
             .catch((err) => {
                 console.error("에러 발생:", err);
                 alert("에러 발생");
             });
     };
-
-    const [isVisible, setIsVisible] = useState(false);
-
-    
 
         return (
             <div className='fixed top-0 left-0 w-screen h-screen bg-black bg-opacity-60 z-50 flex justify-center items-center pointer-events-auto'>

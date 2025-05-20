@@ -36,6 +36,7 @@ function FriendRequest({ setSelectedTab }) {
       .then((data) => {
         console.log(data);
         setRequestList(data);
+        console.log(requestList);
       })
       .catch((error) => {
         console.error('Fetch error:', error);
@@ -143,7 +144,7 @@ function FriendRequest({ setSelectedTab }) {
             {requestList.map((user, index) => {
               return (
                 <div key={index} className="z-[1] w-full max-w-[1000px] min-h-[150px] flex items-center justify-around px-6 py-4 rounded-xl gap-6 text-[#522B2B]">
-                  <img src={testImg} className="w-[100px] h-[100px] rounded-full object-cover" />
+                  <img src={user.profile_url} className="w-[100px] h-[100px] rounded-full object-cover" />
                   <div className="flex flex-col items-start ml-28 mr-44">
                     <div className="text-[20px] opacity-50">닉네임</div>
                     <div className="font-bold text-[24px]">{user.username}</div>

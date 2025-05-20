@@ -11,7 +11,7 @@ function UserProfile(){
     const location = useLocation();
     const [userData, setUserData] = useState(location.state?.userData || {});
 
-    const handleUpdateUser = (updatedUser) => {
+    /*const handleUpdateUser = (updatedUser) => {
         setUserData(updatedUser); // 갱신
         setOpenModal(false); 
     };
@@ -21,7 +21,7 @@ function UserProfile(){
             // userData가 바뀌면 리렌더링
             console.log("프로필이 갱신되었습니다:", userData);
         }
-    }, [modal, userData]);
+    }, [modal, userData]);*/
 
     const handleLogout = () => {
         /*axios.post('/auth/logout', {}, {
@@ -64,7 +64,7 @@ function UserProfile(){
                         <div className='flex w-[200px] h-[50px] bg-[#552F2F] rounded-2xl justify-center items-center cursor-pointer'  onClick={()=>{setOpenModal(true)}}>
                             <div className='text-[20px] text-white text-center'>프로필 수정</div>
                         </div>
-                        {modal && <ProfileModal data={userData} onClose={() => setOpenModal(false)}  onUpdate={handleUpdateUser}/>}
+                        {modal && <ProfileModal data={userData} onClose={() => setOpenModal(false)}  />}
                     </div>
                     </div>
 
