@@ -21,7 +21,7 @@ function ProfileCard() {
     })
     .then( res =>{
       if(!res.ok){
-        throw new Error("네트워크 오류")
+        throw new Error("네트워크 오류");
       }
       return res.json();
     })
