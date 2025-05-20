@@ -6,7 +6,7 @@ from app.auth import login, signup
 from app.get_image import get_stretching_image
 from app.friends import add_friend, search_friends, accept, reject, confirm_requests
 from app.guide import select_poses, get_stretching
-
+from app.update import update_user
 
 #디버깅
 from fastapi import FastAPI, Depends
@@ -28,6 +28,7 @@ app.add_middleware(
 app.include_router(get_poses.router, tags=["Pose"])
 app.include_router(get_characters.router, tags=["Character"]) 
 app.include_router(get_user.router)
+app.include_router(update_user.router, prefix="/users", tags=["User"])
 app.include_router(post_poses.router, tags=["Pose_Analyze"])
 app.include_router(login.router)
 app.include_router(signup.router)
