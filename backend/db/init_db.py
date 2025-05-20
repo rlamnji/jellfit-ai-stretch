@@ -44,6 +44,7 @@ db.add(Category(category_id=3, name="팔/손목"))
 db.add(Category(category_id=4, name="등/허리"))
 db.add(Category(category_id=5, name="가슴"))
 
+
 db.add(Pose(pose_id=6, name="손목돌리기", duration=None, count=5,
             video_url="https://www.youtube.com/shorts/-0nB9SlxzO4",
             thumbnail_url="/images/stretching/smdrg",
@@ -99,6 +100,7 @@ db.add(Character(character_id=7, name="뚱파리", description="해파리계의 
 db.add(Character(character_id=8, name="똥파리", description="이름이 불명예스럽지만 사실은 깊은 해저 정화 활동을 담당한다. 자칭 “물의 배설 시스템”.", image_url="/images/models/jelly8.png"))
 db.add(Character(character_id=9, name="유령 해파리", description="존재하되 존재하지 않는 해파리. 투명도 99.9%.", image_url="/images/models/jelly9.png"))
 db.add(Character(character_id=10, name="화난 해파리", description="뿔났다. 이유는 없다.", image_url="/images/models/jelly10.png"))
+
 db.add(Character(character_id=11, name="단발머리그소녀파리", description="찰랑이는 단발머리. 아무 말 없이 고개를 돌릴 때마다 수면 위가 출렁.", image_url="/images/models/jelly11.png"))
 db.add(Character(character_id=12, name="매먀리", description="고먐미처럼 네모가 된 해파리.", image_url="/images/models/jelly12.png"))
 db.add(Character(character_id=13, name="아보카도 해파리", description="몸이 아보카도가 되어버린 해파리.", image_url="/images/models/jelly13.png"))

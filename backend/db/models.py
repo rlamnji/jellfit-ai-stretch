@@ -12,6 +12,7 @@ class User(Base):
     id = Column(String, unique=True)
     password = Column(String, nullable=False)
     introduction = Column(String, default="안녕하세요!")
+    #profile_url = Column(String, default="/images/profile/profile_1.png")
 
     # 유저 테이블 관계
     diseases = relationship('UserDisease', back_populates='user')
@@ -137,6 +138,7 @@ class Routine(Base):
     user = relationship("User", back_populates="routines")
     routine_poses = relationship('RoutinePose', back_populates='routine')
 
+# 사용자가 고른 루틴
 class RoutinePose(Base):
     __tablename__ = 'routine_poses'
 
