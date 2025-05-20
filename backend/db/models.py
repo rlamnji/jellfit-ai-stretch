@@ -12,7 +12,7 @@ class User(Base):
     id = Column(String, unique=True)
     password = Column(String, nullable=False)
     introduction = Column(String, default="안녕하세요!")
-    #profile_url = Column(String, default="/images/profile/profile_1.png")
+    profile_url = Column(String, default="/images/profile/profile_1.png")
 
     # 유저 테이블 관계
     diseases = relationship('UserDisease', back_populates='user')
@@ -23,6 +23,7 @@ class User(Base):
     routines = relationship("Routine", back_populates="user")
 
 
+# 질병
 class Disease(Base):
     __tablename__ = 'diseases'
 
@@ -32,7 +33,7 @@ class Disease(Base):
     # 질병 테이블 관계
     users = relationship('UserDisease', back_populates='disease')
 
-
+# 사용자 질병
 class UserDisease(Base):
     __tablename__ = 'user_diseases'
 
@@ -44,7 +45,7 @@ class UserDisease(Base):
     user = relationship('User', back_populates='diseases')
     disease = relationship('Disease', back_populates='users')
 
-
+# 친구
 class Friend(Base):
     __tablename__ = 'friends'
 
@@ -58,7 +59,7 @@ class Friend(Base):
     requester = relationship('User', back_populates='friends_sent', foreign_keys=[requester_id])
     receiver = relationship('User', back_populates='friends_received', foreign_keys=[receiver_id])
 
-
+# 사용자 스트레칭 기록
 class UsageRecord(Base):
     __tablename__ = 'usage_records'
 
@@ -68,11 +69,14 @@ class UsageRecord(Base):
     date = Column(DateTime(timezone=True), default=lambda: datetime.now(timezone.utc))
     # 초 기준?
     usage_time = Column(Integer, nullable=False)
+    # 자세번호 (추가)
+    pose_id = Column(Integer, ForeignKey('poses.pose_id'))
 
     # 유저 사용기록 테이블 관계
     user = relationship('User', back_populates='records')
+    pose = relationship('Pose')
 
-
+# 사용자 캐릭터
 class UserCharacter(Base):
     __tablename__ = 'user_characters'
 
@@ -84,7 +88,7 @@ class UserCharacter(Base):
     user = relationship('User', back_populates='characters')
     character = relationship('Character', back_populates='user_characters')
 
-
+# 캐릭터
 class Character(Base):
     __tablename__ = 'characters'
 
@@ -99,7 +103,7 @@ class Character(Base):
     pose = relationship('Pose', back_populates='characters')
     user_characters = relationship('UserCharacter', back_populates='character')
 
-
+# 자세
 class Pose(Base):
     __tablename__ = 'poses'
 

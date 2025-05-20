@@ -3,7 +3,7 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
-from db.models import Base, User, Category, Pose, Routine, RoutinePose, Character, UserCharacter
+from db.models import Base, User, Category, Pose, Routine, RoutinePose, Character, UserCharacter, UsageRecord
 from passlib.context import CryptContext
 
 # 비밀번호 해싱을 위한 패스리브 컨텍스트
@@ -44,6 +44,9 @@ db.add(Category(category_id=3, name="팔/손목"))
 db.add(Category(category_id=4, name="등/허리"))
 db.add(Category(category_id=5, name="가슴"))
 
+# 사용자 스트레칭 기록 (더미데이터)
+db.add(UsageRecord(record_id=1, user_id=1, pose_id=8, usage_time=10))
+db.add(UsageRecord(record_id=2, user_id=1, pose_id=9, usage_time=10))
 
 db.add(Pose(pose_id=6, name="손목돌리기", duration=None, count=5,
             video_url="https://www.youtube.com/shorts/-0nB9SlxzO4",
