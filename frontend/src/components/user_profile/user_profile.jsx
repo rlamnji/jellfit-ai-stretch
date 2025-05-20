@@ -43,8 +43,8 @@ function UserProfile(){
                <img className="absolute top-0 left-0 flex justify-center w-full h-full z-0 pointer-events-none" src={friendsContent}/>
             
                 {/* 프로필(상단) */}
-                <div className='absolute flex flex-row  items-center w-full  text-center'>
-                    <div className='flex flex-row items-center ml-11 mr-10 mt-9'>
+                <div className='absolute flex flex-row  items-center  text-center'>
+                    <div className='flex flex-row items-center ml-11 mr-10 mt-9 w-[680px] '>
                         <img src={userData?.profile_url} className='w-[150px] h-[150px] rounded-full object-cover' />
 
                         <div className='flex flex-col text-start pl-8'>
@@ -59,7 +59,7 @@ function UserProfile(){
                     </div>
 
                     {/* 프로필 수정 버튼 */}
-                    <div className="ml-[430px] h-[90px]">
+                    <div className="ml-[90px] h-[90px]">
                         <div className='flex justify-end text-[15px] text-[#552F2F] underline pb-8 cursor-pointer' onClick={()=>handleLogout()}>로그아웃</div>
                         <div className='flex w-[200px] h-[50px] bg-[#552F2F] rounded-2xl justify-center items-center cursor-pointer'  onClick={()=>{setOpenModal(true)}}>
                             <div className='text-[20px] text-white text-center'>프로필 수정</div>

@@ -7,9 +7,9 @@ import { useEffect, useState } from 'react';
 function SymptomModal({onClose}){
 
         return (
-            <div className='fixed top-0 left-0 w-screen h-screen bg-opacity-60 z-[99999] flex justify-center items-center pointer-events-auto'>
+            <div className='fixed top-0 left-0 w-screen h-screen bg-black bg-opacity-60 z-[99999] flex justify-center items-center pointer-events-auto'>
                 
-                <div className='relative flex flex-col overflow-hidden'> {/* 이용약관 전체 이미지 */}
+                <div className='relative flex flex-col overflow-hidden'> {/* 통증 전체 이미지 */}
                     <div className=" flex flex-col absolute top-7 left-1/2 -translate-x-1/2 ">
                         <div className='h-[150px]'>
                             <div className='text-[25px] text-[#7E6161] font-bold mb-4 ml-4 mt-2'>통증 부위</div>
