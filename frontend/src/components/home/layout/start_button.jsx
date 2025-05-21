@@ -46,7 +46,7 @@ function StartButton() {
           <img src={backModeBtn} className=" w-[150px] mt-4 mr-20 transition-transform duration-200 animate-[moveing_3s_ease-in-out_infinite] cursor-pointer hover:animate-none hover:-translate-y-[5px] hover:scale-[1.02]" alt="자율모드" 
             onClick={
             () => {showPopup ?  console.log("카메라 시작") : setOpenModal(true)} }/>
-          
+          {/*(수정 필요) openModal이 false면 자세교정모드 '시작하기'버튼이 아예 안보일 것 같음. */}
             {openModal ?<BackgroundModal setOpenModal={setOpenModal} showPopup={showPopup} setShowPopup={setShowPopup} /*cameraStarted={cameraStarted} setCameraStarted={setCameraStarted}*/
             /> : null}
         

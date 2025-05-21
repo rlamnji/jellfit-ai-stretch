@@ -6,6 +6,7 @@ from app.auth import login, signup
 from app.get_image import get_stretching_image
 from app.friends import add_friend, delete_friend, search_friends, accept, reject, confirm_requests
 from app.guide import select_poses, get_stretching
+from app.posture_ai import predict
 from app.update import update_user
 
 #디버깅
@@ -41,6 +42,7 @@ app.include_router(reject.router)
 app.include_router(confirm_requests.router)
 app.include_router(select_poses.router)
 app.include_router(get_stretching.router)
+app.include_router(predict.router, tags=["predict-posture"])
 
 # 디버깅
 @app.get("/test/users")

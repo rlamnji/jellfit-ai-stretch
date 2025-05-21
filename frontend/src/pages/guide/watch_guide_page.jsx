@@ -40,7 +40,9 @@ function WatchGuidePage({ stretchingOrder }){
             <TopBar />
             <div className="header w-full h-[20%] border-white">
                 <Link to={`/guide/userStretching/${stretchingId}`} className="flex items-center justify-center w-[100px] h-[40px] bg-[#FBF2E6] font-extrabold text-[#5D3939] rounded-3xl">건너뛰기 ➜</Link>
-                {stretching.name}
+                <div className="ml-[45%] text-2xl font-extrabold text-[#FBF2E6]">
+                    {stretching.name}
+                </div>
             </div>
             <iframe src={stretching.videoURL} frameborder="0" className="w-[90%] h-[60%] mt-16"></iframe>
 
