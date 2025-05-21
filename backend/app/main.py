@@ -7,13 +7,7 @@ from app.get_image import get_stretching_image
 from app.friends import add_friend, delete_friend, search_friends, accept, reject, confirm_requests
 from app.guide import select_poses, get_stretching
 from app.posture_ai import predict
-from app.update import update_user
-
-#디버깅
-from fastapi import FastAPI, Depends
-from sqlalchemy.orm import Session
-from db.database import get_db
-from db.models import User
+from app.update import update_user, update_user_stretch
 
 app = FastAPI()
 
@@ -30,7 +24,8 @@ app.include_router(get_poses.router, tags=["Pose"])
 app.include_router(get_characters.router, tags=["Character"]) 
 app.include_router(get_user.router)
 app.include_router(update_user.router, prefix="/users", tags=["User"])
-app.include_router(post_poses.router, tags=["Pose_Analyze"])
+app.include_router(update_user.router, prefix="/users", tags=["User"])
+app.include_router(update_user_stretch.router, prefix="/guide", tags=["guide"])
 app.include_router(login.router)
 app.include_router(signup.router)
 app.include_router(get_stretching_image.router)
@@ -43,8 +38,3 @@ app.include_router(confirm_requests.router)
 app.include_router(select_poses.router)
 app.include_router(get_stretching.router)
 app.include_router(predict.router, tags=["predict-posture"])
-
-# 디버깅
-@app.get("/test/users")
-def test_get_users(db: Session = Depends(get_db)):
-    return db.query(User).all()

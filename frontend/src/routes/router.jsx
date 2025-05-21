@@ -16,6 +16,8 @@ import CalibrationPage from "../pages/join/calibration_page";
 
 function Router() {
     const [stretchingOrder, setStretchingOrder] = useState([]);
+    const [completedStretchings, setCompletedStretchings] = useState([]);
+
     return (
         <BrowserRouter>
             <Routes>
@@ -36,16 +38,16 @@ function Router() {
                 {/* 가이드 화면 */}
                 <Route 
                     path="/guide/select"
-                    element={<SelectGuidePage setStretchingOrder={setStretchingOrder} />} 
+                    element={<SelectGuidePage setStretchingOrder={setStretchingOrder} completedStretchings={completedStretchings} setCompletedStretchings={setCompletedStretchings}/>} 
                 />
                 <Route
                     path="/guide/video/:stretchingId"
-                    element={<WatchGuidePage stretchingOrder={stretchingOrder}/>} 
+                    element={<WatchGuidePage stretchingOrder={stretchingOrder} completedStretchings={completedStretchings} setCompletedStretchings={setCompletedStretchings}/>} 
                 />
                 {/* 이 라우터는 마지막 페이지를 인식할 수 있도록 해야 함. (수정 필요) */}
                 <Route
                     path="/guide/userStretching/:stretchingId"
-                    element={<SelfStretchPage stretchingOrder={stretchingOrder}/>} 
+                    element={<SelfStretchPage stretchingOrder={stretchingOrder} completedStretchings={completedStretchings} setCompletedStretchings={setCompletedStretchings}/>} 
                 />
                 <Route path="/guide/complete" element={<GuideCompletePage />} /> 
                     

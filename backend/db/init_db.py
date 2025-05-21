@@ -45,9 +45,9 @@ db.add(Category(category_id=4, name="등/허리"))
 db.add(Category(category_id=5, name="가슴"))
 
 
-# 사용자 스트레칭 기록 (더미데이터)
-db.add(UsageRecord(record_id=1, user_id=1, pose_id=8, usage_time=10))
-db.add(UsageRecord(record_id=2, user_id=1, pose_id=9, usage_time=10))
+# 사용자 스트레칭 기록(횟수 + 시간) (더미데이터)
+db.add(UsageRecord(record_id=1, user_id=1, pose_id=1, repeat_cnt=5))
+db.add(UsageRecord(record_id=2, user_id=1, pose_id=2, repeat_cnt=1))
 
 # 스트레칭(자세) 정보 
 db.add(Pose(pose_id=1, name="손목돌리기", duration=None, count=5,

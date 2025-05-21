@@ -3,7 +3,7 @@
 import { useNavigate } from 'react-router-dom';
 import stretchModal from '../../../assets/images/icons/setting_content.png'
 import complteCheck from '../../../assets/images/etc/check.png'
-function StretchModal(){
+function StretchModal({completedStretchings}){
     const navigator = useNavigate();
 
     return(
@@ -21,13 +21,22 @@ function StretchModal(){
                 
                 <div className="abolute z-[1000]">
                     <div className="flex flex-col absolute top-52 left-1/2 -translate-x-1/2 w-[500px] h-[390px]  overflow-y-auto gap-3 p-2 rounded-xl">
-                        <div className='flex flex-row justify-between bg-[#FFFCFA]  h-20 min-h-20 max-h-20 flex-shrink-0 z-[1000] rounded-2xl items-center'>
+                        {completedStretchings.map((stretching, index) => (
+                        <div
+                            key={index}
+                            className='flex flex-row justify-between bg-[#FFFCFA] h-20 min-h-20 max-h-20 flex-shrink-0 z-[1000] rounded-2xl items-center'
+                        >
                             <div className='rounded-full bg-[#0C8D1B] w-7 h-7 ml-7 flex items-center justify-center'>
-                                <img src={complteCheck} className='w-6 h-6' />
+                            <img src={complteCheck} className='w-6 h-6' alt="check" />
                             </div>
-                            <div className=' text-[#455970] font-bold text-[30px] text-center mr-10 w-64'>목돌리기</div>
-                            <div className=' bg-[#38566C] rounded-2xl text-white font-bold text-[30px] text-center w-28 p-1 mr-8'>1 회</div>
+                            <div className='text-[#455970] font-bold text-[30px] text-center mr-10 w-64'>
+                            {stretching.name}
+                            </div>
+                            <div className='bg-[#38566C] rounded-2xl text-white font-bold text-[30px] text-center w-28 p-1 mr-8'>
+                            {stretching.repeatCount} 회
+                            </div>
                         </div>
+                        ))}
 
                     </div>
                 </div>

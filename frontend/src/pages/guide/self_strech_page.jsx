@@ -7,11 +7,10 @@ import { useEffect, useState } from "react";
 import arrowLeft from '../../assets/images/icons/arrow_left.png';
 
 import ModalManager from "../../components/stretching/modal/modal_manager";
-import StretchingModal from "../../components/stretching/modal/stretch_complete_modal";
 
 //좌우 여부 DB에 추가해서 해야하나?
 //좌우 여부에 대한 것 아직 반영 안함. 추후 구현 해야 함.
-function SelfStretchPage({ stretchingOrder }) {
+function SelfStretchPage({ stretchingOrder, completedStretchings, setCompletedStretchings }) {
 
     const navigate = useNavigate();
     const { stretchingId } = useParams();
@@ -22,7 +21,7 @@ function SelfStretchPage({ stretchingOrder }) {
     const [isStretching, setIsStretching] = useState(false);
     const [currentRepeat, setCurrentRepeat] = useState(0);
 
-    // (05.16_rlamnji) 모달창 관련
+    // 스트레칭 모달
     const [modalType, setModalType] = useState(null); // "complete", "getJelly", "confirmQuit"
     const [hasJelly, setHasJelly] = useState(false);
 
@@ -40,9 +39,40 @@ function SelfStretchPage({ stretchingOrder }) {
 
     useEffect(() => {
         async function fetchStretchingData() {
-        const data = await getStretchingData(stretchingId);
-        console.log("스트레칭 응답 데이터:", data);
-        setStretching(data);
+            const data = await getStretchingData(stretchingId);
+            console.log("스트레칭 id", stretchingId)
+            console.log("스트레칭 응답 데이터:", data);
+            setStretching(data);
+
+            // 스트레칭 응답 데이터가 스트레칭 하나당 각각 들어와서 이를 배열로 묶음
+            // 스트레칭 영상 가이드화면과 스트레칭 시작 화면을 왔다갔다 하기때문에 
+            // useEffect가 2번씩 호출 되어 중복 제거함
+            const already = completedStretchings.find(
+                d => d.pose_id === Number(stretchingId)
+            );
+
+            if (already) {
+                console.log("이미 존재함:", already);
+            } else {
+            const newItem = {
+                name: data.name,
+                pose_id: Number(stretchingId),
+                repeatCount: data.repeatCount,
+            };
+
+            setCompletedStretchings(prev => {
+                const withNew = [...prev, newItem];
+
+                // 중복 pose_id 제거
+                const unique = withNew.filter(
+                    (item, index, self) =>
+                    index === self.findIndex(t => t.pose_id === item.pose_id)
+                );
+
+                console.log("중복 제거된 리스트:", unique);
+                return unique;
+            });
+            }
         }
         fetchStretchingData();
     }, [stretchingId]);
@@ -82,6 +112,7 @@ function SelfStretchPage({ stretchingOrder }) {
         }
     }, [currentRepeat, currentStretchingTime, stretching]);
 
+    // 스트레칭 데이터 조회
     async function getStretchingData(stretchingId) {
         const res = await fetch(`http://localhost:8000/guide/stretching/${stretchingId}`, {
         method: "GET",
@@ -103,6 +134,29 @@ function SelfStretchPage({ stretchingOrder }) {
         return <div>데이터를 불러오고 있습니다...</div>;
     }
 
+    // 스트레칭 결과 DB에 저장
+    async function recordUpdate () {
+        const res = await fetch("http://localhost:8000/guide/record/accumulate", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization": "Bearer " + sessionStorage.getItem("accessToken")
+            },
+            body: JSON.stringify({
+                "pose_id":stretchingId,
+                "repeat_cnt":stretching.repeatCount,
+            }),
+
+        });
+        if(res.ok){
+        const data = await res.json();
+        return data
+        } else {
+        console.error("스트레칭 데이터를 가져오지 못했습니다.");
+        return null;
+        }
+    }
+
     return (
         <div className="w-full h-screen flex flex-col items-center bg-space">
 
@@ -112,14 +166,7 @@ function SelfStretchPage({ stretchingOrder }) {
                 onClick={() => {setModalType('confirmQuit'); }} />
             <SoundBtn />
          </div>
-
-
-            {/* (05.16_rlamnji) 모달창 */}
-            <StretchingModal />
-            {/*<CharacterModal />*/}
-            {/*<StretchQuitModal/>*/}
-            <ModalManager modalType={modalType} setModalType={setModalType} />
-
+        
         
         <div className="text-xl font-bold mt-4">{stretching.name}</div>
 
@@ -148,23 +195,27 @@ function SelfStretchPage({ stretchingOrder }) {
         />
 
         {/* ✅ 임시용 버튼 */}
-                <button
+        <button
             className="mt-4 px-4 py-2 bg-gray-600 text-white rounded hover:bg-gray-700"
-            onClick={() => {
+            onClick={async () => {
                 const currentIdx = stretchingOrder.indexOf(Number(stretchingId));
 
                 if (currentIdx === stretchingOrder.length - 1) {
-                navigate("/guide/complete");
+                    console.log("모든 완료된 스트레칭:", completedStretchings);
+                    setModalType("complete"); // 완료 모달 띄우기
+                    recordUpdate(); // api 호출
                 } else {
-                const nextStretchingId = stretchingOrder[currentIdx + 1];
-                navigate(`/guide/video/${nextStretchingId}`); // ✅ 가이드 영상으로 바로 이동
+                    const nextStretchingId = stretchingOrder[currentIdx + 1];
+                    navigate(`/guide/video/${nextStretchingId}`);
                 }
             }}
             >
             다음으로 넘어가기 (임시)
             </button>
 
+         <ModalManager modalType={modalType} setModalType={setModalType} completedStretchings={completedStretchings}/>
         </div>
+        
     );
     }
 
