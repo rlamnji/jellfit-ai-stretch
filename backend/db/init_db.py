@@ -3,7 +3,7 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
-from db.models import Base, User, Category, Pose, Routine, RoutinePose, Character, UserCharacter
+from db.models import Base, User, Category, Pose, Routine, RoutinePose, Character, UserCharacter, UsageRecord
 from passlib.context import CryptContext
 
 # 비밀번호 해싱을 위한 패스리브 컨텍스트
@@ -44,6 +44,12 @@ db.add(Category(category_id=3, name="팔/손목"))
 db.add(Category(category_id=4, name="등/허리"))
 db.add(Category(category_id=5, name="가슴"))
 
+
+# 사용자 스트레칭 기록 (더미데이터)
+db.add(UsageRecord(record_id=1, user_id=1, pose_id=8, usage_time=10))
+db.add(UsageRecord(record_id=2, user_id=1, pose_id=9, usage_time=10))
+
+# 스트레칭(자세) 정보 
 db.add(Pose(pose_id=1, name="손목돌리기", duration=None, count=5,
             video_url="https://www.youtube.com/embed/-0nB9SlxzO4",
             thumbnail_url="/images/stretching/smdrg",
@@ -102,6 +108,7 @@ db.add(RoutinePose(routine_id=2, pose_id=3, order=1))
 db.add(RoutinePose(routine_id=2, pose_id=5, order=2))
 db.add(RoutinePose(routine_id=2, pose_id=4, order=3))
 
+# 해파리 정보 등록
 db.add(Character(character_id=1, name="기본 해파리", description="기본 해파리.", acquisition_num=3, image_url="/images/models/jelly1.png", pose_id=1))
 db.add(Character(character_id=2, name="한입 먹힌 해파리", description="2◎421년 제 32회 해파리 스트레칭난에서 부상투혼을 해버린 해파리. 어딘지 모를 [ 비장함 ]이 느껴진다..", acquisition_num=3, image_url="/images/models/jelly2.png", pose_id=2))
 db.add(Character(character_id=3, name="새끼 해파리", description="응애.", acquisition_num=3, image_url="/images/models/jelly3.png", pose_id=3))
@@ -113,8 +120,7 @@ db.add(Character(character_id=8, name="똥파리", description="이름이 불명
 db.add(Character(character_id=9, name="유령 해파리", description="존재하되 존재하지 않는 해파리. 투명도 99.9%.", acquisition_num=3, image_url="/images/models/jelly9.png", pose_id=9))
 db.add(Character(character_id=10, name="화난 해파리", description="뿔났다. 이유는 없다.", acquisition_num=3, image_url="/images/models/jelly10.png", pose_id=10))
 
-
-
+# 앞으로 스트레칭 추가될 때마다 여기부터 해파리 매칭하면 됨.
 db.add(Character(character_id=11, name="단발머리그소녀파리", description="찰랑이는 단발머리. 아무 말 없이 고개를 돌릴 때마다 수면 위가 출렁.", acquisition_num=2, image_url="/images/models/jelly11.png"))
 db.add(Character(character_id=12, name="매먀리", description="고먐미처럼 네모가 된 해파리.", acquisition_num=2, image_url="/images/models/jelly12.png"))
 db.add(Character(character_id=13, name="아보카도 해파리", description="몸이 아보카도가 되어버린 해파리.", acquisition_num=2, image_url="/images/models/jelly13.png"))
@@ -155,7 +161,6 @@ db.add(Character(character_id=47, name="초콜릿 해파리", description="이 �
 db.add(Character(character_id=48, name="당근 흔드는 해파리", description="말 못할 비밀이 있나보다.", acquisition_num=2, image_url="/images/models/jelly48.png"))
 db.add(Character(character_id=49, name="단세포 해파리", description="유독 단순하다. 말이 통하지 않는다.", acquisition_num=2, image_url="/images/models/jelly49.png"))
 db.add(Character(character_id=50, name="코딩 해파리", description="\"fix: unknown space error\".", acquisition_num=2, image_url="/images/models/jelly50.png"))
-
 
 db.commit()
 db.close()

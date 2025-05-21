@@ -7,6 +7,7 @@ import { useEffect, useState } from "react";
 import arrowLeft from '../../assets/images/icons/arrow_left.png';
 
 import ModalManager from "../../components/stretching/modal/modal_manager";
+import StretchingModal from "../../components/stretching/modal/stretch_complete_modal";
 
 //좌우 여부 DB에 추가해서 해야하나?
 //좌우 여부에 대한 것 아직 반영 안함. 추후 구현 해야 함.
@@ -114,7 +115,7 @@ function SelfStretchPage({ stretchingOrder }) {
 
 
             {/* (05.16_rlamnji) 모달창 */}
-            {/*<StretchingModal />*/}
+            <StretchingModal />
             {/*<CharacterModal />*/}
             {/*<StretchQuitModal/>*/}
             <ModalManager modalType={modalType} setModalType={setModalType} />

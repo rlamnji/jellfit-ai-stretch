@@ -12,6 +12,7 @@ class FriendRequestResponse(BaseModel):
     user_id: int
     username: str
     introduction: str
+    profile_url: str
 
     class Config:
         orm_mode = True

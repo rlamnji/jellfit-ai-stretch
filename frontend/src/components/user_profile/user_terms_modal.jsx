@@ -40,11 +40,11 @@ function TermsModal({type, onClose}){
     }, [type]);
 
         return (
-            <div className='fixed top-0 left-0 w-screen h-screen bg-black bg-opacity-60 z-[9999888] flex justify-center items-center pointer-events-auto'>
+            <div className='fixed top-0 left-0 w-screen h-screen bg-black bg-opacity-60 z-[9999999] flex justify-center items-center pointer-events-auto'>
                 
                 <div className='relative overflow-hidden'> {/* 이용약관 전체 이미지 */}
-                    <div className="absolute top-7 left-1/2 -translate-x-1/2 top-[45px] ">
-                        <div className='text-[25px] text-[#7E6161] font-bold mb-4 ml-4'>개인정보 이용약관</div>
+                    <div className="absolute top-7 left-1/2 -translate-x-1/2 ">
+                        <div className='text-[25px] text-[#7E6161] font-bold mb-4 ml-4 mt-2'>개인정보 이용약관</div>
                         <div className='text-[20px] text-[#7E6161] font-bold mb-4'>{fileTitle}</div>
                         <pre className="font-sans whitespace-pre-wrap w-[400px] h-[400px] overflow-y-auto text-[#85756b] text-[14px] z-[10]">{content}</pre>
                     </div>

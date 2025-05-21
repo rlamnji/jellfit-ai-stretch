@@ -7,7 +7,7 @@ function Terms(){
     const [modal, setModal] = useState(null);
     
     return (
-        <div className="z-10 flex flex-col justify-start w-[300px] h-[400px] top-3 left-11 ">
+        <div className="z-10 flex flex-col justify-start w-[300px] h-[200px] mt-4 left-11 ">
             <div className='flex w-[200px] h-[50px] bg-[#7A7668] rounded-2xl justify-center items-center'>
                 <div className='text-[20px] text-white text-center'>이용 약관</div>
             </div>
