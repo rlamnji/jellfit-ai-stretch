@@ -7,7 +7,7 @@ from db.models import User
 from pydantic import BaseModel
 
 class UserCreate(BaseModel):
-    username: str
+    nickname: str
     id: str
     password: str
 
@@ -25,7 +25,7 @@ def join(user_in: UserCreate, db: Session = Depends(get_db)):
 
     # 3) 새 유저 생성 및 저장
     new_user = User(
-        username=user_in.username,
+        username=user_in.nickname,
         id=user_in.id,
         password=hashed_pw,
     )
@@ -33,4 +33,4 @@ def join(user_in: UserCreate, db: Session = Depends(get_db)):
     db.commit()
     db.refresh(new_user)
 
-    return {"msg": "회원가입 성공", "user_id": new_user.user_id}
+    return {"msg": "회원가입 성공", "userId": new_user.user_id}
