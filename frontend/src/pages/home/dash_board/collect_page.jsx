@@ -43,7 +43,8 @@ function CollectPage() {
          ]);
 
          if (!allRes.ok || !userRes.ok /*|| !stretchRes.ok*/) {
-         throw new Error("하나 이상의 요청이 실패했습니다.");
+            console.error("인증 실패 또는 서버 오류");
+            return;
          }
 
          const allData = await allRes.json();
@@ -62,7 +63,6 @@ function CollectPage() {
    }, []);
 
    console.log("보유",characterUserGetMap);
-   
 
 
    // 그리드에 캐릭터 번호 매핑 (캐릭터 자리 지정)
