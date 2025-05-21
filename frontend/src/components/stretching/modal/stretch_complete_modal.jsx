@@ -26,7 +26,7 @@ function StretchModal(){
                                 <img src={complteCheck} className='w-6 h-6' />
                             </div>
                             <div className=' text-[#455970] font-bold text-[30px] text-center mr-10 w-64'>목돌리기</div>
-                            <div className=' bg-[#38566C] rounded-2xl text-white font-bold text-[30px] text-center w-28 p-1 mr-8'>1m 3s</div>
+                            <div className=' bg-[#38566C] rounded-2xl text-white font-bold text-[30px] text-center w-28 p-1 mr-8'>1 회</div>
                         </div>
 
                     </div>

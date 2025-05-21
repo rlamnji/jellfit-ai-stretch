@@ -12,6 +12,7 @@ class UserInfoResponse(BaseModel):
     username: str
     id: str
     introduction: str
+    profile_url: str
 
     class Config:
         orm_mode = True
@@ -21,4 +22,6 @@ def get_current_user_info(
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user)
 ):
+    print(current_user.profile_url)
+
     return current_user

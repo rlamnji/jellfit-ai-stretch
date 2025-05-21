@@ -25,8 +25,7 @@ function FriendList({ setSelectedTab }) {
       return;
     }
 
-    // 엔드포인트 이름 수정 필요
-    fetch("http://localhost:8000/users/recommend", {
+    fetch("http://localhost:8000/users/friends", {
       headers: {
         Authorization: `Bearer ${accessToken}`
       }
@@ -43,6 +42,30 @@ function FriendList({ setSelectedTab }) {
   }, []);
 
   // 친구 삭제 api 호출 추가해야함
+  const deleteFriend = (friend_id) =>{
+    fetch(`http://localhost:8000/friends/${friend_id}`,{
+      method:"DELETE",
+      headers: {
+        "Authorization": "Bearer " + sessionStorage.getItem("accessToken")
+      }
+    })
+    .then((res)=>{
+      if(!res.ok){
+        const err = new Error("삭제 실패");
+        console.log(err)
+      }
+      return res.json();
+    })
+    .then((data)=>{
+      alert(data.msg);
+      console.log("전",friendList);
+      setFriendList(prev => prev.filter(user => user.user_id !== friend_id));
+      console.log(friendList);
+    })
+    .catch((err)=>{
+      console.log(err);
+    })
+  }
 
   return (
     <div>
@@ -102,7 +125,7 @@ function FriendList({ setSelectedTab }) {
               return (
                 <div key={i} className=" z-[1] w-full max-w-[1000px] min-h-[150px] flex items-center justify-around px-6 py-4 rounded-xl gap-6 text-[#522B2B]">
                   {/* 유저 이미지 */}
-                  <img src={testImg} className="w-[100px] h-[100px] rounded-full object-cover" />
+                  <img src={friend.profile_url} className="w-[100px] h-[100px] rounded-full object-cover" />
 
                   {/* 닉네임 */}
                   <div className="flex flex-col items-start">
@@ -125,7 +148,7 @@ function FriendList({ setSelectedTab }) {
                   </div>
 
                   {/* 삭제 버튼 */}
-                  <img src={deleteBtn} className="w-[60px] cursor-pointer" />
+                  <img src={deleteBtn} className="w-[60px] cursor-pointer" onClick={()=>deleteFriend(friend.user_id)}/>
               </div>
               )
             })}

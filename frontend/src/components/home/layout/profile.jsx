@@ -21,7 +21,7 @@ function ProfileCard() {
     })
     .then( res =>{
       if(!res.ok){
-        throw new Error("네트워크 오류")
+        throw new Error("네트워크 오류");
       }
       return res.json();
     })
@@ -46,7 +46,7 @@ function ProfileCard() {
       
       {/* 왼쪽: 프로필 */}
       <div className="flex flex-col items-center cursor-pointer" onClick={() => navigate('/home/userProfile', { state: { userData }} )}>
-        <img src={test} className="w-[80px] h-[80px] rounded-full object-cover" alt="프로필" />
+        {userData? (<img src={userData.profile_url} className="w-[80px] h-[80px] rounded-full object-cover" alt="프로필" />) : <img src={test} className="w-[80px] h-[80px] rounded-full object-cover" alt="프로필" />}
         <div className="flex flex-row items-center mt-1">
           {userData? (<div className="text-[16px] text-[#455970] font-medium pr-1">{userData.username}</div>) : <div className="text-[16px] text-[#455970] font-medium pr-1">로딩중</div>}
           <div className="text-[12px] pt-[2px]">님</div>

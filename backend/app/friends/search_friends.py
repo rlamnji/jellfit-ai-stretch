@@ -15,6 +15,7 @@ class UserResponse(BaseModel):
     user_id: int
     username: str
     introduction: str
+    profile_url: str
 
     class Config:
         orm_mode = True
@@ -45,7 +46,7 @@ def search_users(
 
     return users
 
-@router.get("/recommend", response_model=List[UserResponse])
+@router.get("/friends", response_model=List[UserResponse])
 def recommend_users(
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user)  # 로그인 유저 판별
