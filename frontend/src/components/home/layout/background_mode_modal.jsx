@@ -6,10 +6,12 @@ import setCancel  from '../../../assets/images/icons/cancel.png';
 import badPose1 from '../../../assets/images/icons/home/background_bad_pose_1.png';
 import badPose2 from '../../../assets/images/icons/home/background_bad_pose_2.png';
 import CameraStretchingScreen from '../../camera_stretching/camera_stretching_screen';
+import CameraPostureScreen from '../../camera_posture/camera_posture_screen';
 
 // 나중에 로그아웃할때 showpopup false로 변경해주는 함수 작성할 것
 function BackgroundModal({setOpenModal,  showPopup, setShowPopup, /*cameraStarted, setCameraStarted*/}) {
     const [cameraStarted, setCameraStarted] = useState(false);
+    const sendFrameTime = 300; // 0.3초마다 프레임 전송
 
     useEffect(() => {
         console.log("cameraStarted changed:", cameraStarted);
@@ -40,6 +42,10 @@ function BackgroundModal({setOpenModal,  showPopup, setShowPopup, /*cameraStarte
         closeModal();
     };
 
+    const handlePostureCode = (postureCode) => {
+        console.log("Posture Code:", postureCode);
+        // 자세 코드에 따라 알람을 주는 코드 추가해야 함.
+    }
     /*const startBackgroundMode = () => {
         // 로그아웃 연결 시 추가
         /*if (showPopup) {
@@ -103,10 +109,7 @@ function BackgroundModal({setOpenModal,  showPopup, setShowPopup, /*cameraStarte
 
             {cameraStarted && (
                 <div className="fixed top-4 overflow-y-auto p-4 right-4 w-[400px] h-[300px] z-[999999] bg-white rounded-lg shadow-lg overflow-hidden">
-                <CameraStretchingScreen
-                    handleIsStretching={() => {}}
-                    sendFrameTime={() => {}}
-                />
+                <CameraPostureScreen handlePostureCode={handlePostureCode} sendFrameTime={sendFrameTime} />
                 </div>
             )}
         </div>

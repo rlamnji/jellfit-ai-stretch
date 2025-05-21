@@ -1,7 +1,7 @@
 from joblib import load
 
 # 모델을 한 번만 로드
-model = load("../../model/posture_rf_model.joblib")
+model = load("models/posture_rf_model.joblib")
 
 def predict_posture(features: list) -> int:
     # features는 예: [0.65, 0.33, 0.12, ...]
