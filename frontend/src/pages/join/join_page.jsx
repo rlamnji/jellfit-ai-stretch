@@ -30,35 +30,34 @@ function JoinPage (){
 
     // 여기서부터 서버 연결하면 주석 해제.
     const sendUserJoinData = async (id, password, nickname) =>{
-        // fetch("/auth/join", {
-        //     method : "POST",
-        //     headers : {
-        //         "Content-Type" : "application/json"
-        //     },
-        //     body : JSON.stringify({
-        //         id : id,
-        //         password : password,
-        //         nickname : nickname
-        //     })
-        // });
-        // return res;
-        return id;
+        const res = await fetch("http://localhost:8000/auth/join", {
+            method : "POST",
+            headers : {
+                "Content-Type" : "application/json"
+            },
+            body : JSON.stringify({
+                id : id,
+                password : password,
+                nickname : nickname
+            })
+        });
+        if(res.ok){
+            return res;
+        } else {
+            console.log(res.status);
+            alert("회원가입에 실패했습니다."); //에러 처리 나중에 수정.
+            navigate("/login");
+            return null;
+        }
     }
-    const handleJoin = (e) => {
+    const handleJoin = async (e) => {
         if (!isValid){
             e.preventDefault();
         }
-        const userCode = sendUserJoinData(id, password, nickname);
-        console.log(userCode); //이거 id로 깔끔하게 나와야 함.
-        navigate(`/condition/${userCode}`); // 회원가입 완료 후 캘리브레이션 페이지로 이동.
-        // if(res.ok){
-            // const userCode = sendUserJoinData(id, password, nickname);
-            // console.log(userCode); //이거 id로 깔끔하게 나와야 함.
-            // navigate(`/condition/${resId}`); //로그인 페이지로 이동.
-        // } else {
-        //     alert("회원가입에 실패했습니다."); //에러 처리 나중에 수정.
-        // }
-
+        const res = await sendUserJoinData(id, password, nickname);
+        const { msg, userId } = await res.json();
+        console.log(`${msg} userId : ${userId}`);
+        navigate(`/condition/${userId}`); //캘리브레이션 페이지로 이동.
     };
 
     return (
