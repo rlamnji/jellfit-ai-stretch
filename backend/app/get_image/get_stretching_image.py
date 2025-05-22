@@ -57,7 +57,7 @@ async def analyze_image(file: UploadFile = File(...), pose_id: int = Form(None))
         print(f"운동 이름: {exercise}, 결과: {result}")
 
         return JSONResponse(content={
-            "exercise": exercise,
+            "pose_id": pose_id,
             "result": result
         })
 
