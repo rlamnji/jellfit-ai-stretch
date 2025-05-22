@@ -64,6 +64,8 @@ function CollectPage() {
 
    console.log("보유",characterUserGetMap);
 
+   // 필요한 데이터 : 지금 내가 한 누적 횟수(누적테이블) / 캐릭터 획득 조건테이블()
+
 
    // 그리드에 캐릭터 번호 매핑 (캐릭터 자리 지정)
    const gridCharacterMap = [
