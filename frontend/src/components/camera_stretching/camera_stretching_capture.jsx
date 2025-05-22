@@ -28,7 +28,7 @@ function CameraStretchingCapture({ handleIsStretching, sendFrameTime }) {
   }, []);
 
   // 2. 프레임 캡처해서 서버로 전송
-  const sendFrame = async () => {
+  const sendFrame = async ({ stretchingId }) => {
     const canvas = canvasRef.current;
     const video = videoRef.current;
     if (!canvas || !video) return;
@@ -43,6 +43,7 @@ function CameraStretchingCapture({ handleIsStretching, sendFrameTime }) {
     canvas.toBlob(async (blob) => {
       const formData = new FormData();
       formData.append("file", blob, "frame.jpg");
+      formData.append("stretchingId", stretchingId);
 
       try {
         const res = await fetch("http://localhost:8000/guide/analyze", {

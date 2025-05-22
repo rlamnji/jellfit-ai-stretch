@@ -226,6 +226,7 @@ function SelfStretchPage({ stretchingOrder, completedStretchings, setCompletedSt
         <CameraStretchingScreen
             handleIsStretching={handleIsStretching}
             sendFrameTime={sendFrameTime}
+            stretchingId = {stretchingId}
         />
 
         {/* ✅ 임시용 버튼 */}
