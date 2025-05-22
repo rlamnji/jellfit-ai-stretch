@@ -1,0 +1,5 @@
+calibration:
+  head_pitch_angle: 178.5
+  left_wrist_z:      -0.02
+  right_wrist_z:     -0.02
+  z_scale:            1.15
