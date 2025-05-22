@@ -1,0 +1,27 @@
+landmarks: [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22]
+
+features:
+  - name: left_elbow_angle
+    type: angle
+    points: [11, 13, 15]
+  - name: right_elbow_angle
+    type: angle
+    points: [12, 14, 16]
+  - name: left_elbow_z
+    type: coordinate_z
+    points: [13]
+  - name: right_elbow_z
+    type: coordinate_z
+    points: [14]
+
+thresholds:
+  min_left_elbow_angle: 160        # 팔꿈치가 펴진 각도 (단위: 도)
+  min_right_elbow_angle: 160
+  max_left_elbow_z: -0.05          # 엘보(z)가 일정 깊이(뒤쪽) 이상
+  max_right_elbow_z: -0.05
+  min_hold_duration_sec: 10        # 자세 유지 시간 (초)
+
+
+cycles:
+  type: hold      # rep vs hold 구분 플래그
+  count: 1        # 10초 유지 동작을 1회 수행해야 성공

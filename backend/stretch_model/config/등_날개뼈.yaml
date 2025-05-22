@@ -1,0 +1,26 @@
+# config/head_turn_stretch.yaml
+
+landmarks: [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22]
+
+features:
+  # 양손을 잡은 상태 확인: 손목 간 거리
+  - name: hand_clasp_distance
+    type: distance
+    points: [15, 16]
+
+  - name: head_turn_angle
+    type: angle
+    points: [7, 0, 8]   # 왼쪽 귀(7) – 코(0) – 오른쪽 귀(8) 각도
+
+thresholds:
+  # 손깍지 거리 최대 허용치
+  max_hand_clasp_distance: 0.05
+
+  min_head_turn_angle: 160  # 180°(정면) 대비 이 값 이하로 떨어지면 기울임 감지
+
+  # 자세 유지 시간 (초)
+  min_hold_duration_sec: 5
+
+cycles:
+  type: hold      # rep vs hold 구분 플래그
+  count: 1        # 10초 유지 동작을 1회 수행해야 성공
