@@ -1,6 +1,6 @@
 import { useRef, useEffect } from "react";
 
-function CameraStretchingCapture({ handleIsStretching, sendFrameTime }) {
+function CameraStretchingCapture({ handleIsStretching, sendFrameTime , stretchingId}) {
   const videoRef = useRef(null);
   const canvasRef = useRef(null); // canvasRef 초기화
   const streamRef = useRef(null); // 스트림을 저장할 ref
@@ -43,7 +43,7 @@ function CameraStretchingCapture({ handleIsStretching, sendFrameTime }) {
     canvas.toBlob(async (blob) => {
       const formData = new FormData();
       formData.append("file", blob, "frame.jpg");
-      formData.append("stretchingId", stretchingId);
+      formData.append("pose_id", stretchingId);
 
       try {
         const res = await fetch("http://localhost:8000/guide/analyze", {
@@ -63,9 +63,12 @@ function CameraStretchingCapture({ handleIsStretching, sendFrameTime }) {
 
   // 3. 일정 간격으로 프레임 전송
   useEffect(() => {
-    const interval = setInterval(sendFrame, sendFrameTime); // 0.3초마다 전송
-    return () => clearInterval(interval); // 컴포넌트 언마운트 시 정리 (안되는 듯?..)
-  }, []);
+  const interval = setInterval(() => {
+    sendFrame({ stretchingId });  // sendFrame 자체가 async이므로 여기선 그냥 호출만
+  }, sendFrameTime);
+
+  return () => clearInterval(interval);
+}, [stretchingId]);
 
   return (
     <div className="w-full flex flex-col items-center py-4">

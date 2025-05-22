@@ -10,7 +10,21 @@ from stretch_model.src.infer_anomaly import StretchTracker
 
 router = APIRouter(prefix="/guide/analyze", tags=["Stretching_Analyze"])
 
-IMAGE_DIR = "./app/get_image/guide_images"
+# IMAGE_DIR = "./app/get_image/guide_images"
+
+# pose_id에 따른 StretchTracker 모델 이름 매핑
+POSE_ID_TO_EXERCISE = {
+    1: "손목_돌리기",
+    2: "등_팔꿈치", # 아직 수정 안함
+    3: "가슴_T자",
+    4: "가슴_Y자",
+    5: "어깨_잡아당기기", # 아직 수정 안함
+    6: "등_앞",
+    7: "등_위",
+    8: "목_뒤로", # 아직 수정 안함
+    9: "어깨_겨드랑이", # 아직 수정 안함
+    10: "팔꿈치_회전" # 아직 수정 안함
+}
 
 tracker_cache = {}
 def get_tracker(exercise_name: str) -> StretchTracker:
@@ -21,7 +35,7 @@ def get_tracker(exercise_name: str) -> StretchTracker:
 
 
 @router.post("")
-async def analyze_image(file: UploadFile = File(...), exercise: str = Form(...)):
+async def analyze_image(file: UploadFile = File(...), pose_id: int = Form(None)):
     '''운동 이름에 맞는 Tracker를 불러와서 이미지 분석 후 결과 반환'''
     try:
         content = await file.read()
@@ -30,12 +44,17 @@ async def analyze_image(file: UploadFile = File(...), exercise: str = Form(...))
 
         if image is None:
             raise HTTPException(status_code=400, detail="이미지를 디코딩할 수 없습니다.")
-        
+
+        # 포즈ID에 따라 운동 이름 결정        
+        exercise = POSE_ID_TO_EXERCISE.get(pose_id)
+
         # exercise에 맞는 Tracker 불러오기
-        tracker = get_tracker(exercise)
+        tracker = get_tracker(exercise or "등_위")
 
         # 모델 추론
         result = tracker.is_performing(image)
+
+        print(f"운동 이름: {exercise}, 결과: {result}")
 
         return JSONResponse(content={
             "exercise": exercise,
