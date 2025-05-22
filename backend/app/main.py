@@ -9,12 +9,19 @@ from app.guide import select_poses, get_stretching
 from app.posture_ai import predict
 from app.update import update_user, update_user_stretch
 
+#디버깅
+from fastapi import FastAPI, Depends
+from sqlalchemy.orm import Session
+from db.database import get_db
+from db.models import User, DailyUsageLog
+
+
 app = FastAPI()
 
 # CORS 설정
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # 개발 환경에서만 사용, 프로덕션에서는 특정 도메인으로 변경
+    allow_origins=["http://localhost:3000"],  # 개발 환경에서만 사용, 프로덕션에서는 특정 도메인으로 변경
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -38,3 +45,8 @@ app.include_router(confirm_requests.router)
 app.include_router(select_poses.router)
 app.include_router(get_stretching.router)
 app.include_router(predict.router, tags=["predict-posture"])
+
+# 디버깅
+@app.get("/test/users")
+def test_get_users(db: Session = Depends(get_db)):
+    return db.query(DailyUsageLog).all()

@@ -2,8 +2,9 @@
 from fastapi import Header, APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from db.database import get_db
-from db.models import UsageRecord, User
+from db.models import UsageRecord, DailyUsageLog, User
 from pydantic import BaseModel
+from datetime import datetime, timezone
 from typing import Optional
 from passlib.context import CryptContext
 from dependencies import get_current_user
@@ -25,6 +26,8 @@ class StretchRecord(BaseModel):
 class StretchResponse(BaseModel):
     msg: str
     records: list[StretchRecord]
+
+
 
 # 횟수 누적
 @router.post("/record/accumulate", response_model=StretchResponse)
@@ -59,5 +62,62 @@ def save_stretching_record(
 
     return StretchResponse(
         msg="스트레칭 기록이 성공적으로 저장되었습니다.",
+        records=result_table
+    )
+
+# 요청
+class TimeRequest(BaseModel):
+    usage_time: int
+
+# 응답
+class TimeRecord(BaseModel):
+    date: str
+    usage_time: int
+
+
+class TimeResponse(BaseModel):
+    msg: str
+    records: list[TimeRecord]
+
+
+# 시간 누적(같은 날짜에 시간 계속 누적)
+@router.post("/time/accumulate", response_model=TimeResponse)
+def save_stretching_time(
+    request: TimeRequest,
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db)
+):
+    today = datetime.now(timezone.utc).date()
+
+    record = db.query(DailyUsageLog).filter_by(
+        user_id=current_user.user_id,
+        date=today
+    ).first()
+
+    # 시간 누적
+    if record:
+        record.usage_time += request.usage_time
+    else:
+        record = DailyUsageLog(
+            user_id=current_user.user_id,
+            date=today,
+            usage_time=request.usage_time
+        )
+        db.add(record)
+
+    db.commit()
+
+    # 모든 날짜 기록 반환
+    result = db.query(DailyUsageLog).filter_by(user_id=current_user.user_id).all()
+    result_table = [
+        TimeRecord(
+            date=r.date.strftime("%Y년 %m월 %d일"),
+            usage_time=r.usage_time
+        )
+        for r in result
+    ]
+
+    return TimeResponse(
+        msg="스트레칭 시간이 성공적으로 저장되었습니다.",
         records=result_table
     )

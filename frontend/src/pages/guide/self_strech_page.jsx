@@ -4,6 +4,11 @@ import TopBar from "../../components/top_bar";
 import SoundBtn from "../../components/buttons/sound_btn";
 import { useParams, useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
+import {
+  startOrResumeSession,
+  pauseSession,
+  endSession
+} from "../../utils/guide_timer";
 import arrowLeft from '../../assets/images/icons/arrow_left.png';
 
 import ModalManager from "../../components/stretching/modal/modal_manager";
@@ -24,6 +29,7 @@ function SelfStretchPage({ stretchingOrder, completedStretchings, setCompletedSt
     // 스트레칭 모달
     const [modalType, setModalType] = useState(null); // "complete", "getJelly", "confirmQuit"
     const [hasJelly, setHasJelly] = useState(false);
+    const [duration, setDuration] = useState(0);
 
     const handleIsStretching = (isStretching) => {
         setIsStretching(isStretching);
@@ -38,6 +44,8 @@ function SelfStretchPage({ stretchingOrder, completedStretchings, setCompletedSt
     };
 
     useEffect(() => {
+        startOrResumeSession(); // 시간 측정 시작
+
         async function fetchStretchingData() {
             const data = await getStretchingData(stretchingId);
             console.log("스트레칭 id", stretchingId)
@@ -75,6 +83,10 @@ function SelfStretchPage({ stretchingOrder, completedStretchings, setCompletedSt
             }
         }
         fetchStretchingData();
+
+        return () =>{
+            pauseSession(); // 페이지 나갈 때 정지
+        };
     }, [stretchingId]);
 
     // 시간이 다 되었을 경우 반복 증가
@@ -157,6 +169,28 @@ function SelfStretchPage({ stretchingOrder, completedStretchings, setCompletedSt
         }
     }
 
+    // 스트레칭 누적 시간 DB에 저장
+    async function timeUpdate(usageTime) {
+        try {
+            const res = await fetch("http://localhost:8000/guide/time/accumulate", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization": "Bearer " + sessionStorage.getItem("accessToken")
+            },
+            body: JSON.stringify({ usage_time: usageTime })
+            });
+
+            const data = await res.json();
+            console.log("데이터:", data);
+            return data;
+
+        } catch (err) {
+            console.error("에러:", err);
+            return null;
+        }
+    }
+
     return (
         <div className="w-full h-screen flex flex-col items-center bg-space">
 
@@ -202,8 +236,12 @@ function SelfStretchPage({ stretchingOrder, completedStretchings, setCompletedSt
 
                 if (currentIdx === stretchingOrder.length - 1) {
                     console.log("모든 완료된 스트레칭:", completedStretchings);
+                    const result = endSession(); // 종료 시간 계산
+                    console.log("누적 시간", result.duration, "초");
+                    setDuration(result.duration); 
+                    timeUpdate(result.duration); // 누적 시간 기록 api 호출
                     setModalType("complete"); // 완료 모달 띄우기
-                    recordUpdate(); // api 호출
+                    recordUpdate(); // 누적 횟수 기록 api 호출
                 } else {
                     const nextStretchingId = stretchingOrder[currentIdx + 1];
                     navigate(`/guide/video/${nextStretchingId}`);
@@ -213,7 +251,7 @@ function SelfStretchPage({ stretchingOrder, completedStretchings, setCompletedSt
             다음으로 넘어가기 (임시)
             </button>
 
-         <ModalManager modalType={modalType} setModalType={setModalType} completedStretchings={completedStretchings}/>
+         <ModalManager modalType={modalType} setModalType={setModalType} completedStretchings={completedStretchings} duration={duration}/>
         </div>
         
     );

@@ -3,11 +3,11 @@ import StretchCompleteModal from "./stretch_complete_modal";
 import CharacterGetModal from "./character_get_modal";
 import StretchQuitModal from "./stretch_quit_modal";
 
-export default function ModalManager({ modalType, setModalType, completedStretchings }) {
+export default function ModalManager({ modalType, setModalType, completedStretchings, duration }) {
   return (
     <>
       {modalType === "complete" && (
-        <StretchCompleteModal completedStretchings={completedStretchings}
+        <StretchCompleteModal completedStretchings={completedStretchings} duration={duration}
           onClose={() => {
             //if (hasJelly) setModalType("getJelly");
             setModalType(null);

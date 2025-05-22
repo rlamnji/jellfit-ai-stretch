@@ -65,10 +65,6 @@ class UsageRecord(Base):
 
     record_id = Column(Integer, primary_key=True)
     user_id = Column(Integer, ForeignKey('users.user_id'))
-    # 람다를 사용하여 동적으로 시간 설정, UTC 현재 시간
-    #date = Column(DateTime(timezone=True), default=lambda: datetime.now(timezone.utc))
-    # 초 기준
-    #usage_time = Column(Integer, nullable=False)
     # 자세번호 (추가)
     pose_id = Column(Integer, ForeignKey('poses.pose_id'))
     # 횟수 (추가)
@@ -85,7 +81,7 @@ class DailyUsageLog(Base):
 
     log_id = Column(Integer, primary_key=True, autoincrement=True)
     user_id = Column(Integer, ForeignKey('users.user_id'), nullable=False)
-    date = Column(Date, default=lambda: datetime.now(timezone.utc).date())  # YYYY-MM-DD 기준
+    date = Column(Date, default=lambda: datetime.now(timezone.utc).date())
     usage_time = Column(Integer, nullable=False)  # 하루 동안의 총 스트레칭 시간 (초)
     
 
