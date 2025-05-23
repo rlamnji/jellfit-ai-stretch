@@ -5,7 +5,7 @@ from db.database import get_db
 from db.models import UsageRecord, DailyUsageLog, User
 from pydantic import BaseModel
 from datetime import datetime, timezone
-from typing import Optional
+from typing import Optional, List
 from passlib.context import CryptContext
 from dependencies import get_current_user
 
@@ -15,45 +15,49 @@ pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 # 요청
 class StretchRequest(BaseModel):
+    name: str
     pose_id: int
-    repeat_cnt: int
+    repeatCount: int
 
-# 응답
+class StretchBatchRequest(BaseModel):
+    records: List[StretchRequest]
+
 class StretchRecord(BaseModel):
     pose_id: int
     repeat_cnt: int
 
 class StretchResponse(BaseModel):
     msg: str
-    records: list[StretchRecord]
+    records: List[StretchRecord]
 
 
 
 # 횟수 누적
 @router.post("/record/accumulate", response_model=StretchResponse)
 def save_stretching_record(
-    request: StretchRequest,
+    request: StretchBatchRequest,
     current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db)
 ):
-    record = db.query(UsageRecord).filter_by(
-        user_id=current_user.user_id,
-        pose_id=request.pose_id
-    ).first()
-
-    # 누적
-    if record:
-        record.repeat_cnt += request.repeat_cnt
-    else:
-        record = UsageRecord(
+    for record in request.records:
+        existing = db.query(UsageRecord).filter_by(
             user_id=current_user.user_id,
-            pose_id=request.pose_id,
-            repeat_cnt=request.repeat_cnt
-        )
-        db.add(record)
+            pose_id=record.pose_id
+        ).first()
+
+        if existing:
+            existing.repeat_cnt += record.repeatCount
+        else:
+            new_record = UsageRecord(
+                user_id=current_user.user_id,
+                pose_id=record.pose_id,
+                repeat_cnt=record.repeatCount
+            )
+            db.add(new_record)
 
     db.commit()
 
+    # 결과 전체 조회
     result = db.query(UsageRecord).filter_by(user_id=current_user.user_id).all()
     result_table = [
         StretchRecord(pose_id=r.pose_id, repeat_cnt=r.repeat_cnt)
@@ -61,7 +65,7 @@ def save_stretching_record(
     ]
 
     return StretchResponse(
-        msg="스트레칭 기록이 성공적으로 저장되었습니다.",
+        msg="모든 스트레칭 기록 저장 완료",
         records=result_table
     )
 
