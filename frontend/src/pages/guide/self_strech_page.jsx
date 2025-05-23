@@ -16,6 +16,7 @@ function SelfStretchPage({ stretchingOrder, completedStretchings, setCompletedSt
     const navigate = useNavigate();
     const { stretchingId } = useParams();
     const [stretching, setStretching] = useState(null);
+    const [selectedIds, setSelectedIds] = useState([]); // 사용자가 선택한 모든 스트레칭 id 목록
 
     const sendFrameTime = 300; // 0.3초마다 프레임 전송
     const [currentStretchingTime, setCurrentStretchingTime] = useState(0);
@@ -158,7 +159,8 @@ function SelfStretchPage({ stretchingOrder, completedStretchings, setCompletedSt
         });
         if(res.ok){
         const data = await res.json();
-        return data
+        console.log("누적 성공", data);
+        return data;
         } else {
         console.error("스트레칭 데이터를 가져오지 못했습니다.");
         return null;
@@ -186,6 +188,29 @@ function SelfStretchPage({ stretchingOrder, completedStretchings, setCompletedSt
             return null;
         }
     }
+
+    // 스트레칭 완료 후 해파리 획득이 가능한지 조건 검사 후 필터링
+     async function checkGetCharacters(stretchingId) {
+        try {
+            const chekRes = await fetch("http://localhost:8000/guide/available-characters", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization": "Bearer " + sessionStorage.getItem("accessToken")
+            },
+            body: JSON.stringify({ pose_id: stretchingId })
+            });
+
+            const data = await chekRes.json();
+            console.log("데이터:", data);
+            return data;
+
+        } catch (err) {
+            console.error("에러:", err);
+            return null;
+        }
+    }   
+
 
     return (
         <div className="w-full h-screen flex flex-col items-center bg-space">
@@ -239,8 +264,20 @@ function SelfStretchPage({ stretchingOrder, completedStretchings, setCompletedSt
                     console.log("누적 시간", result.duration, "초");
                     setDuration(result.duration); 
                     timeUpdate(result.duration); // 누적 시간 기록 api 호출
+
                     setModalType("complete"); // 완료 모달 띄우기
                     recordUpdate(); // 누적 횟수 기록 api 호출
+                    
+                    // 캐릭터 획득 가능한지 조건 검사 api
+                    const charResult = await checkGetCharacters(stretchingId);
+                    
+                    if (charResult?.unlocked_character_ids?.length > 0) {
+                        setSelectedIds(charResult.unlocked_character_ids);  // pose_id 배열 저장
+                        console.log("획득 가능한 캐릭터들:", charResult.unlocked_character_ids);
+                    }
+
+                    // 캐릭터 등록 api
+
                 } else {
                     const nextStretchingId = stretchingOrder[currentIdx + 1];
                     navigate(`/guide/video/${nextStretchingId}`);

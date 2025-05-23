@@ -6,7 +6,7 @@ from pydantic import BaseModel
 from db.models import UsageRecord
 from db.database import get_db
 
-router = APIRouter(prefix="/user", tags=["User"])
+router = APIRouter(prefix="/users", tags=["Users"])
 
 # 응답 스키마
 class usageDetail(BaseModel):

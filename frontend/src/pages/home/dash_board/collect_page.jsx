@@ -82,7 +82,7 @@ function CollectPage() {
 
             const [nameRes, cntRes] = await Promise.all([
                fetch(`http://localhost:8000/guide/stretching/${poseId}`),
-               fetch(`http://localhost:8000/user/repeat-count/${poseId}`)
+               fetch(`http://localhost:8000/users/repeat-count/${poseId}`)
             ]);
 
             if (!nameRes.ok || !cntRes.ok /*|| !stretchRes.ok*/) {
