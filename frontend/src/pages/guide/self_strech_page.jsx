@@ -4,11 +4,7 @@ import TopBar from "../../components/top_bar";
 import SoundBtn from "../../components/buttons/sound_btn";
 import { useParams, useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
-import {
-  startOrResumeSession,
-  pauseSession,
-  endSession
-} from "../../utils/guide_timer";
+import { startOrResumeSession, pauseSession, endSession } from "../../utils/guide_timer";
 import arrowLeft from '../../assets/images/icons/arrow_left.png';
 
 import ModalManager from "../../components/stretching/modal/modal_manager";

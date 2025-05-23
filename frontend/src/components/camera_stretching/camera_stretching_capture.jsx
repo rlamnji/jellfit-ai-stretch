@@ -1,5 +1,5 @@
 import { useRef, useEffect } from "react";
-
+import StretchingFeedback from "../stretching/stretching_feedback";
 function CameraStretchingCapture({ handleIsStretching, sendFrameTime , stretchingId}) {
   const videoRef = useRef(null);
   const canvasRef = useRef(null); // canvasRef 초기화
@@ -76,7 +76,7 @@ function CameraStretchingCapture({ handleIsStretching, sendFrameTime , stretchin
       <video
         ref={videoRef}
         autoPlay
-        className="w-[640px] h-[480px] border rounded-xl transform scale-x-[-1]"
+        className="w-[640px] h-[480px] border rounded-xl transform scale-x-[-1] mb-6"
       />
 
       {/* 👻 서버 전송용 캔버스 (사용자에겐 숨김) */}
@@ -86,6 +86,9 @@ function CameraStretchingCapture({ handleIsStretching, sendFrameTime , stretchin
         height="480"
         className="hidden"
       />
+
+      {/*해파리 피드백*/}
+        <StretchingFeedback/>
     </div>
   );
 }
