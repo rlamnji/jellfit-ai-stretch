@@ -5,17 +5,10 @@ import BackgroundModeModal from '../../../assets/images/icons/home/background_mo
 import setCancel  from '../../../assets/images/icons/cancel.png';
 import badPose1 from '../../../assets/images/icons/home/background_bad_pose_1.png';
 import badPose2 from '../../../assets/images/icons/home/background_bad_pose_2.png';
-import CameraStretchingScreen from '../../camera_stretching/camera_stretching_screen';
-import CameraPostureScreen from '../../camera_posture/camera_posture_screen';
 
 // 나중에 로그아웃할때 showpopup false로 변경해주는 함수 작성할 것
 function BackgroundModal({setOpenModal,  showPopup, setShowPopup, /*cameraStarted, setCameraStarted*/}) {
     const [cameraStarted, setCameraStarted] = useState(false);
-    const sendFrameTime = 300; // 0.3초마다 프레임 전송
-
-    useEffect(() => {
-        console.log("cameraStarted changed:", cameraStarted);
-    }, [cameraStarted]);
 
     const handleClose = () => {
         // 로그아웃 연결 시 추가
@@ -29,23 +22,28 @@ function BackgroundModal({setOpenModal,  showPopup, setShowPopup, /*cameraStarte
         
     };
 
-    const startCamera = () => {
-        setTimeout(() => {
-            setCameraStarted(true);
-            console.log(cameraStarted); // 참고: 여기선 여전히 이전 상태 출력
-        }, 200);
-    };
-
     const startBackgroundMode = () => {
         closeModal();
         startCamera();
         closeModal();
     };
 
-    const handlePostureCode = (postureCode) => {
-        console.log("Posture Code:", postureCode);
-        // 자세 코드에 따라 알람을 주는 코드 추가해야 함.
-    }
+    const startCamera = () => {
+        setTimeout(() => {
+            setCameraStarted(true);
+        }, 200);
+    };
+
+    useEffect(() => {
+        console.log("cameraStarted changed:", cameraStarted);
+        if (window.api && window.api.startPostureMode) {
+            window.api.startPostureMode(); //카메라 창 켜짐.
+        } else {
+            // console.log(window.api); //undefined
+            console.error('Electron API가 정의되지 않았습니다.');
+        }
+    }, [cameraStarted]);
+
     /*const startBackgroundMode = () => {
         // 로그아웃 연결 시 추가
         /*if (showPopup) {
@@ -93,7 +91,7 @@ function BackgroundModal({setOpenModal,  showPopup, setShowPopup, /*cameraStarte
                 </div>
 
 
-                {/* 시작 버튼 */}
+                {/* 오늘 하루동안 보지 않기 */}
                 <div className='absolute flex flex-row items-center left-3/4 bottom-6 z-[1000] gap-2 cursor-pointer'>
                     <div className={`rounded-sm w-5 h-5
                         ${showPopup ? "bg-[#5C5C5C]" : "bg-none border border-[#5C5C5C]" }`
@@ -107,11 +105,11 @@ function BackgroundModal({setOpenModal,  showPopup, setShowPopup, /*cameraStarte
       
             </div>
 
-            {cameraStarted && (
+            {/* {cameraStarted && (
                 <div className="fixed top-4 overflow-y-auto p-4 right-4 w-[400px] h-[300px] z-[999999] bg-white rounded-lg shadow-lg overflow-hidden">
                 <CameraPostureScreen handlePostureCode={handlePostureCode} sendFrameTime={sendFrameTime} />
                 </div>
-            )}
+            )} */}
         </div>
   );
 }

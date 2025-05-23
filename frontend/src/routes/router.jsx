@@ -13,6 +13,7 @@ import SelfStretchPage from "../pages/guide/self_strech_page";
 import WatchGuidePage from "../pages/guide/watch_guide_page";
 import GuideCompletePage from "../pages/guide/guide_complete_page";
 import CalibrationPage from "../pages/join/calibration_page";
+import CameraPostureScreen from "../components/camera_posture/camera_posture_screen";
 
 function Router() {
     const [stretchingOrder, setStretchingOrder] = useState([]);
@@ -53,6 +54,9 @@ function Router() {
                     
                 {/* 일지 화면 */}   
                 <Route path="/diary" element={<DiaryPage />} />
+
+                {/* 카메라 화면 */}
+                <Route path="/camera/posture" element={<CameraPostureScreen />} />
 
 
             </Routes>
