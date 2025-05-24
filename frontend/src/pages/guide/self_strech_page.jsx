@@ -25,8 +25,9 @@ function SelfStretchPage({ stretchingOrder, completedStretchings, setCompletedSt
 
     // 스트레칭 모달
     const [modalType, setModalType] = useState(null); // "complete", "getJelly", "confirmQuit"
-    const [hasJelly, setHasJelly] = useState(false);
+    //const [hasJelly, setHasJelly] = useState(false);
     const [duration, setDuration] = useState(0);
+    const [pendingJelly, setPendingJelly] = useState(null);
 
     const handleIsStretching = (isStretching) => {
         setIsStretching(isStretching);
@@ -202,6 +203,11 @@ function SelfStretchPage({ stretchingOrder, completedStretchings, setCompletedSt
 
             const data = await chekRes.json();
             console.log("획득 가능한 캐릭터 내용", data);
+
+            // 배열에 내용 있을 때 상태 true로
+            /*if (Array.isArray(data) && data.length > 0) {
+                setHasJelly(true);
+            }*/
             return data;
 
         } catch (err) {
@@ -283,10 +289,10 @@ function SelfStretchPage({ stretchingOrder, completedStretchings, setCompletedSt
                     const result = endSession(); // 종료 시간 계산
                     console.log("현재 누적 시간", result.duration, "초");
                     setDuration(result.duration); 
-                    timeUpdate(result.duration); // 누적 시간 기록 api 호출
 
+                    await timeUpdate(result.duration); // 누적 시간 기록 api 호출
                     setModalType("complete"); // 완료 모달 띄우기
-                    recordUpdate(completedStretchings); // 누적 횟수 기록 api 호출
+                    await recordUpdate(completedStretchings); // 누적 횟수 기록 api 호출
                     
                     // 캐릭터 획득 가능한지 조건 검사 api
                     const charResult = await checkGetCharacters();
@@ -294,10 +300,20 @@ function SelfStretchPage({ stretchingOrder, completedStretchings, setCompletedSt
                     if (charResult?.unlocked_character_ids?.length > 0) {
                         setSelectedIds(charResult.unlocked_character_ids);  // pose_id 배열 저장
                         console.log("획득 가능한 캐릭터 아이디", charResult.unlocked_character_ids);
+                        setPendingJelly(charResult.unlocked_character_ids);
                     }
+
+                    // 캐릭터 모달창 띄우기
+                    /*if(hasJelly){
+                        // 획득한 jelly 있음
+                        setModalType("getJelly");
+                    }*/
+                    
 
                     // 캐릭터 등록 api
                     postCharacters(charResult.unlocked_character_ids);
+
+                    // 등록은 확인 버튼 눌렀을 시에
 
                 } else {
                     const nextStretchingId = stretchingOrder[currentIdx + 1];
@@ -308,7 +324,7 @@ function SelfStretchPage({ stretchingOrder, completedStretchings, setCompletedSt
             다음으로 넘어가기 (임시)
             </button>
 
-         <ModalManager modalType={modalType} setModalType={setModalType} completedStretchings={completedStretchings} duration={duration}/>
+         <ModalManager modalType={modalType} setModalType={setModalType} completedStretchings={completedStretchings} duration={duration} pendingJelly={pendingJelly} setPendingJelly={setPendingJelly}/>
         </div>
         
     );
