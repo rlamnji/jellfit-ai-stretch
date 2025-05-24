@@ -1,12 +1,14 @@
-from fastapi import APIRouter, UploadFile, File, HTTPException, Form
+from fastapi import APIRouter, UploadFile, File, HTTPException, Form, Depends
 from fastapi.responses import JSONResponse
-# from PIL import Image
-# import io
-# import os
-# from datetime import datetime
 import numpy as np
 import cv2
 from stretch_model.src.infer_anomaly import StretchTracker
+from sqlalchemy.orm import Session
+from db.database import get_db
+from db.models import User, Pose
+from dependencies import get_current_user
+from app.get_image.manager import stretch_session_manager
+
 
 router = APIRouter(prefix="/guide/analyze", tags=["Stretching_Analyze"])
 
@@ -33,52 +35,73 @@ def get_tracker(exercise_name: str) -> StretchTracker:
         tracker_cache[exercise_name] = StretchTracker(exercise=exercise_name)
     return tracker_cache[exercise_name]
 
-
 @router.post("")
-async def analyze_image(file: UploadFile = File(...), pose_id: int = Form(None)):
-    '''운동 이름에 맞는 Tracker를 불러와서 이미지 분석 후 결과 반환'''
-    try:
-        content = await file.read()
-        image_array = np.asarray(bytearray(content), dtype=np.uint8)
-        image = cv2.imdecode(image_array, cv2.IMREAD_COLOR)
+async def analyze_image(
+    file: UploadFile = File(...),
+    pose_id: int = Form(None or 7),
+    db: Session = Depends(get_db),
+    #current_user: User = Depends(get_current_user)
+):
+    print("시작")
+    print(f"pose_id: {pose_id}")
+    content = await file.read()
+    image_array = np.asarray(bytearray(content), dtype=np.uint8)
+    image = cv2.imdecode(image_array, cv2.IMREAD_COLOR)
 
-        if image is None:
-            raise HTTPException(status_code=400, detail="이미지를 디코딩할 수 없습니다.")
+    pose = db.query(Pose).filter(Pose.pose_id == pose_id).first()
+    if not pose:
+        raise HTTPException(status_code=404, detail="Pose not found")
 
-        # 포즈ID에 따라 운동 이름 결정        
-        exercise = POSE_ID_TO_EXERCISE.get(pose_id)
+    exercise = POSE_ID_TO_EXERCISE.get(pose_id)
+    tracker = get_tracker(exercise or "등_위")
+    result = tracker.is_performing(image)
 
-        # exercise에 맞는 Tracker 불러오기
-        tracker = get_tracker(exercise or "등_위")
+    is_true = result.get("completed", False)
+    direction = result.get("current_side", "none")
 
-        # 모델 추론
-        result = tracker.is_performing(image)
+    dummy_user_id = 1
 
-        print(f"운동 이름: {exercise}, 결과: {result}")
+    session = stretch_session_manager.get_or_create_session(dummy_user_id, pose_id, pose)
+    status = session.update(is_true, direction)
+    print("들어간 방향", direction)
 
-        return JSONResponse(content={
-            "pose_id": pose_id,
-            "result": result
-        })
+    # 응답 메시지 구성
+    message = None
+    
+# 동작이 정확하고 아직 세션이 완료되지 않았을 때
+    if is_true and not status["completed"]:
+        # 목표 횟수에 막 도달한 경우
+        if (direction == "right" and status["right_count"] == 5) or \
+            (direction == "left" and status["left_count"] == 5):
+            message = f"{direction.upper()} 방향 다했어요! 🎉"
 
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+        # 중간 진행 상태에 따라 격려 메시지 다양화
+        elif (direction == "right" and 1 <= status["right_count"] < 5):
+            message = f"오른쪽 {status['right_count']}회! 계속해봐요!"
+        elif (direction == "left" and 1 <= status["left_count"] < 5):
+            message = f"왼쪽 {status['left_count']}회! 계속해봐요!"
 
-    # content = await file.read()
+    # 동작이 틀렸고, 어느 쪽이든 시도가 있었던 경우
+    elif not is_true and (status["right_count"] > 0 or status["left_count"] > 0):
+        # 잘못된 자세일 경우 랜덤한 피드백 메시지들 중 하나 선택 (원하면 random 사용 가능)
+        message = "자세가 조금 흐트러졌어요. 다시 집중해볼까요?"
 
-    # # 이미지 파일 저장
-    # # 스트레칭 가이드 0.3초 간격 프레임이 /backend/app/get_image/guide_images 폴더에 생김
-    # os.makedirs(IMAGE_DIR, exist_ok=True)
+    
 
-    # # 파일명에 타임스탬프 추가
-    # timestamp = datetime.now().strftime("%Y%m%d_%H%M%S_%f")
-    # file_ext = os.path.splitext(file.filename)[1]  # .jpg, .png 등
-    # new_filename = f"{timestamp}{file_ext}"
-    # file_path = os.path.join(IMAGE_DIR, new_filename)
+    print("==========================")
+    print("=API 응답 메시지: ")
+    print ("status",status, "message", message)
+    print("==========================")
 
-    # with open(file_path, "wb") as f:
-    #     f.write(content)
+    return {
+        "status": status,
+        "message": message
+    }
 
-    # print(f"📸 이미지 수신 완료: {len(content)} bytes, filename={file.filename}")
-
-    # return JSONResponse(content={"result": "received", "filename": file.filename})
+    # return {
+    #     "pose_id": pose_id,
+    #     "is_true": is_true,
+    #     "direction": direction,
+    #     "message": message,
+    #     **status  # merged: elapsed_time or counts + completed
+    # }
