@@ -5,9 +5,12 @@ import BackgroundModeModal from '../../../assets/images/icons/home/background_mo
 import setCancel  from '../../../assets/images/icons/cancel.png';
 import badPose1 from '../../../assets/images/icons/home/background_bad_pose_1.png';
 import badPose2 from '../../../assets/images/icons/home/background_bad_pose_2.png';
+import { useNavigate } from 'react-router-dom';
 
 // 나중에 로그아웃할때 showpopup false로 변경해주는 함수 작성할 것
 function BackgroundModal({setOpenModal,  showPopup, setShowPopup, /*cameraStarted, setCameraStarted*/}) {
+    const navigate = useNavigate();
+    
     const [cameraStarted, setCameraStarted] = useState(false);
 
     const handleClose = () => {
@@ -24,25 +27,17 @@ function BackgroundModal({setOpenModal,  showPopup, setShowPopup, /*cameraStarte
 
     const startBackgroundMode = () => {
         closeModal();
-        startCamera();
-        closeModal();
-    };
 
-    const startCamera = () => {
-        setTimeout(() => {
-            setCameraStarted(true);
-        }, 200);
-    };
-
-    useEffect(() => {
-        console.log("cameraStarted changed:", cameraStarted);
         if (window.api && window.api.startPostureMode) {
+            //ON! 카메라종료하면 다시 홈화면으로 가도록..
             window.api.startPostureMode(); //카메라 창 켜짐.
+
         } else {
-            // console.log(window.api); //undefined
             console.error('Electron API가 정의되지 않았습니다.');
         }
-    }, [cameraStarted]);
+
+        setCameraStarted(true);
+    };
 
     /*const startBackgroundMode = () => {
         // 로그아웃 연결 시 추가

@@ -1,7 +1,6 @@
 const { app, BrowserWindow, session, ipcMain, Notification } = require('electron');
 const path = require('path');
 
-
 function createWindow () {
 
   const mainWindow = new BrowserWindow({
@@ -17,16 +16,14 @@ function createWindow () {
 
   // 개발 환경에서는 localhost:3000 (CRA dev server)
   mainWindow.loadURL("http://localhost:3000");
-  // 일렉트론에서 콘솔창 여는 코드. 배포 시 삭제하기.
-  // ctrl + shift + I 누르면 일렉트론에서 수동으로 콘솔창 열림.
-  mainWindow.webContents.openDevTools(); 
   
   // 프로덕션용 경로 (빌드 후 사용할 경우)
   // mainWindow.loadFile(path.join(__dirname, '../frontend/build/index.html'));
 
   //자세교정모드 켜면 뜨는 창
   ipcMain.on('start-posture-mode', () => {
-    mainWindow.hide();
+    mainWindow.webContents.loadURL("http://localhost:3000/posture/state");
+    mainWindow.minimize();
 
     const postureCameraWindow = new BrowserWindow({
       // width: 320,

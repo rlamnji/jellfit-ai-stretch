@@ -14,6 +14,7 @@ import WatchGuidePage from "../pages/guide/watch_guide_page";
 import GuideCompletePage from "../pages/guide/guide_complete_page";
 import CalibrationPage from "../pages/join/calibration_page";
 import CameraPostureScreen from "../components/camera_posture/camera_posture_screen";
+import PostureModeStatePage from "../pages/posture/posture_mode_state_page";
 
 function Router() {
     const [stretchingOrder, setStretchingOrder] = useState([]);
@@ -57,6 +58,9 @@ function Router() {
 
                 {/* 카메라 화면 */}
                 <Route path="/camera/posture" element={<CameraPostureScreen />} />
+
+                {/* 자세 교정모드 상태 화면 페이지 */}
+                <Route path="/posture/state" element={<PostureModeStatePage />} />
 
 
             </Routes>
