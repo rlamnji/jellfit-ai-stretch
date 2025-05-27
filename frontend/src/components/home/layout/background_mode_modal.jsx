@@ -29,7 +29,6 @@ function BackgroundModal({setOpenModal,  showPopup, setShowPopup, /*cameraStarte
         closeModal();
 
         if (window.api && window.api.startPostureMode) {
-            //ON! 카메라종료하면 다시 홈화면으로 가도록..
             window.api.startPostureMode(); //카메라 창 켜짐.
 
         } else {

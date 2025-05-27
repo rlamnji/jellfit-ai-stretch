@@ -11,5 +11,4 @@ contextBridge.exposeInMainWorld('api', {
     ipcRenderer.on("notification-ack", (_, ...args) => callback(...args));
   },
 
-  navigateMain: () => ipcRenderer.send("navigate-main"),
 });

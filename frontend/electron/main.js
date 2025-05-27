@@ -1,4 +1,4 @@
-const { app, BrowserWindow, session, ipcMain, Notification } = require('electron');
+const { app, BrowserWindow, session, ipcMain, Notification, screen } = require('electron');
 const path = require('path');
 
 function createWindow () {
@@ -25,12 +25,19 @@ function createWindow () {
     mainWindow.webContents.loadURL("http://localhost:3000/posture/state");
     mainWindow.minimize();
 
+    const MARGIN = 10;
+    const { width: screenWidth } = screen.getPrimaryDisplay().workAreaSize;
+
+    const popupWidth = 320;
+    const popupHeight = 240;
+
     const postureCameraWindow = new BrowserWindow({
-      // width: 320,
-      // height: 240,
-      width: 800,
-      height: 1000,
-      // frame: false,
+      width: popupWidth,
+      height: popupHeight,
+      x: screenWidth - popupWidth - MARGIN,
+      y: MARGIN,   
+      frame: true,
+      autoHideMenuBar: true,
       // alwaysOnTop: true,
       // resizable: false,
       webPreferences: {
@@ -44,7 +51,9 @@ function createWindow () {
 
     // 전체 화면 아이콘 만들면 이거 수정해야 됨.
     postureCameraWindow.on('closed', () => {
+      mainWindow.webContents.loadURL("http://localhost:3000/home");
       mainWindow.show(); // 카메라 창 닫히면 메인창 다시 보여주기
+      //프레임전송꺼야함.ON!
     });
   });
 
@@ -53,28 +62,13 @@ function createWindow () {
     
     const notification = new Notification({
       title,
-      body,
-      actions: [{ text: "확인", type: "button" }],
-      closeButtonText: "닫기",
+      body
     });
-  
-    notification.on("action", () => {
-      event.sender.send("notification-ack");
-    });
+
   
     notification.show();
   });
-  
-  
 
-  ipcMain.on("navigate-main", (event) => {
-    const windows = BrowserWindow.getAllWindows();
-    const postureCameraWindow = windows.find(w => w.getBounds().width === 320); // 조건은 자유롭게
-    const mainWindow = windows.find(w => w !== postureCameraWindow);
-  
-    if (postureCameraWindow) postureCameraWindow.close(); // 현재 창 닫기
-    if (mainWindow) mainWindow.show(); // 메인창 다시 표시
-  });
 }
 
 

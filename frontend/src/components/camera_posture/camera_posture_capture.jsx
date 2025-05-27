@@ -25,21 +25,7 @@ function CameraPostureCapture({ sendFrameTime }) {
   const [hasAlerted, setHasAlerted] = useState(false);
 
   const [currentPosture, setCurrentPosture] = useState(0);
-
-  // 카메라 끄기 함수
-  const stopCamera = () => {
-    if (streamRef.current) {
-      streamRef.current.getTracks().forEach(track => track.stop());
-      console.log("✅ 카메라 스트림 정지됨");
-    }
   
-    // 프레임 전송 중단
-    if (intervalRef.current) {
-      clearInterval(intervalRef.current);
-      intervalRef.current = null;
-      console.log("🛑 프레임 전송 중단됨");
-    }
-  };
   
 
   // 카메라 연결
@@ -166,20 +152,20 @@ function CameraPostureCapture({ sendFrameTime }) {
   }, [inBadPosture]);
 
   // 2. 알림의 '확인'을 눌러도 알림 상태 초기화됨.
-  useEffect(() => {
-    const handleAck = () => {
-      console.log("✅ 사용자 알림 확인 (버튼 클릭)");
-      hasAlertedRef.current = false;
-      setInBadPosture(false); // 원하면 포함 (알림이 눌리면 나쁜 자세도 끝난 걸로 처리할 때)
-    };
+  // useEffect(() => {
+  //   const handleAck = () => {
+  //     console.log("✅ 사용자 알림 확인 (버튼 클릭)");
+  //     hasAlertedRef.current = false;
+  //     setInBadPosture(false); // 원하면 포함 (알림이 눌리면 나쁜 자세도 끝난 걸로 처리할 때)
+  //   };
   
-    window.api?.onNotificationAck?.(handleAck);
+  //   window.api?.onNotificationAck?.(handleAck);
   
-    return () => {
-      // cleanup: 리스너 제거
-      window.api?.onNotificationAck?.(() => {});
-    };
-  }, []);
+  //   return () => {
+  //     // cleanup: 리스너 제거
+  //     window.api?.onNotificationAck?.(() => {});
+  //   };
+  // }, []);
   
 
   // 좋은 자세 타이머
@@ -194,6 +180,25 @@ function CameraPostureCapture({ sendFrameTime }) {
     return () => clearInterval(intervalRef.current);
   }, [sendFrameTime]);
   
+  // 종료 버튼 클릭 핸들러
+  const handleOnExitClick = () => {
+    stopCamera();
+    window.close();
+  }
+
+  // 카메라 끄기 함수
+  const stopCamera = () => {
+    if (streamRef.current) {
+      streamRef.current.getTracks().forEach(track => track.stop());
+      console.log("✅ 카메라 스트림 정지됨");
+    }
+  
+    if (intervalRef.current) {
+      clearInterval(intervalRef.current);
+      intervalRef.current = null;
+      console.log("🛑 프레임 전송 중단됨");
+    }
+  };
 
   return (
     <div className="w-full h-screen flex flex-col items-center py-4">
@@ -206,8 +211,7 @@ function CameraPostureCapture({ sendFrameTime }) {
 
       {/* 하단 툴바 (종료, 메인, 카메라 종료) */}
       <PostureToolbar
-        onExit={() => window.close()}
-        onBackToMain={() => window.api?.navigateMain?.()}
+        onExit={handleOnExitClick}
         onStopCamera={stopCamera}
       />
 
