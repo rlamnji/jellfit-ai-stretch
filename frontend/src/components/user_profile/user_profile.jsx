@@ -3,38 +3,35 @@
 import friendsContent from '../../assets/images/icons/detail_user_content.png';
 import ProfileModal from './user_profile_modal';
 import { useState, useEffect } from 'react';
-import { useLocation } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 
 function UserProfile(){
+    const navigate = useNavigate();
     const [modal, setOpenModal] = useState(false);
-
     const location = useLocation();
     const [userData, setUserData] = useState(location.state?.userData || {});
 
-    /*const handleUpdateUser = (updatedUser) => {
-        setUserData(updatedUser); // 갱신
-        setOpenModal(false); 
-    };
-
-    useEffect(() => {
-        if (modal === false && userData) {
-            // userData가 바뀌면 리렌더링
-            console.log("프로필이 갱신되었습니다:", userData);
-        }
-    }, [modal, userData]);*/
-
     const handleLogout = () => {
-        /*axios.post('/auth/logout', {}, {
-            headers: {
-              Authorization: `Bearer ${token}`
-            }
-          }).then(() => {
-            // 토큰 삭제 후 페이지 이동
-            localStorage.removeItem('token');
-            navigate('/login');
-          });*/
 
-          console.log('로그아웃 버튼 클릭');
+        const accessToken = sessionStorage.getItem("accessToken");
+
+        fetch('http://127.0.0.1:8000/auth/logout', {
+            method:"POST",
+            headers:{
+                'Authorization': `Bearer ${accessToken}`
+            },
+        })
+        .then(res =>{
+            if(res.ok){
+                sessionStorage.removeItem('token');
+                navigate('/login');
+            } else {
+                console.error("로그아웃 실패 ", res.statusText);
+            }
+        })
+        .catch(err =>{
+            console.log(err);
+        });
     }
 
     return (

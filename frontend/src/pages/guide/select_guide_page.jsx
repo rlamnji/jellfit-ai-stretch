@@ -6,7 +6,7 @@ import SelectedStretching from "../../components/stretching/selected_stretching"
 import { useNavigate } from "react-router-dom";
 
 
-function SelectGuidePage({ setStretchingOrder }) {
+function SelectGuidePage({ setStretchingOrder, setCompletedStretchings }) {
     
     //랜덤 선택해지는 기능 (미완성)
   
@@ -117,8 +117,10 @@ function SelectGuidePage({ setStretchingOrder }) {
             return;
         } else {
             const selectedStretchingIds = selectedStretchingList.map((stretching) => stretching.id);
-            console.log(selectedStretchingIds); //ok
+            console.log("스트레칭 id:", selectedStretchingIds); //ok
             setStretchingOrder(selectedStretchingIds); //동적 라우터 생성.
+ 
+            setCompletedStretchings([]); // 완료 모달창에서 이전에 했던 스트레칭 목록도 같이 나와서 시작전에 배열을 비움
             navigate(`/guide/video/${selectedStretchingIds[0]}`); //첫번째 스트레칭 가이드 영상 화면으로 이동.
         }
     }

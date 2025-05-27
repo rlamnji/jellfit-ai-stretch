@@ -7,7 +7,7 @@ from typing import Optional
 from passlib.context import CryptContext
 from dependencies import get_current_user
 
-router = APIRouter()
+router = APIRouter(prefix="/users", tags=["Users"])
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 

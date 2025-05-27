@@ -15,17 +15,21 @@ import backgroundImg from '../../../assets/images/etc/basic_background2.png';
 function CollectPage() {
 
    const navigate = useNavigate();
-   // 전체 캐릭터
-   const [characterMap, setCharacterMap] = useState([]);
-   // 사용자가 가진 캐릭터 id
-   const [characterUserGetMap, setCharacterUserGetMap] = useState([]);
-   // 자세
-   //const [stretchMap, setStretchMap] = useState([]);
-   // 현재 선택된 id 번호
-   const [selectedCharacterId, setSelectedCharacterId] = useState(null);
+   
+   const [characterMap, setCharacterMap] = useState([]); // 전체 캐릭터
+   const [characterUserGetMap, setCharacterUserGetMap] = useState([]); // 사용자가 가진 캐릭터 id
+   const [selectedCharacterId, setSelectedCharacterId] = useState(null);  // 현재 선택된 id 번호
+   
+   const [poseId, setPoseId] = useState(null); // pose_id 저장용
+   const [poseName, setPoseName] = useState(null); // 스트레칭 이름 저장용
+   const [userCnt, setUserCnt] = useState(null); // 스트레칭 누적 횟수 저장용
 
-   // api
-   // 최초 렌더링 시 전체 캐릭터와 내 캐릭터 get
+   // selectedCharacterId를 기반으로 전체 캐릭터 리스트에서 해당 캐릭터 정보 찾기
+   const fullCharacter = characterMap.find(c => c.character_id === selectedCharacterId);
+   // characterUserGetMap에 선택된 캐릭터 ID가 있는지 여부 (획득 여부 판단)
+   const isUnlocked = characterUserGetMap.some(c => c.character_id === selectedCharacterId);
+
+   // 최초 렌더링 시 전체 캐릭터와 내 캐릭터 조회 api
    useEffect(() => {
    const fetchData = async () => {
       try {
@@ -39,21 +43,18 @@ function CollectPage() {
                Authorization: `Bearer ${token}`,
             }
          }),
-         //fetch(`http://localhost:8000/guide/stretching/${stretchingId}`),
          ]);
 
-         if (!allRes.ok || !userRes.ok /*|| !stretchRes.ok*/) {
+         if (!allRes.ok || !userRes.ok) {
             console.error("인증 실패 또는 서버 오류");
             return;
          }
 
          const allData = await allRes.json();
          const userData = await userRes.json();
-         //const stretchData = await stretchRes.json();
 
          setCharacterMap(allData);
          setCharacterUserGetMap(userData);
-         //setStretchMap(stretchData);
       } catch (err) {
          console.log("API 호출 오류", err);
       }
@@ -63,6 +64,47 @@ function CollectPage() {
    }, []);
 
    console.log("보유",characterUserGetMap);
+
+
+   // pose_id에 맞는 스트레칭 이름 가져오는 api
+   useEffect(() => {
+      if (!selectedCharacterId) return;
+      const selected = characterMap.find(c => c.character_id === selectedCharacterId); // 내가 선택한 id랑 캐릭터 id 일치하는 게 있는지
+      if (selected) {
+         setPoseId(selected.pose_id);
+      }
+   }, [selectedCharacterId, characterMap]);
+
+   useEffect(() => {
+      const fetchData = async () =>{
+         try{
+            if (!poseId) return; // poseId가 없으면 실행하지 않음
+
+            const [nameRes, cntRes] = await Promise.all([
+               fetch(`http://localhost:8000/guide/stretching/${poseId}`),
+               fetch(`http://localhost:8000/users/repeat-count/${poseId}`)
+            ]);
+
+            if (!nameRes.ok || !cntRes.ok /*|| !stretchRes.ok*/) {
+               console.error("인증 실패 또는 서버 오류");
+               return;
+            }
+
+            // 자세 이름
+            const nameData = await nameRes.json();
+            setPoseName(nameData.name);
+
+            // 사용자 누적 횟수
+            const cntData = await cntRes.json();
+            setUserCnt(cntData.repeat_cnt);
+
+         } catch(err){
+            console(err);
+         }
+      }
+
+      fetchData();
+   }, [poseId]);
 
 
    // 그리드에 캐릭터 번호 매핑 (캐릭터 자리 지정)
@@ -83,14 +125,6 @@ function CollectPage() {
       console.log("캐릭터 번호", character_id);
       setSelectedCharacterId(character_id)
    }
-
-
-   // selectedCharacterId를 기반으로 전체 캐릭터 리스트에서 해당 캐릭터 정보 찾기
-   const fullCharacter = characterMap.find(c => c.character_id === selectedCharacterId);
-   // characterUserGetMap에 선택된 캐릭터 ID가 있는지 여부 (획득 여부 판단)
-   const isUnlocked = characterUserGetMap.some(c => c.character_id === selectedCharacterId);
-   // 캐릭터 스트레칭 자세번호와 자세 아이디가 일치하는 애가 있냐 (변수명 변경 시급)
-   //const stretchInfo = stretchMap.find(s => s.s_id === fullCharacter?.stretchName);
 
     return (
       <div className='relative w-screen h-screen overflow-hidden'>
@@ -129,8 +163,8 @@ function CollectPage() {
                      
                      <div className="absolute top-[23.5%] left-[18%] w-[23%] h-[20%] bg-[#E5E5E5] opacity-80 rounded-xl border-2 flex items-center justify-center">
                         <div className='flex flex-col items-center justify-center'>
-                           <div className="text-[10px]"> 바뀌는값 n번만 더 하면 얻을 수 있어요!</div>
-                           <div className="text-[10px]"> * 현재 진행 횟수: 3 / 5</div>  {/* 횟수 수정 필요 */}
+                           <div className="text-[15px] text-[#585050] mb-4"> <span className='text-[20px] font-bold'>{fullCharacter.acquisition_num - userCnt} 번만</span> 더 하면 얻을 수 있어요!</div>
+                           <div className="text-[13px] text-[#585050]"> * 현재 진행 횟수: {userCnt} / {fullCharacter.acquisition_num}</div>
                         </div>
                      </div>
                      }
@@ -151,7 +185,7 @@ function CollectPage() {
             </div>
             <div className="absolute top-[79%] left-[15%] w-[28%] h-[15%] text-[#513030] text-[1.2vw] blur-[0.5px] overflow-y-auto break-words whitespace-normal">
                {selectedCharacterId && (
-               <span>바뀌는값</span>
+               <span>{isUnlocked ?  poseName: poseName}</span>
                )}
             </div>
 

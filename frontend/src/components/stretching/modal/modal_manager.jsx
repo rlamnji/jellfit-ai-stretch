@@ -2,20 +2,40 @@
 import StretchCompleteModal from "./stretch_complete_modal";
 import CharacterGetModal from "./character_get_modal";
 import StretchQuitModal from "./stretch_quit_modal";
+import { useNavigate } from "react-router-dom";
+import { useEffect } from "react";
 
-export default function ModalManager({ modalType, setModalType }) {
+export default function ModalManager({ modalType, setModalType, completedStretchings, duration, pendingJelly, setPendingJelly }) {
+  // pendingJelly : 해파리 획득 가능한 해당 캐릭터아이디의 배열
+  const navigator = useNavigate();
+
+  useEffect(() => {
+  console.log("💡 modalType 변경됨:", modalType);
+}, [modalType]);
+
+  
   return (
     <>
       {modalType === "complete" && (
-        <StretchCompleteModal
+        <StretchCompleteModal completedStretchings={completedStretchings} duration={duration}
           onClose={() => {
-            //if (hasJelly) setModalType("getJelly");
-            //else setModalType(null);
+            console.log("pendingJelly 상태:", pendingJelly);
+
+            if (pendingJelly?.length > 0) {
+              // 캐릭터 있으면 모달 상태 변환
+              console.log("캐릭터 획득 모달");
+              setModalType("getJelly");
+              //setPendingJelly(null);
+            } else {
+              // 캐릭터 없으면 그냥 종료
+              console.log("모달창 종료, 홈으로");
+              navigator('/home');
+            }
           }}
         />
       )}
       {modalType === "getJelly" && (
-        <CharacterGetModal onClose={() => setModalType(null)} />
+        <CharacterGetModal pendingJelly={pendingJelly} onClose={() => navigator('/home')} />
       )}
       {modalType === "confirmQuit" && (
         <StretchQuitModal onClose={() => setModalType(null)} />

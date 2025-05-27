@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String, ForeignKey, Boolean, DateTime
+from sqlalchemy import Column, Integer, String, ForeignKey, Boolean, Date, PrimaryKeyConstraint
 from sqlalchemy.orm import relationship, declarative_base
 from datetime import datetime, timezone
 
@@ -59,22 +59,31 @@ class Friend(Base):
     requester = relationship('User', back_populates='friends_sent', foreign_keys=[requester_id])
     receiver = relationship('User', back_populates='friends_received', foreign_keys=[receiver_id])
 
-# 사용자 스트레칭 기록
+# 사용자 스트레칭 기록(횟수)
 class UsageRecord(Base):
     __tablename__ = 'usage_records'
 
     record_id = Column(Integer, primary_key=True)
     user_id = Column(Integer, ForeignKey('users.user_id'))
-    # 람다를 사용하여 동적으로 시간 설정, UTC 현재 시간
-    date = Column(DateTime(timezone=True), default=lambda: datetime.now(timezone.utc))
-    # 초 기준?
-    usage_time = Column(Integer, nullable=False)
     # 자세번호 (추가)
     pose_id = Column(Integer, ForeignKey('poses.pose_id'))
+    # 횟수 (추가)
+    repeat_cnt = Column(Integer, nullable=False)
 
     # 유저 사용기록 테이블 관계
     user = relationship('User', back_populates='records')
     pose = relationship('Pose')
+
+
+# 사용자 스트레칭 기록(시간)
+class DailyUsageLog(Base):
+    __tablename__ = 'daily_usage_logs'
+
+    log_id = Column(Integer, primary_key=True, autoincrement=True)
+    user_id = Column(Integer, ForeignKey('users.user_id'), nullable=False)
+    date = Column(Date, default=lambda: datetime.now(timezone.utc).date())
+    usage_time = Column(Integer, nullable=False)  # 하루 동안의 총 스트레칭 시간 (초)
+    
 
 # 사용자 캐릭터
 class UserCharacter(Base):
