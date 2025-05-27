@@ -4,11 +4,7 @@ import TopBar from "../../components/top_bar";
 import SoundBtn from "../../components/buttons/sound_btn";
 import { useParams, useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
-import {
-  startOrResumeSession,
-  pauseSession,
-  endSession
-} from "../../utils/guide_timer";
+import { startOrResumeSession, pauseSession, endSession } from "../../utils/guide_timer";
 import arrowLeft from '../../assets/images/icons/arrow_left.png';
 
 import ModalManager from "../../components/stretching/modal/modal_manager";
@@ -20,6 +16,7 @@ function SelfStretchPage({ stretchingOrder, completedStretchings, setCompletedSt
     const navigate = useNavigate();
     const { stretchingId } = useParams();
     const [stretching, setStretching] = useState(null);
+    const [selectedIds, setSelectedIds] = useState([]); // 사용자가 선택한 모든 스트레칭 id 목록
 
     const sendFrameTime = 300; // 0.3초마다 프레임 전송
     const [currentStretchingTime, setCurrentStretchingTime] = useState(0);
@@ -28,8 +25,9 @@ function SelfStretchPage({ stretchingOrder, completedStretchings, setCompletedSt
 
     // 스트레칭 모달
     const [modalType, setModalType] = useState(null); // "complete", "getJelly", "confirmQuit"
-    const [hasJelly, setHasJelly] = useState(false);
+    //const [hasJelly, setHasJelly] = useState(false);
     const [duration, setDuration] = useState(0);
+    const [pendingJelly, setPendingJelly] = useState(null);
 
     const handleIsStretching = (isStretching) => {
         setIsStretching(isStretching);
@@ -77,7 +75,7 @@ function SelfStretchPage({ stretchingOrder, completedStretchings, setCompletedSt
                     index === self.findIndex(t => t.pose_id === item.pose_id)
                 );
 
-                console.log("중복 제거된 리스트:", unique);
+                console.log("중복 제거된 리스트", unique);
                 return unique;
             });
             }
@@ -147,7 +145,7 @@ function SelfStretchPage({ stretchingOrder, completedStretchings, setCompletedSt
     }
 
     // 스트레칭 결과 DB에 저장
-    async function recordUpdate () {
+    async function recordUpdate (completedStretchings) {
         const res = await fetch("http://localhost:8000/guide/record/accumulate", {
             method: "POST",
             headers: {
@@ -155,14 +153,14 @@ function SelfStretchPage({ stretchingOrder, completedStretchings, setCompletedSt
                 "Authorization": "Bearer " + sessionStorage.getItem("accessToken")
             },
             body: JSON.stringify({
-                "pose_id":stretchingId,
-                "repeat_cnt":stretching.repeatCount,
+                records: completedStretchings 
             }),
 
         });
         if(res.ok){
         const data = await res.json();
-        return data
+        console.log("누적 성공(횟수)", data);
+        return data;
         } else {
         console.error("스트레칭 데이터를 가져오지 못했습니다.");
         return null;
@@ -182,7 +180,7 @@ function SelfStretchPage({ stretchingOrder, completedStretchings, setCompletedSt
             });
 
             const data = await res.json();
-            console.log("데이터:", data);
+            console.log("누적 성공(시간)", data);
             return data;
 
         } catch (err) {
@@ -190,6 +188,55 @@ function SelfStretchPage({ stretchingOrder, completedStretchings, setCompletedSt
             return null;
         }
     }
+
+    // 스트레칭 완료 후 해파리 획득이 가능한지 조건 검사 후 필터링
+     async function checkGetCharacters() {
+        try {
+            const chekRes = await fetch("http://localhost:8000/guide/available-characters", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization": "Bearer " + sessionStorage.getItem("accessToken")
+            },
+            
+            });
+
+            const data = await chekRes.json();
+            console.log("획득 가능한 캐릭터 내용", data);
+
+            // 배열에 내용 있을 때 상태 true로
+            /*if (Array.isArray(data) && data.length > 0) {
+                setHasJelly(true);
+            }*/
+            return data;
+
+        } catch (err) {
+            console.error("에러:", err);
+            return null;
+        }
+    }
+
+    // 획득 가능해파리를 사용자 해파리 db에 저장
+    async function postCharacters(CharacterId) {
+        try {
+            const chekRes = await fetch("http://localhost:8000/guide/user-characters", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization": "Bearer " + sessionStorage.getItem("accessToken")
+            },
+            body: JSON.stringify({ character_id: CharacterId })
+            });
+
+            const data = await chekRes.json();
+            console.log(data);
+            return data;
+
+        } catch (err) {
+            console.error("에러:", err);
+            return null;
+        }
+    }    
 
     return (
         <div className="w-full h-screen flex flex-col items-center bg-space">
@@ -238,13 +285,36 @@ function SelfStretchPage({ stretchingOrder, completedStretchings, setCompletedSt
                 const currentIdx = stretchingOrder.indexOf(Number(stretchingId));
 
                 if (currentIdx === stretchingOrder.length - 1) {
-                    console.log("모든 완료된 스트레칭:", completedStretchings);
+                    console.log("모든 완료된 스트레칭", completedStretchings);
                     const result = endSession(); // 종료 시간 계산
-                    console.log("누적 시간", result.duration, "초");
+                    console.log("현재 누적 시간", result.duration, "초");
                     setDuration(result.duration); 
-                    timeUpdate(result.duration); // 누적 시간 기록 api 호출
+
+                    await timeUpdate(result.duration); // 누적 시간 기록 api 호출
                     setModalType("complete"); // 완료 모달 띄우기
-                    recordUpdate(); // 누적 횟수 기록 api 호출
+                    await recordUpdate(completedStretchings); // 누적 횟수 기록 api 호출
+                    
+                    // 캐릭터 획득 가능한지 조건 검사 api
+                    const charResult = await checkGetCharacters();
+                    
+                    if (charResult?.unlocked_character_ids?.length > 0) {
+                        setSelectedIds(charResult.unlocked_character_ids);  // pose_id 배열 저장
+                        console.log("획득 가능한 캐릭터 아이디", charResult.unlocked_character_ids);
+                        setPendingJelly(charResult.unlocked_character_ids);
+                    }
+
+                    // 캐릭터 모달창 띄우기
+                    /*if(hasJelly){
+                        // 획득한 jelly 있음
+                        setModalType("getJelly");
+                    }*/
+                    
+
+                    // 캐릭터 등록 api
+                    postCharacters(charResult.unlocked_character_ids);
+
+                    // 등록은 확인 버튼 눌렀을 시에
+
                 } else {
                     const nextStretchingId = stretchingOrder[currentIdx + 1];
                     navigate(`/guide/video/${nextStretchingId}`);
@@ -254,7 +324,7 @@ function SelfStretchPage({ stretchingOrder, completedStretchings, setCompletedSt
             다음으로 넘어가기 (임시)
             </button>
 
-         <ModalManager modalType={modalType} setModalType={setModalType} completedStretchings={completedStretchings} duration={duration}/>
+         <ModalManager modalType={modalType} setModalType={setModalType} completedStretchings={completedStretchings} duration={duration} pendingJelly={pendingJelly} setPendingJelly={setPendingJelly}/>
         </div>
         
     );

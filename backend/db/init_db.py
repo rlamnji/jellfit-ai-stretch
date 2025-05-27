@@ -65,12 +65,12 @@ db.add(Pose(pose_id=3, name="T자가슴열기", duration=10, count=None,
             thumbnail_url=None,
             category_id=5))  # 가슴
 
-db.add(Pose(pose_id=4, name="Y자가슴열기", duration=10, count=None,
+db.add(Pose(pose_id=4, name="Y자가슴열기", duration=10, count=3,
             video_url="https://www.youtube.com/embed/G-1VPhV0Yhl",
             thumbnail_url=None,
             category_id=5))  # 가슴
 
-db.add(Pose(pose_id=5, name="손걸고잡아당기기", duration=5, count=None,
+db.add(Pose(pose_id=5, name="손걸고잡아당기기", duration=5, count=3,
             video_url="https://www.youtube.com/embed/8q3lHCP3E7g",
             thumbnail_url=None,
             category_id=2))  # 어깨

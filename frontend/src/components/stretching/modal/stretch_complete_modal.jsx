@@ -3,7 +3,7 @@
 import { useNavigate } from 'react-router-dom';
 import stretchModal from '../../../assets/images/icons/setting_content.png'
 import complteCheck from '../../../assets/images/etc/check.png'
-function StretchModal({completedStretchings, duration}){
+function StretchModal({onClose, completedStretchings, duration}){
     const navigator = useNavigate();
     // 시간 계산 (초단위로 들어옴)
     function formatDuration(duration) {
@@ -56,7 +56,7 @@ function StretchModal({completedStretchings, duration}){
                 </div>
                 <div className="flex flex-col absolute bottom-10 left-1/2 -translate-x-1/2 z-[1000] text-center items-center">
                     <div className='bg-[#D9D5D3] rounded-2xl text-black font-bold p-2 text-[30px] w-[250px] cursor-pointer'
-                                    onClick={()=>navigator('/home')}
+                                    onClick={onClose}
                     >홈으로</div>
                 </div>
 

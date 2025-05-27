@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from app.get import get_poses, get_characters, get_user, get_usage
-from app.post import post_poses
+from app.post import post_poses, post_user_character, post_modal
 from app.auth import login, signup, logout
 from app.get_image import get_stretching_image
 from app.friends import add_friend, delete_friend, search_friends, accept, reject, confirm_requests
@@ -31,13 +31,17 @@ app.include_router(get_poses.router, tags=["Pose"])
 app.include_router(get_characters.router, tags=["Character"]) 
 app.include_router(get_user.router)
 app.include_router(get_usage.router)
-app.include_router(update_user.router, prefix="/users", tags=["User"])
-app.include_router(update_user.router, prefix="/users", tags=["User"])
+app.include_router(update_user.router)
+app.include_router(update_user.router)
 app.include_router(update_user_stretch.router, prefix="/guide", tags=["Guide"])
 app.include_router(login.router)
 app.include_router(signup.router)
 app.include_router(logout.router)
+
 app.include_router(get_stretching_image.router)
+app.include_router(post_poses.router) # 캘리브레이션
+app.include_router(post_user_character.router)
+app.include_router(post_modal.router) # 캐릭터(정보) 모달창
 app.include_router(add_friend.router)
 app.include_router(delete_friend.router)
 app.include_router(search_friends.router)
