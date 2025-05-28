@@ -23,8 +23,10 @@ def get_all_characters(db: Session = Depends(get_db)):
         {
             "character_id": c.character_id,
             "name": c.name,
+            "acquisition_num": c.acquisition_num,
             "description": c.description,
-            "image_url": c.image_url
+            "image_url": c.image_url,
+            "pose_id": c.pose_id
 
         } for c in characters
     ]

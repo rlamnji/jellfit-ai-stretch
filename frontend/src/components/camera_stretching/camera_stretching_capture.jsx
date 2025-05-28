@@ -1,6 +1,6 @@
 import { useRef, useEffect } from "react";
-
-function CameraStretchingCapture({ handleIsStretching, sendFrameTime }) {
+import StretchingFeedback from "../stretching/stretching_feedback";
+function CameraStretchingCapture({ handleIsStretching, sendFrameTime , stretchingId}) {
   const videoRef = useRef(null);
   const canvasRef = useRef(null); // canvasRef 초기화
   const streamRef = useRef(null); // 스트림을 저장할 ref
@@ -28,7 +28,7 @@ function CameraStretchingCapture({ handleIsStretching, sendFrameTime }) {
   }, []);
 
   // 2. 프레임 캡처해서 서버로 전송
-  const sendFrame = async () => {
+  const sendFrame = async ({ stretchingId }) => {
     const canvas = canvasRef.current;
     const video = videoRef.current;
     if (!canvas || !video) return;
@@ -43,6 +43,7 @@ function CameraStretchingCapture({ handleIsStretching, sendFrameTime }) {
     canvas.toBlob(async (blob) => {
       const formData = new FormData();
       formData.append("file", blob, "frame.jpg");
+      formData.append("pose_id", stretchingId);
 
       try {
         const res = await fetch("http://localhost:8000/guide/analyze", {
@@ -62,9 +63,12 @@ function CameraStretchingCapture({ handleIsStretching, sendFrameTime }) {
 
   // 3. 일정 간격으로 프레임 전송
   useEffect(() => {
-    const interval = setInterval(sendFrame, sendFrameTime); // 0.3초마다 전송
-    return () => clearInterval(interval); // 컴포넌트 언마운트 시 정리 (안되는 듯?..)
-  }, []);
+  const interval = setInterval(() => {
+    sendFrame({ stretchingId });  // sendFrame 자체가 async이므로 여기선 그냥 호출만
+  }, sendFrameTime);
+
+  return () => clearInterval(interval);
+}, [stretchingId]);
 
   return (
     <div className="w-full flex flex-col items-center py-4">
@@ -72,7 +76,7 @@ function CameraStretchingCapture({ handleIsStretching, sendFrameTime }) {
       <video
         ref={videoRef}
         autoPlay
-        className="w-[640px] h-[480px] border rounded-xl transform scale-x-[-1]"
+        className="w-[640px] h-[480px] border rounded-xl transform scale-x-[-1] mb-6"
       />
 
       {/* 👻 서버 전송용 캔버스 (사용자에겐 숨김) */}
@@ -82,6 +86,9 @@ function CameraStretchingCapture({ handleIsStretching, sendFrameTime }) {
         height="480"
         className="hidden"
       />
+
+      {/*해파리 피드백*/}
+        <StretchingFeedback/>
     </div>
   );
 }

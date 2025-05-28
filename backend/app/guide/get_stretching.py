@@ -27,3 +27,4 @@ def get_stretching_detail(stretchingId: int, db: Session = Depends(get_db)):
         repeatCount=pose.count,
         videoURL=pose.video_url
     )
+
