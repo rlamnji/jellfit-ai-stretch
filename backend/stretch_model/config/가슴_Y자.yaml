@@ -8,18 +8,45 @@ features:
     type: angle
     points: [12, 14, 16]
 
-  # Ear–Nose–Ear 법선 기반 pitch proxy
-  - name: head_pitch_proxy
-    type: normal_vector_pitch
-    points: [7, 0, 8]      # (leftEar, nose, rightEar)
+  - name: left_hand_alignment
+    type: delta_y
+    points: [2, 15]   # 왼쪽 눈 - 왼쪽 손목 
+
+  - name: right_hand_alignment
+    type: delta_y
+    points: [2, 15]   # 왼쪽 눈 - 왼쪽 손목 
+
+   # 고개 각도 감지를 위한 눈-귀 관계
+  - name: left_eye_ear_y_diff
+    type: delta_y
+    points: [7, 2]  # 왼쪽 귀 Y - 왼쪽 눈 Y
+  
+  - name: right_eye_ear_y_diff  
+    type: delta_y
+    points: [8, 5]  # 오른쪽 귀 Y - 오른쪽 눈 Y
 
 
 thresholds:
-  min_left_elbow_angle: 160    # 팔꿈치가 충분히 펴져 있어야 함 (단위: 도)
-  min_right_elbow_angle: 160
+  min_left_elbow_angle:    # 팔꿈치가 충분히 펴져 있어야 함 (단위: 도)
+    value: 160
+    message: "왼쪽 팔이 구부러졌어요. 팔을 쭉 뻗어주세요."
+  min_right_elbow_angle: 
+    value: 160
+    message: "오른쪽 팔이 구부러졌어요. 팔을 쭉 뻗어주세요."
 
-  # proxy 각도가 10° 이상이면 뒤로 젖힌 것으로 간주
-  min_head_pitch_proxy: 10
+  min_left_hand_alignment:      # 손이 눈보다 위쪽에 위치하기만 하면 팔을 위로 들었다고 판단
+    value: 0.01
+    message: "왼쪽 팔을 더 위로 올려야 해요."
+  min_right_hand_alignment: 
+    value: 0.01     
+    message: "오른쪽 팔을 더 위로 올려야 해요."
+
+  min_left_eye_ear_y_diff: 
+    value: 0.015
+    message: "고개를 더 젖히거나, 카메라와 너무 멀리 떨어져 있을 수 있어요."
+  min_right_eye_ear_y_diff: 
+    value: 0.015
+    message: "고개를 더 젖히거나, 카메라와 너무 멀리 떨어져 있을 수 있어요."
   
   min_hold_duration_sec: 10    # 자세를 유지해야 하는 최소 시간 (단위: 초)
 

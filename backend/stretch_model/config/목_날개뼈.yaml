@@ -9,18 +9,22 @@ features:
     type: angle
     points: [12, 14, 16]
 
-  # 팔꿈치의 z축 깊이 측정: 가슴 개방 정도 감지
-  - name: left_elbow_z
-    type: coordinate_z
-    points: [13]
-  - name: right_elbow_z
-    type: coordinate_z
-    points: [14]
+  # 손이 일정 범위 코보다 아래로 내려가지 않게 함
+  - name: left_hand_nose_y_diff
+    type: delta_y
+    points: [15, 0] # 왼손목 - 코
 
-  # Ear–Nose–Ear 법선 기반 pitch proxy
-  - name: head_pitch_proxy
-    type: normal_vector_pitch
-    points: [7, 0, 8]      # (leftEar, nose, rightEar)
+  - name: right_han_nose_y_diff
+    type: delta_y
+    points: [16, 0]
+
+  - name: left_eye_ear_y_diff
+    type: delta_y
+    points: [7, 2]  # 왼쪽 귀 Y - 왼쪽 눈 Y
+  
+  - name: right_eye_ear_y_diff  
+    type: delta_y
+    points: [8, 5]  # 오른쪽 귀 Y - 오른쪽 눈 Y
 
 thresholds:
   min_left_elbow_flexion:   70   # 70° 이상(팔을 충분히 굽힌 상태)
@@ -28,10 +32,20 @@ thresholds:
   min_right_elbow_flexion:  70
   max_right_elbow_flexion: 110
 
-  max_left_elbow_z:    0.10      # 가슴 개방 정도
-  max_right_elbow_z:   0.10
+  max_left_hand_nose_y_diff:
+    value: 0.3
+    message: "왼손이 너무 아래로 내려갔어요."
+  min_left_hand_nose_y_diff:
+    value: -0.1
+    message: "손이 너무 위로 올라갔어요."
+  max_right_hand_nose_y_diff:
+    value: 0.3
+    message: "오른손이 너무 아래로 내려갔어요."
+  min_right_hand_nose_y_diff:
+    value: -0.1
+    message: "오른손이 너무 위로 올라갔어요."
 
-  min_head_pitch_proxy: 10       # 뒤로 젖힌 정도 최소 각도
+
 
 cycles:
   type: rep
@@ -50,7 +64,7 @@ cycles:
 aggregate:
   - name: swing_amplitude
     type: amplitude
-    target_feature: head_pitch_proxy
+    target_feature: 
 
   - name: cycle_duration
     type: duration
