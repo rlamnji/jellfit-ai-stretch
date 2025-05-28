@@ -65,7 +65,7 @@ function CameraCaliCapture() {
   };
 
   // 페이지이동 테스트 (인식 X)
-  /*useEffect(() => {
+  useEffect(() => {
   if (isCameraOn) {
     const timer = setTimeout(() => {
       stopCamera();
@@ -75,7 +75,7 @@ function CameraCaliCapture() {
 
     return () => clearTimeout(timer); // 컴포넌트 언마운트 시 정리
   }
-}, [isCameraOn]);*/
+}, [isCameraOn]);
 
   // 가이드선 그리기
   useEffect(() => {

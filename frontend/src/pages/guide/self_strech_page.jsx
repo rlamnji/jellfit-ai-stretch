@@ -239,7 +239,7 @@ function SelfStretchPage({ stretchingOrder, completedStretchings, setCompletedSt
     }    
 
     return (
-        <div className="w-full h-screen flex flex-col items-center bg-space">
+        <div className="w-full h-full flex flex-col items-center bg-space">
 
         {/*<TopBar/> ==> (05.16_rlamnji) 뒤로가기 컴포에 아예 Link가 있어서 setModalType 설정이 안되더라고!*/}
          <div className='w-full h-14 flex justify-between'>      
@@ -270,11 +270,15 @@ function SelfStretchPage({ stretchingOrder, completedStretchings, setCompletedSt
             </>
         )}
 
-        <CameraStretchingScreen
-            handleIsStretching={handleIsStretching}
-            sendFrameTime={sendFrameTime}
-            stretchingId = {stretchingId}
-        />
+
+            <CameraStretchingScreen
+                handleIsStretching={handleIsStretching}
+                sendFrameTime={sendFrameTime}
+                stretchingId = {stretchingId}
+            />
+
+
+
 
         {/* ✅ 임시용 버튼 */}
         {/* 임시용 버튼을 없애고 true --> 끝 --> 모달창 까지 연결해야함*/}
@@ -303,17 +307,9 @@ function SelfStretchPage({ stretchingOrder, completedStretchings, setCompletedSt
                         setPendingJelly(charResult.unlocked_character_ids);
                     }
 
-                    // 캐릭터 모달창 띄우기
-                    /*if(hasJelly){
-                        // 획득한 jelly 있음
-                        setModalType("getJelly");
-                    }*/
-                    
-
                     // 캐릭터 등록 api
                     postCharacters(charResult.unlocked_character_ids);
 
-                    // 등록은 확인 버튼 눌렀을 시에
 
                 } else {
                     const nextStretchingId = stretchingOrder[currentIdx + 1];

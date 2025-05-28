@@ -39,7 +39,7 @@ app.include_router(signup.router)
 app.include_router(logout.router)
 
 app.include_router(get_stretching_image.router)
-app.include_router(post_poses.router) # 캘리브레이션
+#app.include_router(post_poses.router) # 캘리브레이션
 app.include_router(post_user_character.router)
 app.include_router(post_modal.router) # 캐릭터(정보) 모달창
 app.include_router(add_friend.router)
