@@ -1,40 +1,64 @@
 landmarks: [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22]
 
-sides:
-  - name: left # 몸통을 왼쪽으로 기울임
-    features:
-      # 손으로 반대쪽 팔꿈치를 잡고 있는 거리 (작을수록 잡고 있는 상태)
-      - name: left_pull_distance
-        type: distance
-        points: [15, 14]   # 왼손목 ↔ 오른쪽 팔꿈치
-      - name: left_eye_level_diff
-        type: delta_y
-        points: [5, 2]
-      - name: left_shoulder_level_diff
-        type: delta_y
-        points: [12, 11]
+features:
+  # 손으로 반대쪽 팔꿈치를 잡고 있는 거리 (작을수록 잡고 있는 상태)
+  - name: left_pull_distance
+    type: distance
+    points: [15, 14]   # 왼손목 ↔ 오른쪽 팔꿈치
 
-  - name: right
-    features:
-      - name: right_pull_distance
-        type: distance
-        points: [16, 13]   # 오른손목 ↔ 왼쪽 팔꿈치
-      # 몸을 오른쪽으로 기울였을 때: 눈과 어깨 레벨 차이가 일정 이상
-      - name: right_eye_level_diff
-        type: delta_y
-        points: [2, 5]
-      - name: right_shoulder_level_diff
-        type: delta_y
-        points: [11, 12]
+  - name: right_pull_distance
+    type: distance
+    points: [16, 13]   # 오른손목 ↔ 왼쪽 팔꿈치
+
+  # 왼쪽으로 기울일 때, 오른쪽 팔꿈치가 오른쪽 눈보다 위에 있어야 함
+  - name: left_pull_alignment
+    type: delta_y
+    points: [5, 14]
+
+  - name: right_pull_alignment
+    type: delta_y
+    points: [2, 13]
+
+  # 왼 - 오
+  - name: eye_level_diff
+    type: delta_y
+    points: [2, 5]
+  - name: shoulder_level_diff
+    type: delta_y
+    points: [11, 12]
+
+thresholds:
+  min_hold_duration_sec: 10
+
 
 cycles:
   type: hold
   count: 1
 
-thresholds:
-  max_left_pull_distance: 0.05      # 잡은 팔꿈치까지의 거리 최대값
-  min_left_eye_level_diff:       0.03  # 눈 레벨 차이 (normalized y)
-  min_left_shoulder_level_diff:  0.03  # 어깨 레벨 차이
-  min_right_eye_level_diff:      0.03
-  min_right_shoulder_level_diff: 0.03
-  min_hold_duration_sec: 10         # 자세 유지 시간 (초)
+direction:
+  left:
+    eye_level_diff: 
+      sign: positive  # 양수면 왼쪽
+      threshold: 0  # 최소 레벨 차이
+    shoulder_level_diff:
+      sign: positive
+      threshold: 0.03
+    left_pull_distance:  # 팔꿈치를 잡은 상태 확인
+      sign: positive
+      threshold: 0.05
+    left_pull_alignment:
+      sign: positive
+      threshold: 0.05
+  right:
+    eye_level_diff:
+      sign: negative  # 음수면 오른쪽
+      threshold: 0
+    shoulder_level_diff:
+      sign: negative
+      threshold: 0.03
+    right_pull_distance: 
+      sign: positive
+      threshold: 0.05
+    right_pull_alignment:
+      sign: positive
+      threshold: 0.05
