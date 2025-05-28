@@ -2,13 +2,14 @@ import { useState } from "react";
 import CameraPostureConsent from "./camera_posture_consent";
 import CameraPostureCapture from "./camera_posture_capture";
 
-function CameraPostureScreen({ handlePostureCode, sendFrameTime }) {
+function CameraPostureScreen() {
   const [allowed, setAllowed] = useState(false);
+  const sendFrameTime = 300;
 
   return (
     <>
       {allowed ? (
-        <CameraPostureCapture handlePostureCode={handlePostureCode} sendFrameTime={sendFrameTime}/>
+        <CameraPostureCapture sendFrameTime={sendFrameTime}/>
       ) : (
         <CameraPostureConsent onAllow={() => setAllowed(true)} />
       )}
@@ -17,5 +18,3 @@ function CameraPostureScreen({ handlePostureCode, sendFrameTime }) {
 }
 
 export default CameraPostureScreen;
-
-
