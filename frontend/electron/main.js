@@ -6,6 +6,9 @@ function createWindow () {
   const mainWindow = new BrowserWindow({
     width: 800,
     height: 600,
+    frame: true,
+    autoHideMenuBar: true,
+    title: 'Jellfit',
     webPreferences: {
       preload: path.join(__dirname, 'preload.js'), // ✅ 노출 최소화용
       contextIsolation: true,                      // ✅ 보안: 렌더러 분리
@@ -38,6 +41,7 @@ function createWindow () {
       y: MARGIN,   
       frame: true,
       autoHideMenuBar: true,
+      title: 'Jellfit - 📸 자세 교정 모드',
       // alwaysOnTop: true,
       // resizable: false,
       webPreferences: {

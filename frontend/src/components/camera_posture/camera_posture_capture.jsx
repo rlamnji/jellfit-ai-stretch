@@ -25,6 +25,8 @@ function CameraPostureCapture({ sendFrameTime }) {
   const [hasAlerted, setHasAlerted] = useState(false);
 
   const [currentPosture, setCurrentPosture] = useState(0);
+
+  const [isCameraOn, setIsCameraOn] = useState(true);
   
   
 
@@ -36,9 +38,11 @@ function CameraPostureCapture({ sendFrameTime }) {
         if (videoRef.current) {
           videoRef.current.srcObject = stream;
         }
+        setIsCameraOn(true);
       })
       .catch((err) => {
         console.error("❌ 카메라 연결 실패:", err);
+        setIsCameraOn(false);
       });
 
     return () => {
@@ -142,30 +146,13 @@ function CameraPostureCapture({ sendFrameTime }) {
     }
   }, [badPostureDuration, inBadPosture]);
 
-  // 알림 상태 초기화 관련 useEffect
-
-  // 1. 좋은 자세 MIN_GOOD_POSTURE_DURATION(초) 유지하면 나쁜 자세 모드 해제되면서 알림 상태 초기화.
+  // 알림 상태 초기화 함수
+  // 좋은 자세 MIN_GOOD_POSTURE_DURATION(초) 유지하면 나쁜 자세 모드 해제되면서 알림 상태 초기화.
   useEffect(() => {
     if (!inBadPosture) {
       hasAlertedRef.current = false; // 알림 다시 가능하도록 리셋
     }
   }, [inBadPosture]);
-
-  // 2. 알림의 '확인'을 눌러도 알림 상태 초기화됨.
-  // useEffect(() => {
-  //   const handleAck = () => {
-  //     console.log("✅ 사용자 알림 확인 (버튼 클릭)");
-  //     hasAlertedRef.current = false;
-  //     setInBadPosture(false); // 원하면 포함 (알림이 눌리면 나쁜 자세도 끝난 걸로 처리할 때)
-  //   };
-  
-  //   window.api?.onNotificationAck?.(handleAck);
-  
-  //   return () => {
-  //     // cleanup: 리스너 제거
-  //     window.api?.onNotificationAck?.(() => {});
-  //   };
-  // }, []);
   
 
   // 좋은 자세 타이머
@@ -198,7 +185,34 @@ function CameraPostureCapture({ sendFrameTime }) {
       intervalRef.current = null;
       console.log("🛑 프레임 전송 중단됨");
     }
+    
+    setIsCameraOn(false);
   };
+
+  
+  // 카메라 켜기 함수
+  const startCamera = async () => {
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+      streamRef.current = stream;
+      if (videoRef.current) {
+        videoRef.current.srcObject = stream;
+      }
+  
+      // ✅ 카메라 상태 설정
+      setIsCameraOn(true);
+      console.log("📷 카메라 켜짐");
+  
+      // ✅ 프레임 전송 시작 (이전에 멈췄다면 다시 시작)
+      if (!intervalRef.current) {
+        intervalRef.current = setInterval(sendFrame, sendFrameTime);
+        console.log("📤 프레임 전송 시작됨");
+      }
+    } catch (err) {
+      console.error("❌ 카메라 켜기 실패:", err);
+    }
+  };
+  
 
   return (
     <div className="w-full h-screen flex flex-col items-center py-4">
@@ -213,6 +227,8 @@ function CameraPostureCapture({ sendFrameTime }) {
       <PostureToolbar
         onExit={handleOnExitClick}
         onStopCamera={stopCamera}
+        onStartCamera={startCamera}
+        isCameraOn = {isCameraOn}
       />
 
       {/* 👻 서버 전송용 캔버스 (숨김 처리) */}
