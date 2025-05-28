@@ -153,6 +153,12 @@ def extract_features(df: pd.DataFrame,
             
             feats[nm] = angles
 
+        elif ft == 'delta_z' and len(pts) == 2:
+            # 두 포인트 간의 Z축 차이 계산 (pts[1] - pts[0])
+            z1 = df[f'z{pts[0]}'].to_numpy() * scale  # 첫 번째 포인트 (기준점)
+            z2 = df[f'z{pts[1]}'].to_numpy() * scale  # 두 번째 포인트 (타겟점)
+            feats[nm] = z2 - z1  # 양수: 타겟이 기준보다 뒤, 음수: 타겟이 기준보다 앞
+        
         else:
             raise ValueError(f"Unknown feature type or wrong definition: {f}")
 
@@ -230,81 +236,38 @@ def segment_reps(feat_df: pd.DataFrame, cfg: Dict, fps: int = 30):
 
 def segment_holds(feat_df: pd.DataFrame, cfg: Dict, fps: int = 30):
     """
-    Find hold segments based on threshold conditions.
-    If direction is specified in config, returns segments by direction.
+    누적 시간 기반 hold 세그멘테이션 - 중간 불만족 프레임 무시
     
     Args:
         feat_df: DataFrame containing extracted features
-        cfg: Configuration dictionary containing thresholds and optional direction logic
+        cfg: Configuration dictionary containing thresholds
         fps: Frames per second
     
     Returns:
-        If direction specified: Dictionary of direction -> segments
-        Otherwise: List of (start, end) frame indices
+        List of (start, end) frame indices for segments that meet cumulative duration
     """
     thr = cfg.get('thresholds', {})
-    min_duration = int(thr.get('min_hold_duration_sec', 1) * fps)
+    min_duration_frames = int(thr.get('min_hold_duration_sec', 1) * fps)
     
-    # 기본 임계값 조건 검사 (방향 판단과 무관한 기본 자세 조건)
-    base_conditions = np.ones(len(feat_df), dtype=bool)
-    for k, v in thr.items():
-        if k == 'min_hold_duration_sec':
-            continue
-            
-        # 특징 이름 추출
-        if k.startswith('min_'):
-            feat_name = k[4:]  # 'min_' 제거
-            if feat_name in feat_df.columns:
-                condition = feat_df[feat_name] >= v
-                base_conditions &= condition
-                print(f"Base condition {feat_name} >= {v}: {condition.sum()} frames satisfied")
-        elif k.startswith('max_'):
-            feat_name = k[4:]  # 'max_' 제거
-            if feat_name in feat_df.columns:
-                condition = feat_df[feat_name] <= v
-                base_conditions &= condition
-                print(f"Base condition {feat_name} <= {v}: {condition.sum()} frames satisfied")
+    print(f"=== Cumulative Hold Segmentation ===")
+    print(f"Total frames in data: {len(feat_df)}")
+    print(f"Target cumulative frames: {min_duration_frames} ({thr.get('min_hold_duration_sec', 1)} seconds)")
     
-    print(f"Total frames satisfying all base conditions: {base_conditions.sum()}")
+    # 모든 기본 조건 확인
+    base_conditions = check_all_base_conditions(feat_df, thr)
+    
+    total_satisfied = base_conditions.sum()
+    print(f"Total satisfied frames: {total_satisfied}/{len(feat_df)} ({total_satisfied/len(feat_df)*100:.1f}%)")
+    
+    if total_satisfied < min_duration_frames:
+        print(f"Insufficient satisfied frames. Need {min_duration_frames}, got {total_satisfied}")
+        return []
     
     # 방향 판단이 필요한 경우
     if 'direction' in cfg:
-        direction_cfg = cfg['direction']
-        segments_by_direction = {}
-        
-        # 각 방향별 조건 생성
-        for direction, conditions in direction_cfg.items():
-            # 방향 판단은 베이스 컨디션과 독립적으로 수행
-            direction_mask = np.ones(len(feat_df), dtype=bool)
-            
-            for feat_name, condition_cfg in conditions.items():
-                if feat_name in feat_df.columns:
-                    sign = condition_cfg['sign']
-                    threshold = condition_cfg['threshold']
-                    
-                    if sign == 'positive':
-                        condition = feat_df[feat_name] > threshold
-                        direction_mask &= condition
-                        print(f"Direction {direction} condition {feat_name} > {threshold}: {condition.sum()} frames satisfied")
-                    elif sign == 'negative':
-                        condition = feat_df[feat_name] < -threshold
-                        direction_mask &= condition
-                        print(f"Direction {direction} condition {feat_name} < -{threshold}: {condition.sum()} frames satisfied")
-            
-            print(f"Direction {direction} total frames satisfying all conditions: {direction_mask.sum()}")
-            
-            # 연속된 구간 찾기
-            segments = find_continuous_segments(direction_mask, min_duration)
-            if segments:
-                segments_by_direction[direction] = segments
-                print(f"Found {len(segments)} segments for direction {direction}")
-            else:
-                print(f"No segments found for direction {direction}")
-        
-        return segments_by_direction
-    
-    # 방향 판단이 필요 없는 경우
-    return find_continuous_segments(base_conditions, min_duration)
+        return segment_holds_cumulative_with_direction(feat_df, cfg, fps, base_conditions, min_duration_frames)
+    else:
+        return segment_holds_cumulative_simple(base_conditions, min_duration_frames)
 
 def find_continuous_segments(mask: np.ndarray, min_duration: int) -> List[Tuple[int, int]]:
     """
@@ -332,3 +295,103 @@ def find_continuous_segments(mask: np.ndarray, min_duration: int) -> List[Tuple[
         segments.append((start, len(mask)))
     
     return segments
+
+
+def check_all_base_conditions(feat_df: pd.DataFrame, thresholds: Dict) -> np.ndarray:
+    """모든 기본 임계값 조건을 확인하여 boolean array 반환"""
+    conditions = np.ones(len(feat_df), dtype=bool)
+    
+    for k, v in thresholds.items():
+        if k == 'min_hold_duration_sec':
+            continue
+        
+        # 새로운 형태 (값 + 메시지) 처리
+        if isinstance(v, dict) and 'value' in v:
+            threshold_value = v['value']
+        else:
+            # 기존 형태 (값만) 처리  
+            threshold_value = v
+            
+        if k.startswith('min_'):
+            feat_name = k[4:]
+            if feat_name in feat_df.columns:
+                condition = feat_df[feat_name] >= threshold_value
+                conditions &= condition
+                passes = condition.sum()
+                print(f"  {feat_name} >= {threshold_value}: {passes}/{len(feat_df)} frames pass ({passes/len(feat_df)*100:.1f}%)")
+                
+        elif k.startswith('max_'):
+            feat_name = k[4:]
+            if feat_name in feat_df.columns:
+                condition = feat_df[feat_name] <= threshold_value
+                conditions &= condition
+                passes = condition.sum()
+                print(f"  {feat_name} <= {threshold_value}: {passes}/{len(feat_df)} frames pass ({passes/len(feat_df)*100:.1f}%)")
+        
+        elif k.startswith('abs_'):
+                feat_name = k[4:]  # 'abs_' 제거
+                if feat_name in feat_df.columns:
+                    # 절댓값이 임계값을 넘어서야 함
+                    condition = np.abs(feat_df[feat_name]) >= threshold_value
+                    conditions &= condition
+                    passes = condition.sum()
+                    print(f"  |{feat_name}| >= {threshold_value}: {passes}/{len(feat_df)} frames pass ({passes/len(feat_df)*100:.1f}%)")
+    
+    return conditions
+
+def segment_holds_cumulative_simple(conditions: np.ndarray, min_duration_frames: int) -> List[Tuple[int, int]]:
+    """방향 구분 없는 누적 세그멘테이션"""
+    satisfied_indices = np.where(conditions)[0]
+    
+    if len(satisfied_indices) < min_duration_frames:
+        return []
+    
+    # 첫 번째 만족 프레임부터 목표 프레임 수만큼 포함하는 구간
+    start_idx = satisfied_indices[0]
+    end_idx = satisfied_indices[min_duration_frames - 1]
+    
+    print(f"Created segment: frames {start_idx}-{end_idx} (contains {min_duration_frames} satisfied frames)")
+    return [(start_idx, end_idx + 1)]
+
+def segment_holds_cumulative_with_direction(feat_df: pd.DataFrame, cfg: Dict, fps: int, 
+                                          base_conditions: np.ndarray, min_duration_frames: int):
+    """방향별 누적 세그멘테이션"""
+    direction_cfg = cfg['direction']
+    segments_by_direction = {}
+    
+    for direction, conditions in direction_cfg.items():
+        print(f"\n--- Direction: {direction} ---")
+        
+        # 방향별 조건 확인
+        direction_mask = np.ones(len(feat_df), dtype=bool)
+        for feat_name, condition_cfg in conditions.items():
+            if feat_name in feat_df.columns:
+                sign = condition_cfg['sign']
+                threshold = condition_cfg['threshold']
+                
+                if sign == 'positive':
+                    condition = feat_df[feat_name] > threshold
+                elif sign == 'negative':
+                    condition = feat_df[feat_name] < -threshold
+                elif sign == 'interval':
+                    condition = -threshold < feat_df[feat_name] < threshold
+                else:
+                    continue
+                    
+                direction_mask &= condition
+                passes = condition.sum()
+                print(f"  {feat_name} {sign} {threshold}: {passes}/{len(feat_df)} frames pass")
+        
+        # 기본 조건과 방향 조건을 모두 만족하는 프레임들
+        combined_conditions = base_conditions & direction_mask
+        satisfied_count = combined_conditions.sum()
+        
+        print(f"Combined conditions for {direction}: {satisfied_count}/{len(feat_df)} frames pass")
+        
+        if satisfied_count >= min_duration_frames:
+            segments = segment_holds_cumulative_simple(combined_conditions, min_duration_frames)
+            if segments:
+                segments_by_direction[direction] = segments
+                print(f"Created {len(segments)} segments for direction {direction}")
+    
+    return segments_by_direction
