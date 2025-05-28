@@ -98,12 +98,6 @@ function BackgroundModal({setOpenModal,  showPopup, setShowPopup, /*cameraStarte
 
       
             </div>
-
-            {/* {cameraStarted && (
-                <div className="fixed top-4 overflow-y-auto p-4 right-4 w-[400px] h-[300px] z-[999999] bg-white rounded-lg shadow-lg overflow-hidden">
-                <CameraPostureScreen handlePostureCode={handlePostureCode} sendFrameTime={sendFrameTime} />
-                </div>
-            )} */}
         </div>
   );
 }

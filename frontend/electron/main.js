@@ -32,7 +32,7 @@ function createWindow () {
     const { width: screenWidth } = screen.getPrimaryDisplay().workAreaSize;
 
     const popupWidth = 320;
-    const popupHeight = 240;
+    const popupHeight = 320;
 
     const postureCameraWindow = new BrowserWindow({
       width: popupWidth,

@@ -1,10 +1,11 @@
-import { useRef, useEffect, useState } from "react";
+import { useRef, useEffect, useState, use } from "react";
 import PostureToolbar from "./posture_toolbar";
 
 function CameraPostureCapture({ sendFrameTime }) {
   const videoRef = useRef(null);
   const canvasRef = useRef(null);
   const streamRef = useRef(null);
+  const centerGuideCanvasRef = useRef(null);
   const intervalRef = useRef(null); // interval ID 저장용
 
   const prevPostureCodeRef = useRef(null);
@@ -212,15 +213,116 @@ function CameraPostureCapture({ sendFrameTime }) {
       console.error("❌ 카메라 켜기 실패:", err);
     }
   };
+
+  // useEffect(() => {
+  //   const video = videoRef.current;
+  //   const canvas = centerGuideCanvasRef.current;
+  
+  //   if (!video || !canvas) return;
+  
+  //   const drawCrosshair = () => {
+  //     // 십자가캔버스를 비디오 크기에 맞추기
+  //     canvas.width = video.videoWidth;
+  //     canvas.height = video.videoHeight;
+  
+  //     const ctx = canvas.getContext("2d");
+  //     const w = canvas.width;
+  //     const h = canvas.height;
+  
+  //     ctx.clearRect(0, 0, w, h);
+  
+  //     ctx.strokeStyle = "red";
+  //     ctx.lineWidth = 2;
+  
+  //     // 십자가 그리기
+  //     ctx.beginPath();
+  //     ctx.moveTo(w / 2, h / 2 - 20);
+  //     ctx.lineTo(w / 2, h / 2 + 20);
+  //     ctx.stroke();
+  
+  //     ctx.beginPath();
+  //     ctx.moveTo(w / 2 - 20, h / 2);
+  //     ctx.lineTo(w / 2 + 20, h / 2);
+  //     ctx.stroke();
+  //   };
+  
+  //   video.addEventListener("loadedmetadata", drawCrosshair);
+  
+  //   return () => {
+  //     video.removeEventListener("loadedmetadata", drawCrosshair);
+  //   };
+  // }, []);
+  useEffect(() => {
+    const drawCrosshair = () => {
+      const canvas = centerGuideCanvasRef.current;
+      const video = videoRef.current;
+  
+      if (!canvas || !video) return;
+  
+      // ✅ 비디오가 실제로 보여지는 크기 기준으로 캔버스 크기 설정
+      const w = video.clientWidth;
+      const h = video.clientHeight;
+  
+      canvas.width = w;
+      canvas.height = h;
+  
+      const ctx = canvas.getContext("2d");
+  
+      // 캔버스 초기화
+      ctx.clearRect(0, 0, w, h);
+  
+      // 십자선 스타일
+      ctx.strokeStyle = "red";
+      ctx.lineWidth = 2;
+  
+      // 세로선
+      ctx.beginPath();
+      ctx.moveTo(w / 2, h / 2 - 20);
+      ctx.lineTo(w / 2, h / 2 + 20);
+      ctx.stroke();
+  
+      // 가로선
+      ctx.beginPath();
+      ctx.moveTo(w / 2 - 20, h / 2);
+      ctx.lineTo(w / 2 + 20, h / 2);
+      ctx.stroke();
+    };
+  
+    const handleResize = () => {
+      drawCrosshair(); // 창 크기 변경 시 다시 그리기
+    };
+  
+    const video = videoRef.current;
+  
+    if (video) {
+      video.addEventListener("loadedmetadata", drawCrosshair);
+    }
+  
+    window.addEventListener("resize", handleResize);
+  
+    return () => {
+      if (video) {
+        video.removeEventListener("loadedmetadata", drawCrosshair);
+      }
+      window.removeEventListener("resize", handleResize);
+    };
+  }, []);
+  
+
+  
+  
   
 
   return (
-    <div className="w-full h-screen flex flex-col items-center py-4">
-      {/* ✅ 사용자에게 거울처럼 보이는 비디오 */}
+    <div className="relative w-full h-screen flex flex-col items-center py-4">
       <video
         ref={videoRef}
         autoPlay
-        className="transform scale-x-[-1]"
+        className="absolute top-0 left-0 transform scale-x-[-1]"
+      />
+      <canvas
+        ref = {centerGuideCanvasRef}
+        className="absolute top-0 left-0 pointer-events-none"
       />
 
       {/* 하단 툴바 (종료, 메인, 카메라 종료) */}
