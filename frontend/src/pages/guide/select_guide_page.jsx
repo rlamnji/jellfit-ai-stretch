@@ -5,11 +5,14 @@ import Stretching from "../../components/stretching/stretching";
 import SelectedStretching from "../../components/stretching/selected_stretching";
 import { useNavigate } from "react-router-dom";
 
+import dice from '../../../src/assets/images/icons/guide_dice.png'
 
 function SelectGuidePage({ setStretchingOrder, setCompletedStretchings }) {
     
-    //랜덤 선택해지는 기능 (미완성)
-  
+    const [selectFav, setSelectFav] = useState(false); // 즐찾
+    const [randomGuideSelect, setRandomGuideSelect] = useState(0); // 랜덤 선택
+    const [allStretchingList, setAllStretchingList] = useState([]); // 전체 스트레칭 리스트
+   
     const [mainCategory, setMainCategory] = useState('신체부위');
     const [subCategory, setSubCategory] = useState('목');
     const [stretchingList, setStretchingList] = useState([]); 
@@ -24,7 +27,18 @@ function SelectGuidePage({ setStretchingOrder, setCompletedStretchings }) {
 
     const handleMainCategory = (categoryName) => {
         setMainCategory(categoryName);
-    }
+
+          if (categoryName === '내 스트레칭') {
+            // 로컬스토리지에서 '내 루틴' 불러오기
+            const saved = localStorage.getItem("myStretchings");
+            if (saved) {
+                setStretchingList(JSON.parse(saved));
+            } else {
+                alert("저장된 내 스트레칭 루틴이 없습니다.");
+                setStretchingList([]);
+            }
+        }
+    };
 
     const showSubCategories = () =>{
         return subCategories[mainCategory].map((item) => (
@@ -43,6 +57,9 @@ function SelectGuidePage({ setStretchingOrder, setCompletedStretchings }) {
     }
     useEffect(() =>{
         async function fetchData() {
+            if (mainCategory === '내 스트레칭') {
+                return; // ❌ 서버 요청하지 않음
+            }
             console.log(`서버로 전송할 카테고리: ${subCategory}`); //ok
             const stretchingList = await getStretchingData(subCategory); //배열로 받음.
             setStretchingList(stretchingList);
@@ -110,6 +127,7 @@ function SelectGuidePage({ setStretchingOrder, setCompletedStretchings }) {
             </li>
         ));
     };
+
     const handleSelectedStretchingDelete = (id) => {
         setSelectedStretchingList((prev) => prev.filter((item) => item.id !== id));
     };
@@ -128,6 +146,95 @@ function SelectGuidePage({ setStretchingOrder, setCompletedStretchings }) {
             navigate(`/guide/video/${selectedStretchingIds[0]}`); //첫번째 스트레칭 가이드 영상 화면으로 이동.
         }
     }
+
+    // 스트레칭 랜덤 선택 기능
+    const handleDiceClick = () => {
+        setRandomGuideSelect(prev => prev + 1); // 카운트 증가 함수
+    };
+
+    // 스트레칭 전체 정보 불러오기
+    useEffect(() => {
+        fetch('http://localhost:8000/poses', {
+                method: 'GET',
+                headers: {
+                'Content-Type': 'application/json',
+                },
+        })
+        .then((res) => {
+                if (!res.ok) {
+                    throw new Error('서버 응답 실패');
+                }
+                return res.json();
+                })
+                .then((data) => {
+                    setAllStretchingList(data);
+                    console.log('전체 스트레칭 목록:', data);
+                })
+                .catch((error) => {
+                    console.error('스트레칭 목록 불러오기 실패:', error);
+                });
+    }, []);
+
+    // 스트레칭 랜덤 선택 함수
+    const randomhandleStrechingSelect = (allStretching) =>{
+        if (allStretching.length === 0) {
+            alert("스트레칭 목록이 없습니다.");
+            return;
+        }
+
+        // 1~5 사이의 무작위
+        const count = Math.floor(Math.random() * 5) + 1;
+
+        // 스트레칭 목록을 무작위로 섞고 앞에서 count개 선택
+        const shuffled = [...allStretching].sort(() => Math.random() - 0.5);
+        const randomSelection = shuffled.slice(0, count).map((s) =>({
+            ...s,
+            id: s.pose_id,
+        }));
+        console.log("랜덤 선택 스트레칭:", randomSelection);
+
+        // 기존 리스트 초기화 후 랜덤 스트레칭 담기
+        setSelectedStretchingList(randomSelection);
+    };
+
+    useEffect(() => {
+        if (randomGuideSelect > 0) {
+            randomhandleStrechingSelect(allStretchingList);
+        }
+    }, [randomGuideSelect]);
+
+
+    // 즐겨찾기
+    const favGuideSelect = () =>{
+        // 만약 selectFav 가 true면
+        // 지금 있는 해당 리스트들을 '내 스트레칭' 카테고리로 넣기
+        // 리스트가 없다면 alert 창
+        if(selectFav == true){
+            if (selectedStretchingList.length === 0) {
+                alert("스트레칭이 없습니다.");
+                return;
+            }
+            
+            // 기존 즐겨찾기 불러오기
+            const prev = JSON.parse(localStorage.getItem("myStretchings")) || [];
+
+            // 중복 제거 (id 기준)
+            const newList = [...prev, ...selectedStretchingList].filter(
+            (pose, index, self) =>
+                index === self.findIndex(p => p.id === pose.id)
+            );
+
+            localStorage.setItem("myStretchings", JSON.stringify(newList));
+            console.log("저장완료")
+
+        }
+    };
+    useEffect(() => {
+        if (selectFav === true) {
+            favGuideSelect();
+        }
+    }, [selectFav]);
+
     return(
         <div className="w-full h-screen bg-[#E5D2D2]">
             <TopBar />
@@ -168,12 +275,26 @@ function SelectGuidePage({ setStretchingOrder, setCompletedStretchings }) {
                     </ul>
                 </div>
                 <div className="selectedPart w-[30%]">
-                    <h1 className="mb-6 font-semibold text-xl text-[#522B2B]">담긴 스트레칭</h1>
+                    <div className="flex flex-row justify-between">
+                        <h1 className="mb-4 font-semibold text-xl text-[#522B2B]">담긴 스트레칭</h1>
+                        <div className="flex flex-row pr-9 gap-4">
+                            {/* 즐겨찾기 */}
+                            <div onClick={() => setSelectFav(prev => !prev)} 
+                            className="w-[33px] h-[33px] rounded-full border border-[#B7AEAE] flex items-center justify-center cursor-pointer text-[20px] text-[#B7AEAE]">
+                                {selectFav === true ? "★" : "☆"}</div>
+                            {/* 랜덤루틴 */}
+                            <div onClick={handleDiceClick} className="w-[33px] h-[33px] border border-[#B7AEAE] rounded-full flex items-center justify-center cursor-pointer">
+                                <img src={dice} className="w-[20px] h-[20px]"></img>
+                            </div>
+                        </div>
+ 
+                    </div>
                     <div className="w-[90%] h-[300px] bg-[#dad1d1] rounded-3xl">
                         <ul className="selectedStretchingList flex flex-col items-center pt-4">
                             {showSelectedStretchingList(selectedStretchingList)}
                         </ul>
                     </div>
+                    
                     <button 
                         className="w-[76%] h-[48px] mt-6 ml-4 bg-[#552F2F] rounded-3xl font-bold text-xl text-white hover:bg-[#7C4A4A]"
                         onClick={() =>{handleStartbuttonClick(selectedStretchingList)}}
