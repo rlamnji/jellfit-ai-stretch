@@ -233,11 +233,6 @@ function SelfStretchPage({ stretchingOrder, completedStretchings, setCompletedSt
         }
     }
     
-    // 스트레칭 인식이 잘 안될시 캘리브레이션 페이지로 전환
-    const changeCalibration = () =>{
-
-    }
-
     return (
         <div className="w-full h-full flex flex-col items-center bg-space">
 
@@ -262,9 +257,6 @@ function SelfStretchPage({ stretchingOrder, completedStretchings, setCompletedSt
                     </div>
                 </div>
         
-                
-            
-
 
             <div className="text-xl font-bold mt-4 text-center mx-auto w-max">{stretching.name}</div>
             {stretching.time != null && (

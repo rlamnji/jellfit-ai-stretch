@@ -5,6 +5,7 @@ import { startChangingRandomItem } from '../../utils/get_random_msg';
 
 function StretchingFeedback() {
     const [message, setMessage] = useState('');
+    
 
     // 4초마다 응원 메시지 랜덤
     // 스트레칭 피드백은 백엔드에서 받아온 값으로 출력한다치면
