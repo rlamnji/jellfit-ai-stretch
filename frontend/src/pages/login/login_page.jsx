@@ -19,10 +19,10 @@ function LoginPage(){
         setPassword(value);
     };
 
-    //여기서부터 서버 연결 코드
     const handleLogin = async (e) => {
-        e.preventDefault(); // 폼 제출 기본 동작 방지
-
+        if (!isValid){
+            e.preventDefault();
+        }
         try {
             const formData = new URLSearchParams();
             formData.append("username", id);
@@ -58,7 +58,13 @@ function LoginPage(){
             </div>
 
             <div className="relative w-[350px] h-auto">
-                <div className="inputContainer flex flex-col w-[350px] h-auto pl-8 pt-8 bg-input-container-color rounded-[40px]">
+                <form 
+                    className="inputContainer flex flex-col w-[350px] h-auto pl-8 pt-8 bg-input-container-color rounded-[40px]"
+                    onSubmit={(e) => {
+                        e.preventDefault();
+                        handleLogin();
+                    }}
+                >
                     <InputField id='id' title='아이디' type='text' placeholder='' onTextChange={handleIdInput} />
                     <InputField id='password' title='비밀번호' type='password' placeholder='' onTextChange={handlePasswordInput} />
                     
@@ -74,12 +80,12 @@ function LoginPage(){
                     >
                         <button
                             className={`font-semibold text-white text-xl ${isValid ? '' : 'pointer-events-none'}`}
-                            onClick={handleLogin}
+                            type='submit'
                         >
                             로그인
                         </button>
                     </div>
-                </div>
+                </form>
 
                 <img className="absolute w-[600px] h-[200px] -left-60 top-40" src={imgCloudLeft} alt="왼쪽 구름" />
                 <img className="absolute w-[500px] h-[200px] -right-80 -top-10" src={imgCloudRight} alt="오른쪽 구름" />
