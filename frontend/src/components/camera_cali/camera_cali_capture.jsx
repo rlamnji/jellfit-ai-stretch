@@ -3,6 +3,7 @@ import { useRef, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Pose } from "@mediapipe/pose";
 import { Camera } from "@mediapipe/camera_utils";
+import { isPostureAligned, isTPoseAligned } from "../../utils/pose_check";
 
 function CameraCaliCapture() {
   const navigate = useNavigate();
@@ -108,7 +109,7 @@ function CameraCaliCapture() {
 
       } else if (step === "posture") {
         ctx.strokeStyle = "rgba(0, 200, 255, 0.4)";
-        const y = guideCanvas.height * 0.66;
+        const y = guideCanvas.height * 0.5;
 
         ctx.beginPath();
         ctx.moveTo(guideCanvas.width * 0.4, y);
@@ -202,15 +203,11 @@ function CameraCaliCapture() {
     pose.onResults( async (results) => {
       if (!results.poseLandmarks) return;
 
-      const getY = (idx) => results.poseLandmarks[idx]?.y ?? 0;
+      const landmarks = results.poseLandmarks;
 
       // ✅ 정자세 인식
       if (step === "posture" && !postureSuccess) {
-        const isAligned =
-          Math.abs(getY(11) - 0.66) < 0.08 && // 왼쪽 어깨 y좌표에서 y=0.66 부근에 있는지 검사
-          Math.abs(getY(12) - 0.66) < 0.08; // 오른쪽
-
-        if (isAligned) {
+        if (isPostureAligned(landmarks)) {
           postureStableCount++;
           console.log(`정자세 정렬 프레임 수: ${postureStableCount}`);
           setMessage("정자세 인식을 시작합니다! 다음 안내까지 자세를 유지해주세요!");
@@ -235,13 +232,7 @@ function CameraCaliCapture() {
 
       // ✅ T자세 인식
       if (step === "tpose" && !tposeSuccess) {
-        const isAligned =
-          Math.abs(getY(11) - 0.55) < 0.08 &&
-          Math.abs(getY(12) - 0.55) < 0.08 &&
-          Math.abs(getY(15) - 0.55) < 0.08 && // 왼쪽 팔꿈치
-          Math.abs(getY(16) - 0.55) < 0.08; // 오른쪽 팔꿈치
-
-        if (isAligned) {
+        if (isTPoseAligned(landmarks)) {
           tposeStableCount++;
           console.log(`T자세 정렬 프레임 수: ${tposeStableCount}`);
           setMessage("T자 자세 인식을 시작합니다! 다음 안내까지 자세를 유지해주세요!");

@@ -65,9 +65,9 @@ async def analyze_image(
     csv_path = os.path.join(csv_dir, base_filename + ".csv")
     try:
         extract_landmarks_to_csv(img_path, csv_path)
-        os.remove(img_path)  # 이미지 파일은 사용 후 삭제
+        #os.remove(img_path)  # 이미지 파일은 사용 후 삭제
     except Exception as e:
-        os.remove(img_path)
+        #os.remove(img_path)
         return JSONResponse(status_code=500, content={"error": str(e)})
     
 
