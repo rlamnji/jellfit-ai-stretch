@@ -1,13 +1,12 @@
+import { Link, useNavigate } from 'react-router-dom';
 import arrowLeft from '../../assets/images/icons/arrow_left.png';
-import { Link } from 'react-router-dom';
 
 function BackBtn(){
+    const navigate = useNavigate();
     return(
-        <div class="w-8 h-8 m-4">
-            <Link to="/home">
+        <button className="w-8 h-8 m-4" onClick={() => navigate(-1)}>
                 <img src={arrowLeft} alt="뒤로가기버튼" />
-            </Link>
-        </div>
+        </button>
     );
 }
 export default BackBtn;
