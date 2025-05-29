@@ -283,6 +283,7 @@ function SelfStretchPage({ stretchingOrder, completedStretchings, setCompletedSt
         {/* ✅ 임시용 버튼 */}
         {/* 임시용 버튼을 없애고 true --> 끝 --> 모달창 까지 연결해야함*/}
         {/* 로직은 backend */}
+        {/* 최종 완료는 true를 받았을 때 / 임시버튼은 현재까지 한대로만 */}
         <button
             className="mt-4 px-4 py-2 bg-gray-600 text-white rounded hover:bg-gray-700"
             onClick={async () => {

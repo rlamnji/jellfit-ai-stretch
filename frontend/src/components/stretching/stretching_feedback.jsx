@@ -8,7 +8,7 @@ function StretchingFeedback() {
 
     // 4초마다 응원 메시지 랜덤
     // 스트레칭 피드백은 백엔드에서 받아온 값으로 출력한다치면
-    // 4초씩 랜덤띄우다가 api에 메시지가 있으면? 메시지 출력하기
+    // 4초씩 랜덤띄우다가 api에 똑같은 메시지가 3초씩? 있으면 메시지 출력하기
     useEffect(() => {
         const stop = startChangingRandomItem(cheersMessages, setMessage, 4000);
         return () => stop(); 
