@@ -71,9 +71,13 @@ function SelectGuidePage({ setStretchingOrder, setCompletedStretchings }) {
             return [];
         }
     }
+
+    // 카테고리 별 스트레칭 출력
     const showStretchingList = (stretchingList) => { 
         return stretchingList.map((stretching) => (
-            <li key={stretching.id}>
+            <li 
+                key={stretching.id}
+                className="m-2 w-[160px] h-[180px]">
                 <Stretching stretching={stretching} onClick={handleStrechingSelect}/>
             </li>
         ));
@@ -87,7 +91,7 @@ function SelectGuidePage({ setStretchingOrder, setCompletedStretchings }) {
             // 중복 스트레칭 & 5개 초과 담기 방지.
             if (prev.some((item) => item.id === stretching.id)) {
                 return prev;
-            }else if (prev.length > 5) {
+            }else if (prev.length >= 5) {
                 alert("최대 5개까지 담을 수 있어요.");
                 return prev;
             }
@@ -97,7 +101,7 @@ function SelectGuidePage({ setStretchingOrder, setCompletedStretchings }) {
     const showSelectedStretchingList = () => {
         return selectedStretchingList.map((stretching) => (
             <li key={stretching.id}
-                className="selectedStretching w-[90%] h-[44px] mt-2 z-10 pt-1 pl-2 bg-[#F1E9E9] hover:bg-[#beb5b4] rounded-3xl font-semibold text-[#786B5D]"
+                className="selectedStretching flex items-center w-[90%] h-[44px] pl-4 pt-2 pb-2 pr-4 mt-2 z-10 bg-[#F1E9E9] hover:bg-[#beb5b4] rounded-3xl font-semibold text-[#786B5D]"
             >
                 <SelectedStretching 
                     name={stretching.name}
@@ -159,7 +163,7 @@ function SelectGuidePage({ setStretchingOrder, setCompletedStretchings }) {
                             {showSubCategories()}    
                         </ul>
                     </div>
-                    <ul className="stretchingList flex">
+                    <ul className="stretchingList p-2 flex flex-wrap items-start">
                         {showStretchingList(stretchingList)} 
                     </ul>
                 </div>

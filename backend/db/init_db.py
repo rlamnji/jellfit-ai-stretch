@@ -78,17 +78,17 @@ db.add(Pose(name="팔꿈치굽혀서옆구리늘리기", duration=10, count=1,
 
 db.add(Pose(name="T자가슴열기", duration=10, count=None,
             video_url="https://www.youtube.com/embed/G-1VPhV0Yhl",
-            thumbnail_url=None,
+            thumbnail_url="/images/stretching/tjgsyg",
             category_id=5))  # 가슴
 
 db.add(Pose(name="Y자가슴열기", duration=10, count=3,
             video_url="https://www.youtube.com/embed/G-1VPhV0Yhl",
-            thumbnail_url=None,
+            thumbnail_url="/images/stretching/yjgsyg",
             category_id=5))  # 가슴
 
 db.add(Pose(name="손걸고잡아당기기", duration=5, count=3,
             video_url="https://www.youtube.com/embed/8q3lHCP3E7g",
-            thumbnail_url=None,
+            thumbnail_url="/images/stretching/sggjadgg",
             category_id=2))  # 어깨
 
 db.add(Pose(name="팔앞으로쭉뻗기", duration=5, count=3,
@@ -98,12 +98,12 @@ db.add(Pose(name="팔앞으로쭉뻗기", duration=5, count=3,
 
 db.add(Pose(name="팔뻗고옆구리늘리기", duration=10, count=None,
             video_url="https://www.youtube.com/embed/RobdPJZAxdM",
-            thumbnail_url=None,
+            thumbnail_url="/images/stretching/pfgygrnrg",
             category_id=4))  # 등/허리
 
 db.add(Pose(name="목뒤로젖히기", duration=10, count=None,
             video_url="https://www.youtube.com/embed/UfvkTe8cP5c",
-            thumbnail_url=None,
+            thumbnail_url="/images/stretching/mdrjhg",
             category_id=1))  # 목
 db.add(Pose(name="겨드랑이향하여목당기기", duration=10, count=None,
             video_url="https://www.youtube.com/embed/LNwfbj_Sy7M",

@@ -3,6 +3,7 @@ import { useRef, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Pose } from "@mediapipe/pose";
 import { Camera } from "@mediapipe/camera_utils";
+import { isPostureAligned, isTPoseAligned } from "../../utils/pose_check";
 
 function CameraCaliCapture() {
   const navigate = useNavigate();
@@ -15,7 +16,7 @@ function CameraCaliCapture() {
   const [message, setMessage] = useState(""); // 상태 메시지 표시
 
 
-  const expectedPoseYMap = {
+  /*const expectedPoseYMap = {
     // 정자세
     posture: {
       leftShoulder: 0.66,
@@ -28,7 +29,7 @@ function CameraCaliCapture() {
       leftWrist: 0.52,
       rightWrist: 0.52,
     },
-  };
+  };*/
 
 
   // 카메라 켜기
@@ -108,7 +109,7 @@ function CameraCaliCapture() {
 
       } else if (step === "posture") {
         ctx.strokeStyle = "rgba(0, 200, 255, 0.4)";
-        const y = guideCanvas.height * 0.66;
+        const y = guideCanvas.height * 0.5;
 
         ctx.beginPath();
         ctx.moveTo(guideCanvas.width * 0.4, y);
@@ -128,42 +129,41 @@ function CameraCaliCapture() {
 
   // 프레임 캡처해서 서버로 전송
   const sendFrame = async () => {
-  const canvas = canvasRef.current;
-  const video = videoRef.current;
+    const canvas = canvasRef.current;
+    const video = videoRef.current;
 
-
-
-  if (!canvas || !video) {
-    console.warn("⛔ canvas 또는 video 요소가 null입니다.");
-    return;
-  }
-
-  const ctx = canvas.getContext("2d");
-  if (!ctx) {
-    console.warn("⛔ canvas 2D context를 가져올 수 없습니다.");
-    return;
-  }
-
-  ctx.setTransform(1, 0, 0, 1, 0, 0);
-  ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
-
-  canvas.toBlob(async (blob) => {
-    if (!blob) return;
-    const formData = new FormData();
-    formData.append("file", blob, "frame.jpg");
-
-    try {
-      const res = await fetch("http://localhost:8000/analyze", {
-        method: "POST",
-        body: formData,
-      });
-      const result = await res.json();
-      console.log("📥 서버 응답:", result);
-    } catch (err) {
-      console.error("❌ 전송 실패:", err);
+    if (!canvas || !video) {
+      console.warn("⛔ canvas 또는 video 요소가 null입니다.");
+      return;
     }
-  }, "image/jpeg");
-};
+
+    const ctx = canvas.getContext("2d");
+    if (!ctx) {
+      console.warn("⛔ canvas 2D context를 가져올 수 없습니다.");
+      return;
+    }
+
+    ctx.setTransform(1, 0, 0, 1, 0, 0);
+    ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+    canvas.toBlob(async (blob) => {
+      if (!blob) return;
+      const formData = new FormData();
+      formData.append("file", blob, "frame.jpg");
+      formData.append("pose_type", step);
+
+      try {
+        const res = await fetch("http://localhost:8000/analyze", {
+          method: "POST",
+          body: formData,
+        });
+        const result = await res.json();
+        console.log("📥 서버 응답:", result);
+      } catch (err) {
+        console.error("❌ 전송 실패:", err);
+      }
+    }, "image/jpeg");
+  };
 
 
 
@@ -176,6 +176,11 @@ function CameraCaliCapture() {
   };
 
   useEffect(() => {
+    // 1. Mediapipe Pose 모델 초기화
+    // 2. 정자세 인식 로직
+    // 3. T자세 인식 로직
+    // 4. 일정 시간 자세 유지되면 -> 프레임 전송 -> 다음 단계로 전환
+
     if (!videoRef.current) return;
 
     const pose = new Pose({
@@ -198,20 +203,17 @@ function CameraCaliCapture() {
     pose.onResults( async (results) => {
       if (!results.poseLandmarks) return;
 
-      const getY = (idx) => results.poseLandmarks[idx]?.y ?? 0;
+      const landmarks = results.poseLandmarks;
 
       // ✅ 정자세 인식
       if (step === "posture" && !postureSuccess) {
-        const isAligned =
-          Math.abs(getY(11) - 0.66) < 0.08 &&
-          Math.abs(getY(12) - 0.66) < 0.08;
-
-        if (isAligned) {
+        if (isPostureAligned(landmarks)) {
           postureStableCount++;
           console.log(`정자세 정렬 프레임 수: ${postureStableCount}`);
           setMessage("정자세 인식을 시작합니다! 다음 안내까지 자세를 유지해주세요!");
 
-          if (postureStableCount >= 30) { // 약 1초 (30fps 기준)
+          // 정렬프레임 30 넘어가면 화면 찍음
+          if (postureStableCount >= 30) {
             postureSuccess = true;
             console.log("✅ 정자세 연속 인식 성공 → 프레임 전송 시작");
             setMessage("✅ 정자세 연속 인식 성공 → 프레임 전송 시작");
@@ -230,13 +232,7 @@ function CameraCaliCapture() {
 
       // ✅ T자세 인식
       if (step === "tpose" && !tposeSuccess) {
-        const isAligned =
-          Math.abs(getY(11) - 0.55) < 0.08 &&
-          Math.abs(getY(12) - 0.55) < 0.08 &&
-          Math.abs(getY(15) - 0.55) < 0.08 &&
-          Math.abs(getY(16) - 0.55) < 0.08;
-
-        if (isAligned) {
+        if (isTPoseAligned(landmarks)) {
           tposeStableCount++;
           console.log(`T자세 정렬 프레임 수: ${tposeStableCount}`);
           setMessage("T자 자세 인식을 시작합니다! 다음 안내까지 자세를 유지해주세요!");
@@ -310,22 +306,6 @@ function CameraCaliCapture() {
           height="600"
           className="hidden"
         />
-        {/* 자세 측정 알림 UI 추후 수정
-        {step==="start_message" && (
-          <div className="fade-in-out absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-white/80 text-xl font-semibold px-6 py-3 rounded-xl shadow">
-            정자세 측정을 시작합니다!
-          </div>
-        )}
-        {step === "message" && (
-          <div className="fade-in-out absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-white/80 text-xl font-semibold px-6 py-3 rounded-xl shadow">
-            정자세 완료! T자 자세로 이동합니다.
-          </div>
-        )}
-        {step==="end_message" && (
-          <div className="fade-in-out absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-white/80 text-xl font-semibold px-6 py-3 rounded-xl shadow">
-            T자 자세 완료! 자세 캘리브레이션을 종료합니다!
-          </div>
-        )}*/}
 
       </div>
 
