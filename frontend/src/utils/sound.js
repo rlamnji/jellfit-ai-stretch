@@ -7,23 +7,44 @@ let audioInstance = null;
 
 // 브금 재생 함수
 export const playAudio = (src) => {
-    if (!audioInstance) {
-        audioInstance = new Audio(src);
-        audioInstance.loop = true;
-        audioInstance.volume = 0.5;
-      }
-      audioInstance.play().catch(console.error);
-      return audioInstance;
-}
+  const absoluteSrc = new URL(src, window.location.href).href;
+
+  // 브라우저 전역에 저장
+  if (!window.audioInstance) {
+    window.audioInstance = new Audio(absoluteSrc);
+    window.audioInstance.loop = true;
+    window.audioInstance.volume = 0.5;
+    window.audioInstance.play().catch(console.error);
+    return window.audioInstance;
+  }
+
+  // 이미 같은 음악이 재생 중이라면 그대로 둠
+  if (window.audioInstance.src === absoluteSrc) {
+    if (window.audioInstance.paused) {
+      window.audioInstance.play().catch(console.error);
+    }
+    return window.audioInstance;
+  }
+
+  // 다른 음악이면 멈추고 새로
+  window.audioInstance.pause();
+  window.audioInstance.currentTime = 0;
+
+  window.audioInstance = new Audio(absoluteSrc);
+  window.audioInstance.loop = true;
+  window.audioInstance.volume = 0.5;
+  window.audioInstance.play().catch(console.error);
+
+  return window.audioInstance;
+};
 
 // 브금 정지 함수
-export const stopAudio = (src) => {
-    // 배경음이 꺼졌을 때는 소리 정지
-    if (audioInstance) {
-        audioInstance.pause();
-        audioInstance.currentTime = 0;
-      }
-}
+export const stopAudio = () => {
+  if (window.audioInstance) {
+    window.audioInstance.pause();
+    window.audioInstance.currentTime = 0;
+  }
+};
 
 
 // 클릭 사운드
