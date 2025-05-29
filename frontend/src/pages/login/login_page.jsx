@@ -4,6 +4,7 @@ import { useState } from 'react';
 import imgLogo from '../../assets/images/etc/logo_title.png';
 import imgCloudLeft from '../../assets/images/etc/cloud_left.png';
 import imgCloudRight from '../../assets/images/etc/cloud_right.png';
+import SoundBtn from '../../components/buttons/sound_btn';
 
 function LoginPage(){
 
@@ -53,6 +54,9 @@ function LoginPage(){
 
     return (
         <div className='w-full h-screen bg-space flex flex-col items-center'>
+            <div class="w-full h-14 flex justify-end ">
+                <SoundBtn />
+            </div>
             <div className='header w-fit h-fit p-1'>
                 <img className='w-[400px] h-[200px]' src={imgLogo} alt="타이틀 로고" />
             </div>

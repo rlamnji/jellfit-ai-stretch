@@ -4,6 +4,7 @@ import { useState } from 'react';
 import imgLogo from '../../assets/images/etc/logo_title.png';
 import imgCloudLeft from '../../assets/images/etc/cloud_left.png';
 import imgCloudRight from '../../assets/images/etc/cloud_right.png';
+import TopBar from '../../components/top_bar';
 
 
 function JoinPage (){
@@ -62,6 +63,7 @@ function JoinPage (){
 
     return (
         <div className='w-full h-screen bg-space flex flex-col items-center'>
+            <TopBar />
             <div className='header w-fit h-fit p-1'>
                 <img className='w-[400px] h-[200px]' src={imgLogo} alt="타이틀 로고" />
             </div>
