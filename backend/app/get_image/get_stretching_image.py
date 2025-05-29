@@ -6,7 +6,7 @@ from stretch_model.src.infer_anomaly import StretchTracker
 from sqlalchemy.orm import Session
 from db.database import get_db
 from db.models import User, Pose
-from dependencies import get_current_user
+# from dependencies import get_current_user
 
 router = APIRouter(prefix="/guide/analyze", tags=["Stretching_Analyze"])
 
@@ -50,7 +50,7 @@ async def analyze_image(
     file: UploadFile = File(...),
     pose_id: int = Form(None or 7),
     db: Session = Depends(get_db),
-    current_user: User = Depends(get_current_user)
+    # current_user: User = Depends(get_current_user)
 ):
     content = await file.read()
     image_array = np.asarray(bytearray(content), dtype=np.uint8)
