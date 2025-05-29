@@ -40,15 +40,16 @@ class StretchTracker:
         self.hold_start = None # hold 시작 프레임 인덱스
         self.counts = {} # 각 방향별 수행 횟수를 저장할거임
         self.feature_buffer = deque(maxlen=self.required_window) # 특징 버퍼 (윈도우 크기만큼 저장)
+        self.done_sides = set() # 각 방향별 완료 여부를 저장할 set
         
         # 모델 로딩 전 방향을 가지는 동작인지 판단 후 결과에 따라 다른 방식으로 로딩
         self.has_direction = 'direction' in self.cfg and self.cfg['direction']
-        sides = self.cfg['direction'] if self.has_direction else [None]
+        self.sides = self.cfg['direction'] if self.has_direction else [None]
 
         # 모델 로딩
         model_dir = base_dir / "models" # 모델 경로
         self.models = {}
-        for side in sides:
+        for side in self.sides:
             # 만약 방향이 없으면 model filenames 에 "_<side>"라는 suffix(접미사)가 생략됨 
             suffix = f"_{side}" if side else ""
             m_path = model_dir / f"{exercise}{suffix}_anomaly.joblib"
@@ -134,7 +135,7 @@ class StretchTracker:
                 return side
         return None
 
-    def is_performing(self, image: np.ndarray) -> Dict:
+    def is_performing(self, image: np.ndarray, outlier_threshold: float = -0.2) -> Dict:
         self.frame_idx += 1
         feats = self.extract_landmarks(image)
 
@@ -153,10 +154,6 @@ class StretchTracker:
             return result
 
         # DataFrame으로 변환하여 임계값 검사용으로 사용
-        # print("feats:", feats)
-        # df = pd.DataFrame([feats])
-        # print("df.columns:", df.columns.tolist())
-        # print(repr(df.columns.tolist()))
         feat_df = pd.DataFrame([feats]) # 추후 calibration과 z_scale도 적용할 수 있음
 
         # 1) 방향 결정
@@ -210,7 +207,7 @@ class StretchTracker:
 
             # 이상치 판정
             if scores is not None:
-                inliers = scores >= -0.2
+                inliers = scores >= outlier_threshold
                 vote_ratio = inliers.mean()
                 print("Inlier flags:", inliers.astype(int))
             else:
@@ -265,12 +262,21 @@ class StretchTracker:
             print(f"elapsed={elapsed}, min_hold={self.min_hold}")
 
             if elapsed >= self.min_hold:
-                self.counts[side] += 1
-                result['counts'][side] = self.counts[side]       
-                all_sides_done = all(cnt >= self.target_count for cnt in self.counts.values())
-                if all_sides_done:
-                    result['completed'] = True
-                    result['feedback_messages'] = ["완료! 잘하셨습니다!"]
+                if self.counts[side] < self.target_count:
+                    self.counts[side] += 1
+                    result['counts'][side] = self.counts[side]
+
+                    # 해당 방향 완료 체크
+                    if self.counts[side] >= self.target_count:
+                        self.done_sides.add(side)
+
+                        # 아직 다른 방향 남아 있음
+                        remaining_sides = [s for s in self.sides if s not in self.done_sides]
+                        if remaining_sides:
+                            result['feedback_messages'] = ["다른 방향으로 동작해주세요!"]
+                        else:
+                            result['completed'] = True
+                            result['feedback_messages'] = ["완료! 잘하셨습니다!"]
                     
         else:
             # 노이즈 방지를 위해 실패 시 윈도우·hold 초기화
