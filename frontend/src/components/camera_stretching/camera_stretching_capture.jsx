@@ -71,21 +71,24 @@ function CameraStretchingCapture({ handleIsStretching, sendFrameTime , stretchin
 }, [stretchingId]);
 
   return (
-    <div className="w-full flex flex-col items-center py-4">
-      {/* ✅ 사용자에게 거울처럼 보이는 비디오 */}
-      <video
-        ref={videoRef}
-        autoPlay
-        className="w-[640px] h-[480px] border rounded-xl transform scale-x-[-1] mb-6"
-      />
+    <div className="flex flex-col items-center py-4 w-full ">
+      <div className="mb-6">
+        <video
+          ref={videoRef}
+          autoPlay
+          className="w-[1200px] h-[720px] border rounded-xl transform scale-x-[-1] "
+        />
 
-      {/* 👻 서버 전송용 캔버스 (사용자에겐 숨김) */}
-      <canvas
-        ref={canvasRef} // canvasRef 연결
-        width="640"
-        height="480"
-        className="hidden"
-      />
+        {/* 👻 서버 전송용 캔버스 (사용자에겐 숨김) */}
+        <canvas
+          ref={canvasRef} // canvasRef 연결
+          width="1200"
+          height="720"
+          className="hidden"
+        />
+
+      </div>
+      {/* ✅ 사용자에게 거울처럼 보이는 비디오 */}
 
       {/*해파리 피드백*/}
         <StretchingFeedback/>
