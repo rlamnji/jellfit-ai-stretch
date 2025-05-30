@@ -20,7 +20,7 @@ function SelectGuidePage({ setStretchingOrder, setCompletedStretchings }) {
     const navigate = useNavigate();
 
     const subCategories = {
-        '신체부위' : ['목', '어깨', '팔/손목', '등/허리', '가슴'],
+        '신체부위' : ['목', '어깨', '등/허리', '가슴'],
         '상황' : ['자기 전', '일어나서', '작업 하기 전', '식사 후'],
         '내 스트레칭' : ['']
     };
