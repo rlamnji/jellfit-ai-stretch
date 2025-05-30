@@ -182,7 +182,7 @@ class Routine(Base):
     user = relationship("User", back_populates="routines")
     routine_poses = relationship('RoutinePose', back_populates='routine')
 
-# 사용자가 고른 루틴
+# 즐겨찾기 테이블
 class RoutinePose(Base):
     __tablename__ = 'routine_poses'
 
