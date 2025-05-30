@@ -114,7 +114,7 @@ db.add(Pose(name="뒷목걸고고개젖히기", duration=10, count=None,
             video_url="https://www.youtube.com/embed/LNwfbj_Sy7M",
             thumbnail_url=None,
             category_id=1,
-            have_direction=True))  # 목
+            have_direction=False))  # 목
 
 
 db.add(Routine(user_id=1, image_url="https://example.com/routine1.jpg"))
