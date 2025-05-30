@@ -5,10 +5,10 @@ features:
   # 팔꿈치 각도 (자연스럽게 내린 상태)
   - name: left_arm_angle
     type: angle
-    points: [11, 13, 15]
+    points: [7, 11, 13]
   - name: right_arm_angle
     type: angle
-    points: [12, 14, 16]
+    points: [8, 12, 14]
   
   # 어깨 정렬
   - name: shoulder_alignment
@@ -17,7 +17,7 @@ features:
 
 thresholds:
   
-  # 팔꿈치가 거의 펴진 상태여야 함
+  # 팔을 아래로 내린 상태
   min_left_arm_angle: 150
   min_right_arm_angle: 150
   

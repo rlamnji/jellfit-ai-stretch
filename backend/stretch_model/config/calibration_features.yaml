@@ -28,33 +28,39 @@ features:
   #   description: "T자세 손목 간격"
 
   # 눈-귀 Y차이 (고개 각도 기준)
-  - name: neutral_left_eye_ear_y_diff
+  - name: left_eye_ear_y_diff
     type: delta_y
     source_pose: neutral
     points: [2, 7]
     description: "중립시 왼쪽 눈-귀 Y차이"
     
-  - name: neutral_right_eye_ear_y_diff
+  - name: right_eye_ear_y_diff
     type: delta_y
     source_pose: neutral
     points: [5, 8]
     description: "중립시 오른쪽 눈-귀 Y차이"
 
-# 계산된 특징들 (ratio, average 등)
-computed_features:
-  - name: avg_arm_length
-    type: average
-    source_features: [left_arm_length, right_arm_length]
-    description: "평균 팔 길이"
+  - name: face_x_spread
+    type: spread_x
+    source_pose: neutral
+    points: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+    description: "얼굴 랜드마크들의 x좌표 분산도"
+
+# # 계산된 특징들 (ratio, average 등)
+# computed_features:
+#   - name: avg_arm_length
+#     type: average
+#     source_features: [left_arm_length, right_arm_length]
+#     description: "평균 팔 길이"
     
-  - name: wrist_expansion_ratio
-    type: ratio
-    numerator: tpose_wrist_distance
-    denominator: neutral_wrist_distance
-    description: "손목 확장 비율 (T자세/중립자세)"
+#   - name: wrist_expansion_ratio
+#     type: ratio
+#     numerator: tpose_wrist_distance
+#     denominator: neutral_wrist_distance
+#     description: "손목 확장 비율 (T자세/중립자세)"
     
-  - name: arm_shoulder_ratio
-    type: ratio
-    numerator: avg_arm_length
-    denominator: shoulder_width
-    description: "팔길이 대비 어깨너비 비율"
+#   - name: arm_shoulder_ratio
+#     type: ratio
+#     numerator: avg_arm_length
+#     denominator: shoulder_width
+#     description: "팔길이 대비 어깨너비 비율"
