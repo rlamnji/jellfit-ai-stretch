@@ -57,6 +57,8 @@ class CalibrationProcessor:
         else:
             raise FileNotFoundError(f"특징 정의 파일 없음: {config_path}")
     
+    # (05.30) csv 상태에서 코드 받도록 수정할 것
+    # 여기부터 수정
     def start_session(self, user_id: str) -> Dict:
         """캘리브레이션 세션 시작"""
         self.sessions[user_id] = {
@@ -189,6 +191,7 @@ class CalibrationProcessor:
         
         return True
     
+    # 해당 함수로 csv 평균값
     def finalize_calibration(self, user_id: str) -> Dict:
         """캘리브레이션 완료 처리"""
         session = self.sessions[user_id]

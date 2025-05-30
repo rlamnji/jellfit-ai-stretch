@@ -1,9 +1,28 @@
-import { useRef, useEffect } from "react";
+import { useRef, useEffect, useState } from "react";
 import StretchingFeedback from "../stretching/stretching_feedback";
 function CameraStretchingCapture({ handleIsStretching, sendFrameTime , stretchingId}) {
   const videoRef = useRef(null);
   const canvasRef = useRef(null); // canvasRef 초기화
   const streamRef = useRef(null); // 스트림을 저장할 ref
+
+  const [showStart, setShowStart] = useState(true);
+  const intervalRef = useRef(null);
+  const [message, setMessage] = useState('');
+
+  useEffect(() => {
+    // 시작 메시지 먼저 보여줌
+    setMessage('시작합니다!');
+    setShowStart(true);
+
+    const startTimeout = setTimeout(() => {
+      setShowStart(false); // 시작 메시지 숨김
+    }, 2000);
+
+    return () => {
+      clearTimeout(startTimeout);
+      clearInterval(intervalRef.current);
+    };
+  }, []);
 
   // 1. 카메라 연결
   useEffect(() => {
@@ -51,9 +70,16 @@ function CameraStretchingCapture({ handleIsStretching, sendFrameTime , stretchin
           body: formData,
         });
         if(res.ok){
-          const { isStretching } = await res.json();
-          console.log("✅ 서버 응답:", isStretching);
-          handleIsStretching(isStretching);
+          const data = await res.json(); // ✅ 실제 응답 JSON 받아오기
+          console.log("✅ 서버 응답:", data);
+
+          if (data.completed) {
+            console.log("스트레칭 완료!!");
+            handleIsStretching(true);
+          } else {
+            console.log("스트레칭 아직ing");
+            handleIsStretching(false);
+          }
         }
       } catch (err) {
         console.error("❌ 서버 전송 실패:", err);
@@ -72,6 +98,15 @@ function CameraStretchingCapture({ handleIsStretching, sendFrameTime , stretchin
 
   return (
     <div className="flex flex-col items-center py-4 w-full ">
+        {/* 시작합니다 메시지 - 중앙 */}
+        {showStart && (
+          <div className="opacity-90 absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 
+                          w-[800px] h-[120px] bg-white text-center text-[48px] font-bold text-[#975D5D] 
+                          flex items-center justify-center rounded-3xl shadow-xl z-50">
+            시작합니다!
+          </div>
+        )}
+
       <div className="mb-6">
         <video
           ref={videoRef}

@@ -277,7 +277,7 @@ function CameraCaliCapture() {
 
   return (
     <div className="w-full flex flex-col items-center py-4 overflow-y-hidden">
-      <div className="relative w-[1200px] h-[600px]">
+      <div className="relative w-[1200px] h-[675px]">
         <video
           ref={videoRef}
           autoPlay
@@ -297,13 +297,13 @@ function CameraCaliCapture() {
         <canvas
           ref={guideCanvasRef}
           width="1200"
-          height="600"
+          height="675"
           className="absolute top-0 left-0 z-10 pointer-events-none"
         />
         <canvas
           ref={canvasRef}
           width="1200"
-          height="600"
+          height="675"
           className="hidden"
         />
 
