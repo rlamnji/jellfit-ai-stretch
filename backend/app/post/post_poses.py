@@ -6,9 +6,12 @@ import mediapipe as mp
 import cv2
 import pandas as pd
 
-from fastapi import APIRouter, UploadFile, File, FastAPI, Form
+from fastapi import APIRouter, UploadFile, File, FastAPI, Form, Depends
 from fastapi.responses import JSONResponse
-from stretch_model.src.calibrate import calibrate
+from stretch_model.src.calibrate import CalibrationProcessor
+from dependencies import get_current_user
+from db.models import User
+import numpy as np
 
 router = APIRouter()
 
@@ -39,9 +42,14 @@ def extract_landmarks_to_csv(image_path: str, csv_path: str):
 @router.post("/analyze")
 async def analyze_image(
     file: UploadFile = File(...), 
-    pose_type: str = Form(...)
+    pose_type: str = Form(...),
+    current_user: User = Depends(get_current_user)
 ):
     content = await file.read()
+    image_array = np.asarray(bytearray(content), dtype=np.uint8)
+    image = cv2.imdecode(image_array, cv2.IMREAD_COLOR)
+
+    calibrate.process_frame(current_user, image)
 
     # csv 저장
     csv_dir = f"./calibration_data/{pose_type}"

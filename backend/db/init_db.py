@@ -3,7 +3,7 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
-from db.models import Base, User, Category, Pose, Routine, RoutinePose, Character, UserCharacter, UsageRecord, Calibration, UserCalibration, UserCalibrationLandmark
+from db.models import Base, User, Category, Pose, Routine, RoutinePose, Character, UserCharacter, UsageRecord, Calibration, UserCalibration, UserCalibrationLandmark, DailyUsageLog
 from passlib.context import CryptContext
 
 # 비밀번호 해싱을 위한 패스리브 컨텍스트
