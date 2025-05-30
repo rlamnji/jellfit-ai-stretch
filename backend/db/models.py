@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String, ForeignKey, Boolean, Date, PrimaryKeyConstraint
+from sqlalchemy import Column, Integer, String, ForeignKey, Boolean, Date, Float, JSON
 from sqlalchemy.orm import relationship, declarative_base
 from datetime import datetime, timezone
 
@@ -7,7 +7,7 @@ Base = declarative_base()
 class User(Base):
     __tablename__ = 'users'
 
-    user_id = Column(Integer, primary_key=True, unique=True)
+    user_id = Column(Integer, primary_key=True, autoincrement=True)
     username = Column(String, nullable=False)
     id = Column(String, unique=True)
     password = Column(String, nullable=False)
@@ -21,13 +21,44 @@ class User(Base):
     friends_sent = relationship('Friend', back_populates='requester', foreign_keys='Friend.requester_id')
     friends_received = relationship('Friend', back_populates='receiver', foreign_keys='Friend.receiver_id')
     routines = relationship("Routine", back_populates="user")
+    user_calibrations = relationship("UserCalibration", back_populates="user")
+    calibration_landmarks = relationship("UserCalibrationLandmark", back_populates="user")
 
+# 캘리브레이션 종류
+class Calibration(Base):
+    __tablename__ = 'calibrations'
+
+    calibration_id = Column(Integer, primary_key=True, autoincrement=True)
+    name = Column(String, nullable=False, unique=True)
+
+# 사용자의 캘리브레이션 값
+class UserCalibration(Base):
+    __tablename__ = 'user_calibrations'
+
+    user_calibration_id = Column(Integer, primary_key=True, autoincrement=True)
+    user_id = Column(Integer, ForeignKey('users.user_id'), nullable=False)
+    calibration_id = Column(Integer, ForeignKey('calibrations.calibration_id'), nullable=False)
+    value = Column(Float, nullable=False)
+
+    user = relationship("User", back_populates="user_calibrations")
+    calibration = relationship("Calibration", backref="user_calibrations")
+
+# 추후 캘리브레이션 종류가 추가되면, 여기서 랜드마크 뽑아서 계산
+class UserCalibrationLandmark(Base):
+    __tablename__ = 'user_calibration_landmarks'
+
+    user_calibration_landmark_id = Column(Integer, primary_key=True, autoincrement=True)
+    user_id = Column(Integer, ForeignKey('users.user_id'), nullable=False)
+    pose_name = Column(String, nullable=False)  # e.g., 'neutral', 'tpose'
+    landmarks = Column(JSON, nullable=False)  # {"x0": 0.1, ..., "z22": -0.3}
+
+    user = relationship("User", back_populates="calibration_landmarks")
 
 # 질병
 class Disease(Base):
     __tablename__ = 'diseases'
 
-    disease_id = Column(Integer, primary_key=True)
+    disease_id = Column(Integer, primary_key=True, autoincrement=True)
     name = Column(String, nullable=False)
 
     # 질병 테이블 관계
@@ -37,7 +68,7 @@ class Disease(Base):
 class UserDisease(Base):
     __tablename__ = 'user_diseases'
 
-    user_disease_id = Column(Integer, primary_key=True)
+    user_disease_id = Column(Integer, primary_key=True, autoincrement=True)
     user_id = Column(Integer, ForeignKey('users.user_id'))
     disease_id = Column(Integer, ForeignKey('diseases.disease_id'))
 
@@ -49,7 +80,7 @@ class UserDisease(Base):
 class Friend(Base):
     __tablename__ = 'friends'
 
-    friend_id = Column(Integer, primary_key=True)
+    friend_id = Column(Integer, primary_key=True, autoincrement=True)
     requester_id = Column(Integer, ForeignKey('users.user_id'))
     receiver_id = Column(Integer, ForeignKey('users.user_id'))
     accepted = Column(Boolean, default=False)
@@ -63,7 +94,7 @@ class Friend(Base):
 class UsageRecord(Base):
     __tablename__ = 'usage_records'
 
-    record_id = Column(Integer, primary_key=True)
+    record_id = Column(Integer, primary_key=True, autoincrement=True)
     user_id = Column(Integer, ForeignKey('users.user_id'))
     # 자세번호 (추가)
     pose_id = Column(Integer, ForeignKey('poses.pose_id'))
@@ -89,7 +120,7 @@ class DailyUsageLog(Base):
 class UserCharacter(Base):
     __tablename__ = 'user_characters'
 
-    user_character_id = Column(Integer, primary_key=True)
+    user_character_id = Column(Integer, primary_key=True, autoincrement=True)
     user_id = Column(Integer, ForeignKey('users.user_id'))
     character_id = Column(Integer, ForeignKey('characters.character_id'))
 
@@ -101,7 +132,7 @@ class UserCharacter(Base):
 class Character(Base):
     __tablename__ = 'characters'
 
-    character_id = Column(Integer, primary_key=True)
+    character_id = Column(Integer, primary_key=True, autoincrement=True)
     name = Column(String, nullable=False)
     acquisition_num = Column(Integer, nullable=True) # 캐릭터 획득 횟수, 추후 nullable=False로 변경
     description = Column(String)
@@ -116,7 +147,7 @@ class Character(Base):
 class Pose(Base):
     __tablename__ = 'poses'
 
-    pose_id = Column(Integer, primary_key=True)
+    pose_id = Column(Integer, primary_key=True, autoincrement=True)
     name = Column(String, nullable=False)
     duration = Column(Integer, nullable=True) # 포즈 지속 시간, 초 단위, 나중에 nullable=False로 변경
     count = Column(Integer, nullable=True) # 포즈 반복 횟수, 나중에 nullable=False로 변경
@@ -133,7 +164,7 @@ class Pose(Base):
 class Category(Base):
     __tablename__ = 'categories'
 
-    category_id = Column(Integer, primary_key=True)
+    category_id = Column(Integer, primary_key=True, autoincrement=True)
     name = Column(String, nullable=False)
 
     # 카테고리 테이블 관계
@@ -143,8 +174,8 @@ class Category(Base):
 class Routine(Base):
     __tablename__ = 'routines'
 
-    routine_id = Column(Integer, primary_key=True)
-    user_id = Column(String, ForeignKey('users.user_id'), nullable=False) # 루틴 소유자
+    routine_id = Column(Integer, primary_key=True, autoincrement=True)
+    user_id = Column(Integer, ForeignKey('users.user_id'), nullable=False) # 루틴 소유자
     image_url = Column(String, nullable=True) # 루틴 이미지 URL, 나중에 nullable=False로 변경
 
     # 루틴 테이블 관계
@@ -155,7 +186,7 @@ class Routine(Base):
 class RoutinePose(Base):
     __tablename__ = 'routine_poses'
 
-    routine_pose_id = Column(Integer, primary_key=True)
+    routine_pose_id = Column(Integer, primary_key=True, autoincrement=True)
     routine_id = Column(Integer, ForeignKey('routines.routine_id'))
     pose_id = Column(Integer, ForeignKey('poses.pose_id'))
     order = Column(Integer, nullable=True) # 포즈 순서, 나중에 nullable=False로 변경

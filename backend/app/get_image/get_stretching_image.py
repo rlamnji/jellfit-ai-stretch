@@ -7,8 +7,6 @@ from sqlalchemy.orm import Session
 from db.database import get_db
 from db.models import User, Pose
 # from dependencies import get_current_user
-#from app.get_image.manager import stretch_session_manager
-
 
 router = APIRouter(prefix="/guide/analyze", tags=["Stretching_Analyze"])
 
@@ -26,6 +24,20 @@ POSE_ID_TO_EXERCISE = {
     10: "어깨_팔꿈치"
 }
 
+# pose_id에 따른 이상치 임계값 설정
+POSE_ID_TO_OUTLIER_THRESHOLD = {
+    1: -0.25,  # 손목_돌리기
+    2: -0.2,   # 등_팔꿈치
+    3: -0.1,  # 가슴_T자
+    4: -0.1,  # 가슴_Y자
+    5: -0.2,   # 등_날개뼈
+    6: -0.2,   # 등_앞
+    7: -0.2,   # 등_위
+    8: -0.3,   # 목_날개뼈
+    9: -0.25,  # 어깨_겨드랑이
+    10: -0.2   # 어깨_팔꿈치
+}
+
 tracker_cache = {}
 def get_tracker(exercise_name: str) -> StretchTracker:
     """exercise 이름에 맞는 Tracker를 반환 (캐싱 방식)"""
@@ -38,7 +50,7 @@ async def analyze_image(
     file: UploadFile = File(...),
     pose_id: int = Form(None or 7),
     db: Session = Depends(get_db),
-    #current_user: User = Depends(get_current_user)
+    # current_user: User = Depends(get_current_user)
 ):
     content = await file.read()
     image_array = np.asarray(bytearray(content), dtype=np.uint8)
@@ -50,7 +62,8 @@ async def analyze_image(
 
     exercise = POSE_ID_TO_EXERCISE.get(pose_id)
     tracker = get_tracker(exercise or "등_위")
-    result = tracker.is_performing(image)
+    outlier_threshold = POSE_ID_TO_OUTLIER_THRESHOLD.get(pose_id, -0.2)
+    result = tracker.is_performing(image, outlier_threshold=outlier_threshold)
     print("get_stretching_image에서 is_performing 사용 결과:", result)
 
     return {"completed": bool(result.get("completed", False))}
