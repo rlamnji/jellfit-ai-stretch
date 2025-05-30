@@ -40,7 +40,7 @@ db.add(UserCharacter(user_id=2, character_id=6))
 
 db.add(Category(name="목"))
 db.add(Category(name="어깨"))
-# db.add(Category(name="팔/손목"))
+db.add(Category(name="팔/손목"))
 db.add(Category(name="등/허리"))
 db.add(Category(name="가슴"))
 
@@ -69,7 +69,7 @@ db.add(UsageRecord(record_id=2, user_id=1, pose_id=2, repeat_cnt=1))
 
 db.add(Pose(name="팔꿈치굽혀서옆구리늘리기", duration=10, count=1,
             video_url="https://www.youtube.com/embed/RobdPJZAXdM",
-            thumbnail_url="/images/stretching/pkcghsygnrrg",
+            thumbnail_url="/images/stretching/pkcghsygrnrg",
             category_id=4,
             have_direction=True))  # 등/허리
 
@@ -100,19 +100,19 @@ db.add(Pose(name="팔뻗고옆구리늘리기", duration=10, count=None,
 
 db.add(Pose(name="겨드랑이향하여목당기기", duration=10, count=None,
             video_url="https://www.youtube.com/embed/LNwfbj_Sy7M",
-            thumbnail_url=None,
+            thumbnail_url="/images/stretching/gdrihhymdgg",
             category_id=1,
             have_direction=True))  # 목
 
 db.add(Pose(name="어깨늘리기", duration=10, count=None,
             video_url="https://youtu.be/embed/PfERed6LRmQ?si=W0MIdsg6VFW_QiUX&t=152",
-            thumbnail_url=None,
+            thumbnail_url="/images/stretching/uknrg",
             category_id=2,
             have_direction=True))  # 어깨
 
 db.add(Pose(name="뒷목걸고고개젖히기", duration=10, count=None,
             video_url="https://www.youtube.com/embed/LNwfbj_Sy7M",
-            thumbnail_url=None,
+            thumbnail_url="/images/stretching/dmggggjhg",
             category_id=1,
             have_direction=False))  # 목
 
