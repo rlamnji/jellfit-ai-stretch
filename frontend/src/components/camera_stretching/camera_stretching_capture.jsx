@@ -70,9 +70,16 @@ function CameraStretchingCapture({ handleIsStretching, sendFrameTime , stretchin
           body: formData,
         });
         if(res.ok){
-          const { isStretching } = await res.json();
-          console.log("✅ 서버 응답:", isStretching);
-          handleIsStretching(isStretching);
+          const data = await res.json(); // ✅ 실제 응답 JSON 받아오기
+          console.log("✅ 서버 응답:", data);
+
+          if (data.completed) {
+            console.log("스트레칭 완료!!");
+            handleIsStretching(true);
+          } else {
+            console.log("스트레칭 아직ing");
+            handleIsStretching(false);
+          }
         }
       } catch (err) {
         console.error("❌ 서버 전송 실패:", err);

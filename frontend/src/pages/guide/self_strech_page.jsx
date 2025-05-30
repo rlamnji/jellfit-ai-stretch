@@ -41,6 +41,35 @@ function SelfStretchPage({ stretchingOrder, completedStretchings, setCompletedSt
         }
     };
 
+    /*const handleIsStretching = async (isCompleted) => {
+        if (isCompleted) {
+            const currentIdx = stretchingOrder.indexOf(Number(stretchingId));
+
+            if (currentIdx === stretchingOrder.length - 1) {
+            console.log("모든 완료된 스트레칭", completedStretchings);
+            const result = endSession(); // 종료 시간 계산
+            console.log("현재 누적 시간", result.duration, "초");
+            setDuration(result.duration); 
+
+            await timeUpdate(result.duration); // 누적 시간 기록 api 호출
+            setModalType("complete"); // 완료 모달 띄우기
+            await recordUpdate(completedStretchings); // 누적 횟수 기록 api 호출
+            
+            const charResult = await checkGetCharacters();
+            if (charResult?.unlocked_character_ids?.length > 0) {
+                setSelectedIds(charResult.unlocked_character_ids);  
+                setPendingJelly(charResult.unlocked_character_ids);
+            }
+
+            postCharacters(charResult.unlocked_character_ids);
+            } else {
+            const nextStretchingId = stretchingOrder[currentIdx + 1];
+            navigate(`/guide/video/${nextStretchingId}`);
+            }
+        }
+    };*/
+
+
     useEffect(() => {
         startOrResumeSession(); // 시간 측정 시작
 
@@ -292,6 +321,9 @@ function SelfStretchPage({ stretchingOrder, completedStretchings, setCompletedSt
             {/* 임시용 버튼을 없애고 true --> 끝 --> 모달창 까지 연결해야함*/}
             {/* 로직은 backend */}
             {/* 최종 완료는 true를 받았을 때 / 임시버튼은 현재까지 한대로만 */}
+
+            {/* 서버에서 true를 받았을 시 동작 완료 */}
+
             <button
                 className="mt-4 px-4 py-2 bg-gray-600 text-white rounded hover:bg-gray-700"
                 onClick={async () => {
