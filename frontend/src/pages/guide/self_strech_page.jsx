@@ -41,6 +41,35 @@ function SelfStretchPage({ stretchingOrder, completedStretchings, setCompletedSt
         }
     };
 
+    /*const handleIsStretching = async (isCompleted) => {
+        if (isCompleted) {
+            const currentIdx = stretchingOrder.indexOf(Number(stretchingId));
+
+            if (currentIdx === stretchingOrder.length - 1) {
+            console.log("모든 완료된 스트레칭", completedStretchings);
+            const result = endSession(); // 종료 시간 계산
+            console.log("현재 누적 시간", result.duration, "초");
+            setDuration(result.duration); 
+
+            await timeUpdate(result.duration); // 누적 시간 기록 api 호출
+            setModalType("complete"); // 완료 모달 띄우기
+            await recordUpdate(completedStretchings); // 누적 횟수 기록 api 호출
+            
+            const charResult = await checkGetCharacters();
+            if (charResult?.unlocked_character_ids?.length > 0) {
+                setSelectedIds(charResult.unlocked_character_ids);  
+                setPendingJelly(charResult.unlocked_character_ids);
+            }
+
+            postCharacters(charResult.unlocked_character_ids);
+            } else {
+            const nextStretchingId = stretchingOrder[currentIdx + 1];
+            navigate(`/guide/video/${nextStretchingId}`);
+            }
+        }
+    };*/
+
+
     useEffect(() => {
         startOrResumeSession(); // 시간 측정 시작
 
@@ -203,11 +232,6 @@ function SelfStretchPage({ stretchingOrder, completedStretchings, setCompletedSt
 
             const data = await chekRes.json();
             console.log("획득 가능한 캐릭터 내용", data);
-
-            // 배열에 내용 있을 때 상태 true로
-            /*if (Array.isArray(data) && data.length > 0) {
-                setHasJelly(true);
-            }*/
             return data;
 
         } catch (err) {
@@ -236,94 +260,109 @@ function SelfStretchPage({ stretchingOrder, completedStretchings, setCompletedSt
             console.error("에러:", err);
             return null;
         }
-    }    
-
+    }
+    
     return (
         <div className="w-full h-full flex flex-col items-center bg-space">
 
-        {/*<TopBar/> ==> (05.16_rlamnji) 뒤로가기 컴포에 아예 Link가 있어서 setModalType 설정이 안되더라고!*/}
-         <div className='w-full h-14 flex justify-between'>      
-            <img src={arrowLeft} className="w-8 h-8 m-4 cursor-pointer" 
-                onClick={() => {setModalType('confirmQuit'); }} />
-            <SoundBtn />
-         </div>
-        
-        
-        <div className="text-xl font-bold mt-4">{stretching.name}</div>
-
-        {stretching.time != null && (
-            <>
-            <div className="mt-4">현재 시간 / 전체 시간</div>
-            <div>
-                00 : {Math.floor(currentStretchingTime / 1000)} / 00 :{" "}
-                {stretching.time}
+            {/*<TopBar/> ==> (05.16_rlamnji) 뒤로가기 컴포에 아예 Link가 있어서 setModalType 설정이 안되더라고!*/}
+            <div className='w-full h-14 flex justify-between'>      
+                <img src={arrowLeft} className="w-8 h-8 m-4 cursor-pointer" 
+                    onClick={() => {setModalType('confirmQuit'); }} />
+                <SoundBtn />
             </div>
-            </>
-        )}
-
-        {stretching.repeatCount != null && (
-            <>
-            <div className="mt-4">반복 횟수</div>
-            <div>
-                {currentRepeat} / {stretching.repeatCount}
-            </div>
-            </>
-        )}
 
 
-            <CameraStretchingScreen
-                handleIsStretching={handleIsStretching}
-                sendFrameTime={sendFrameTime}
-                stretchingId = {stretchingId}
-            />
+                <div className="relative group inline-block">
+                    <div className="bg-[#F7EDAD] px-3 py-1 rounded-2xl cursor-pointer font-bold" onClick={()=>navigate("/condition/:id")}>
+                        인식 오류?
+                    </div>
+
+                    {/* 툴팁 */}
+                    <div className="absolute left-1/2 -translate-x-1/2 mt-2 w-max px-2 py-2 leading-relaxed bg-black text-white text-sm rounded opacity-0 group-hover:opacity-100 transition-opacity z-10">
+                        스트레칭 중 자세 인식이 잘 되지 않는다면<br />
+                        <b className="text-[16px]">클릭하여 캘리브레이션 화면</b>으로 이동해<br />
+                        기준 자세를 다시 맞춰주세요.
+                    </div>
+                </div>
+        
+
+            <div className="text-xl font-bold mt-4 text-center mx-auto w-max">{stretching.name}</div>
+            {stretching.time != null && (
+                <>
+                <div className="mt-4">현재 시간 / 전체 시간</div>
+                <div>
+                    00 : {Math.floor(currentStretchingTime / 1000)} / 00 :{" "}
+                    {stretching.time}
+                </div>
+                </>
+            )}
+
+            {stretching.repeatCount != null && (
+                <>
+                <div className="mt-4">반복 횟수</div>
+                <div>
+                    {currentRepeat} / {stretching.repeatCount}
+                </div>
+                </>
+            )}
+
+
+                <CameraStretchingScreen
+                    handleIsStretching={handleIsStretching}
+                    sendFrameTime={sendFrameTime}
+                    stretchingId = {stretchingId}
+                />
 
 
 
 
-        {/* ✅ 임시용 버튼 */}
-        {/* 임시용 버튼을 없애고 true --> 끝 --> 모달창 까지 연결해야함*/}
-        {/* 로직은 backend */}
-        {/* 최종 완료는 true를 받았을 때 / 임시버튼은 현재까지 한대로만 */}
-        <button
-            className="mt-4 px-4 py-2 bg-gray-600 text-white rounded hover:bg-gray-700"
-            onClick={async () => {
-                const currentIdx = stretchingOrder.indexOf(Number(stretchingId));
+            {/* ✅ 임시용 버튼 */}
+            {/* 임시용 버튼을 없애고 true --> 끝 --> 모달창 까지 연결해야함*/}
+            {/* 로직은 backend */}
+            {/* 최종 완료는 true를 받았을 때 / 임시버튼은 현재까지 한대로만 */}
 
-                if (currentIdx === stretchingOrder.length - 1) {
-                    console.log("모든 완료된 스트레칭", completedStretchings);
-                    const result = endSession(); // 종료 시간 계산
-                    console.log("현재 누적 시간", result.duration, "초");
-                    setDuration(result.duration); 
+            {/* 서버에서 true를 받았을 시 동작 완료 */}
 
-                    await timeUpdate(result.duration); // 누적 시간 기록 api 호출
-                    setModalType("complete"); // 완료 모달 띄우기
-                    await recordUpdate(completedStretchings); // 누적 횟수 기록 api 호출
-                    
-                    // 캐릭터 획득 가능한지 조건 검사 api
-                    const charResult = await checkGetCharacters();
-                    
-                    if (charResult?.unlocked_character_ids?.length > 0) {
-                        setSelectedIds(charResult.unlocked_character_ids);  // pose_id 배열 저장
-                        console.log("획득 가능한 캐릭터 아이디", charResult.unlocked_character_ids);
-                        setPendingJelly(charResult.unlocked_character_ids);
+            <button
+                className="mt-4 px-4 py-2 bg-gray-600 text-white rounded hover:bg-gray-700"
+                onClick={async () => {
+                    const currentIdx = stretchingOrder.indexOf(Number(stretchingId));
+
+                    if (currentIdx === stretchingOrder.length - 1) {
+                        console.log("모든 완료된 스트레칭", completedStretchings);
+                        const result = endSession(); // 종료 시간 계산
+                        console.log("현재 누적 시간", result.duration, "초");
+                        setDuration(result.duration); 
+
+                        await timeUpdate(result.duration); // 누적 시간 기록 api 호출
+                        setModalType("complete"); // 완료 모달 띄우기
+                        await recordUpdate(completedStretchings); // 누적 횟수 기록 api 호출
+                        
+                        // 캐릭터 획득 가능한지 조건 검사 api
+                        const charResult = await checkGetCharacters();
+                        
+                        if (charResult?.unlocked_character_ids?.length > 0) {
+                            setSelectedIds(charResult.unlocked_character_ids);  // pose_id 배열 저장
+                            console.log("획득 가능한 캐릭터 아이디", charResult.unlocked_character_ids);
+                            setPendingJelly(charResult.unlocked_character_ids);
+                        }
+
+                        // 캐릭터 등록 api
+                        postCharacters(charResult.unlocked_character_ids);
+
+
+                    } else {
+                        const nextStretchingId = stretchingOrder[currentIdx + 1];
+                        navigate(`/guide/video/${nextStretchingId}`);
                     }
-
-                    // 캐릭터 등록 api
-                    postCharacters(charResult.unlocked_character_ids);
-
-
-                } else {
-                    const nextStretchingId = stretchingOrder[currentIdx + 1];
-                    navigate(`/guide/video/${nextStretchingId}`);
-                }
-            }}
-            >
-            다음으로 넘어가기 (임시)
+                }}
+                >
+                다음으로 넘어가기 (임시)
             </button>
 
-         <ModalManager modalType={modalType} setModalType={setModalType} completedStretchings={completedStretchings} duration={duration} pendingJelly={pendingJelly} setPendingJelly={setPendingJelly}/>
+            <ModalManager modalType={modalType} setModalType={setModalType} completedStretchings={completedStretchings} duration={duration} pendingJelly={pendingJelly} setPendingJelly={setPendingJelly}/>
         </div>
-        
     );
     }
 
