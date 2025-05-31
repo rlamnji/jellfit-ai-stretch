@@ -37,19 +37,25 @@ def extract_landmarks_to_csv(image_path: str, csv_path: str):
     df = pd.DataFrame([data])
     df.to_csv(csv_path, index=False)
 
+processor = CalibrationProcessor()
 
 # 이미지 파일 받아서 csv 파일로 변환
 @router.post("/analyze")
 async def analyze_image(
     file: UploadFile = File(...), 
     pose_type: str = Form(...),
-    current_user: User = Depends(get_current_user)
+    # current_user: User = Depends(get_current_user)
 ):
     content = await file.read()
     image_array = np.asarray(bytearray(content), dtype=np.uint8)
     image = cv2.imdecode(image_array, cv2.IMREAD_COLOR)
 
-    calibrate.process_frame(current_user, image)
+    # 프레임 처리
+    # result = processor.process_frame(current_user, image)
+    result = processor.process_frame(1, image)
+    print(f"Processed frame for {pose_type}: {result}")
+
+    return result
 
     # csv 저장
     csv_dir = f"./calibration_data/{pose_type}"
