@@ -128,56 +128,86 @@ function CameraCaliCapture() {
   }, [step, isCameraOn]);
 
 
-  // 프레임 캡처해서 서버로 전송
-  const sendFrame = async () => {
-    const canvas = canvasRef.current;
-    const video = videoRef.current;
+// 📌 프레임 한 장 전송
+const sendFrame = async () => {
+  const canvas = canvasRef.current;
+  const video = videoRef.current;
 
-    if (!canvas || !video) {
-      console.warn("⛔ canvas 또는 video 요소가 null입니다.");
-      return;
-    }
+  if (!canvas || !video) {
+    console.warn("⛔ canvas 또는 video 요소가 null입니다.");
+    return null;
+  }
 
-    const ctx = canvas.getContext("2d");
-    if (!ctx) {
-      console.warn("⛔ canvas 2D context를 가져올 수 없습니다.");
-      return;
-    }
+  const ctx = canvas.getContext("2d");
+  if (!ctx) {
+    console.warn("⛔ canvas 2D context를 가져올 수 없습니다.");
+    return null;
+  }
 
-    ctx.setTransform(1, 0, 0, 1, 0, 0);
-    ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+  ctx.setTransform(1, 0, 0, 1, 0, 0);
+  ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
 
+  return new Promise((resolve) => {
     canvas.toBlob(async (blob) => {
-      if (!blob) return;
+      if (!blob) return resolve(null);
+
       const formData = new FormData();
       formData.append("file", blob, "frame.jpg");
-      formData.append("pose_type", step);
+      formData.append("pose_type", step);  // e.g., "neutral" or "tpose"
 
       try {
         const res = await fetch("http://localhost:8000/analyze", {
           method: "POST",
-          headers:{
+          headers: {
             "Authorization": "Bearer " + token,
           },
           body: formData,
         });
+
         const result = await res.json();
         console.log("📥 서버 응답:", result);
+        resolve(result);
       } catch (err) {
         console.error("❌ 전송 실패:", err);
+        resolve(null);
       }
     }, "image/jpeg");
-  };
+  });
+};
 
+// 📌 정해진 수 만큼 프레임 전송 (기존 용도 유지)
+const sendMultipleFrames = async (count = 5, interval = 500) => {
+  for (let i = 0; i < count; i++) {
+    await sendFrame();
+    await new Promise((res) => setTimeout(res, interval));
+  }
+};
 
+// ✅ 서버 수신된 유효 프레임 수(`collected_frames`)가 target 될 때까지 반복 전송
+const sendUntilCollected = async (target = 30, interval = 300, maxTry = 100) => {
+  let collected = 0;
+  let tries = 0;
 
-  // 여러 프레임 보내는 함수
-  const sendMultipleFrames = async (count = 5, interval = 500) => {
-    for (let i = 0; i < count; i++) {
-      await sendFrame(); // 기존 함수 재사용
-      await new Promise((res) => setTimeout(res, interval));
+  while (collected < target && tries < maxTry) {
+    const result = await sendFrame();
+
+    if (result && result.collected_frames !== undefined) {
+      collected = result.collected_frames;
+      console.log(`✅ 누적 유효 프레임 수: ${collected}/${target}`);
+    } else {
+      console.warn("⚠️ 응답에 collected_frames 없음 또는 실패");
     }
-  };
+
+    await new Promise((r) => setTimeout(r, interval));
+    tries++;
+  }
+
+  if (collected >= target) {
+    console.log("🎯 포즈 수집 완료!");
+  } else {
+    console.warn("🕰 최대 시도 횟수 초과, 수집 미완료");
+  }
+};
 
   useEffect(() => {
     // 1. Mediapipe Pose 모델 초기화
@@ -221,7 +251,7 @@ function CameraCaliCapture() {
             postureSuccess = true;
             console.log("✅ 정자세 연속 인식 성공 → 프레임 전송 시작");
             setMessage("✅ 정자세 연속 인식 성공 → 프레임 전송 시작");
-            await sendMultipleFrames(30, 300);
+            await sendUntilCollected(30, 300);
             setTimeout(() => {
               console.log("👉 T자세로 전환");
               setMessage("👉 T자세로 전환");
@@ -245,7 +275,7 @@ function CameraCaliCapture() {
             tposeSuccess = true;
             console.log("✅ T자세 연속 인식 성공 → 프레임 전송 시작");
             setMessage("✅ T자세 연속 인식 성공 → 프레임 전송 시작");
-            await sendMultipleFrames(5, 500);
+            await sendUntilCollected(30, 500);
             setTimeout(() => {
               console.log("🎉 캘리브레이션 종료");
               setMessage("캘리브레이션 종료");

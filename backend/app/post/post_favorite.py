@@ -34,6 +34,17 @@ def post_fav_poses(
             db.add(entry)
             created.append(pose_id)
 
-        db.commit()
+    db.commit()
 
-        return {"registered": created}
+    return {"registered": created}
+
+
+# 즐겨찾기 삭제
+@router.delete("/favorites/{pose_id}")
+def delete_favorite(pose_id: int, db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
+    fav = db.query(FavPose).filter_by(user_id=current_user.user_id, pose_id=pose_id).first()
+    if not fav:
+        raise HTTPException(status_code=404, detail="즐겨찾기 항목 없음")
+    db.delete(fav)
+    db.commit()
+    return {"detail": "삭제 완료"}

@@ -1,9 +1,10 @@
-# 즐겨찾기 테이블 조회
 from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
+from sqlalchemy import select
 from db.database import SessionLocal
-from db.models import FavPose
-from dependencies import get_current_user  # access token 인증
+from db.models import FavPose, User, Pose
+from dependencies import get_current_user
+from pydantic import BaseModel
 from typing import List
 
 router = APIRouter()
@@ -16,15 +17,33 @@ def get_db():
     finally:
         db.close()
 
-# 전체 캐릭터
-@router.get("/favorites", response_model=List[dict])
-def get_all_fav(db: Session = Depends(get_db)):
-    fav_poses = db.query(FavPose).all()
-    return [
-        {
-            "fav_pose_id": c.fav_pose_id,
-            "user_id": c.user_id,
-            "pose_id": c.pose_id
+# 응답
+class FavPoseResponse(BaseModel):
+    fav_pose_id: int
+    user_id: int
+    pose_id: int
+    name: str
 
-        } for c in fav_poses
-    ]
+    class Config:
+        orm_mode = True
+
+# 즐겨찾기 조회
+@router.get("/favorites", response_model=List[FavPoseResponse])
+def get_my_fav_poses(
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user)
+):
+    results = (
+        db.query(
+            FavPose.fav_pose_id,
+            FavPose.user_id,
+            FavPose.pose_id,
+            Pose.name 
+        )
+        .join(Pose, FavPose.pose_id == Pose.pose_id)
+        .filter(FavPose.user_id == current_user.user_id)
+        .all()
+    )
+
+    # SQLAlchemy Row → dict로 변환
+    return [dict(row._mapping) for row in results]
