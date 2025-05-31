@@ -221,7 +221,7 @@ function CameraCaliCapture() {
             postureSuccess = true;
             console.log("✅ 정자세 연속 인식 성공 → 프레임 전송 시작");
             setMessage("✅ 정자세 연속 인식 성공 → 프레임 전송 시작");
-            await sendMultipleFrames(5, 500);
+            await sendMultipleFrames(30, 300);
             setTimeout(() => {
               console.log("👉 T자세로 전환");
               setMessage("👉 T자세로 전환");
