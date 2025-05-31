@@ -10,12 +10,13 @@ from .utils import load_config, extract_features, segment_holds
 import yaml
 import cv2
 import mediapipe as mp
+from app.services.calibration_service import save_user_calibration, save_user_calibration_landmark
+from db.database import get_db
 
 class CalibrationProcessor:
     """
     YAML 기반 캘리브레이션 시스템
     """
-    
     def __init__(self):
         # MediaPipe 초기화
         self.mp_pose = mp.solutions.pose
@@ -38,7 +39,7 @@ class CalibrationProcessor:
         
     def load_calibration_configs(self):
         """캘리브레이션용 YAML 설정들 로드"""
-        config_dir = Path("config")
+        config_dir = Path(__file__).resolve().parents[1] / "config"
         
         # 각 자세별 설정 로드
         for pose_name in ['neutral', 'tpose']:
@@ -50,15 +51,14 @@ class CalibrationProcessor:
                 
     def load_feature_config(self):
         """캘리브레이션 특징 정의 로드"""
-        config_path = Path("config") / "calibration_features.yaml"
+        config_dir = Path(__file__).resolve().parents[1] / "config"
+        config_path = config_dir / "calibration_features.yaml"
         if config_path.exists():
             with open(config_path, 'r', encoding='utf-8') as f:
                 return yaml.safe_load(f)
         else:
             raise FileNotFoundError(f"특징 정의 파일 없음: {config_path}")
     
-    # (05.30) csv 상태에서 코드 받도록 수정할 것
-    # 여기부터 수정
     def start_session(self, user_id: str) -> Dict:
         """캘리브레이션 세션 시작"""
         self.sessions[user_id] = {
@@ -82,7 +82,7 @@ class CalibrationProcessor:
     def process_frame(self, user_id: str, image: np.ndarray) -> Dict:
         """프레임 처리"""
         if user_id not in self.sessions:
-            return {'success': False, 'message': '세션이 없습니다.'}
+            self.start_session(user_id)
         
         session = self.sessions[user_id]
         current_pose = session['current_pose']
@@ -303,6 +303,7 @@ class CalibrationProcessor:
         clean_df = df[~outlier_mask].copy()
         
         if len(clean_df) < len(df) * 0.5:  # 50% 이상 제거되면 실패
+            print("이상치 제거 후 데이터가 너무 적습니다.")
             return None
         
         return {
@@ -315,9 +316,22 @@ class CalibrationProcessor:
     def save_calibration(self, calibration_data: Dict):
         """캘리브레이션 데이터 저장"""
         user_id = calibration_data['user_id']
-        output_dir = Path("data/calibration")
+        base_dir = Path(__file__).resolve().parent 
+        output_dir = base_dir / ".." / "data" / "calibration"
         output_dir.mkdir(parents=True, exist_ok=True)
-        
+
+        """
+        # DB 저장 부분 (우선 ladnmark만 저장)
+        db = next(get_db())
+
+        save_user_calibration_landmark(
+            user_id=int(user_id),
+            pose_name= self.sessions[user_id]['current_pose'],
+            landmarks=calibration_data,
+            db=db
+        )
+        """
+
         # JSON 저장
         json_path = output_dir / f"calibration_{user_id}.json"
         with open(json_path, 'w', encoding='utf-8') as f:
