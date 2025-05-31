@@ -24,12 +24,20 @@ function StretchingFeedback() {
     }, []);
 
     return (
-        <div className='flex flex-row items-center justify-center'>
-            <div className='absolute left-44 w-[240px] h-[240px]'><img src="/images/models/jelly23.png"/></div>
-            <div className="flex justify-center w-[1000px] h-[100px] bg-white border-4 border-[#975D5D]  rounded-full">
-                <div className="flex items-center text-[40px] text-[#694444] font-bold">{message}</div>
-            </div>
+        <div className="flex items-center justify-center w-full h-[140px] mt-2 relative">
+          {/* 해파리 이미지 */}
+          <div className="w-[160px] h-[160px] absolute -left-40 top-1/2 -translate-y-1/2">
+            <img src="/images/models/jelly23.png" alt="해파리" className="w-full h-full object-contain" />
+          </div>
+    
+          {/* 피드백 메시지 박스 */}
+          <div className="flex items-center justify-center w-full max-w-[800px] h-full bg-white border-4 border-[#975D5D] rounded-full shadow-lg px-6">
+            <span className="text-[#694444] font-bold text-[32px] leading-tight text-center">
+              {message}
+            </span>
+          </div>
         </div>
-  );
+      );
 }
+
 export default StretchingFeedback;

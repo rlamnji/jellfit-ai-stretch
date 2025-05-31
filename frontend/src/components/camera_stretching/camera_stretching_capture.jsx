@@ -101,9 +101,10 @@ function CameraStretchingCapture({ handleIsCompleted, handleElapsedTime, sendFra
     <div className="flex flex-col items-center justify-center w-[60%] h-full rounded-xl">
         {/* 시작합니다 메시지 - 중앙 */}
         {showStart && (
-          <div className="opacity-90 absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 
-                          w-[800px] h-[120px] bg-white text-center text-[48px] font-bold text-[#975D5D] 
-                          flex items-center justify-center rounded-3xl shadow-xl z-50">
+          <div className="opacity-90 absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2
+                          w-[90%] max-w-[800px] h-[100px] md:h-[120px] bg-white text-center 
+                          text-xl md:text-3xl lg:text-[48px] font-bold text-[#975D5D] 
+                          flex items-center justify-center rounded-3xl shadow-xl z-50 px-4">
             시작합니다!
           </div>
         )}
