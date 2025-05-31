@@ -256,21 +256,30 @@ function CameraCaliCapture() {
     });
 
 
-    const cam = new Camera(videoRef.current, {
-      onFrame: async () => {
-        const video = videoRef.current;
-        if (!video || !video.srcObject || !video.srcObject.active) {
-          console.warn("📛 video 없음 또는 스트림 종료됨 → pose.send() 생략");
-          return;
-        }
 
-        try {
-          await pose.send({ image: video });
-        } catch (err) {
-          console.error("❌ pose.send 중 에러:", err);
-        }
-      },
-    });
+
+    let frameCount = 0;
+let lastTimestamp = performance.now();
+
+const cam = new Camera(videoRef.current, {
+  onFrame: async () => {
+    frameCount++;
+    const now = performance.now();
+    const elapsed = now - lastTimestamp;
+
+    if (elapsed >= 1000) {
+      console.log(`📸 FPS: ${frameCount} frames/sec`);
+      frameCount = 0;
+      lastTimestamp = now;
+    }
+
+    try {
+      await pose.send({ image: videoRef.current });
+    } catch (err) {
+      console.error("❌ pose.send 중 에러:", err);
+    }
+  },
+});
 
     cam.start();
   }, [step]);
