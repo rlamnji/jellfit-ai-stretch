@@ -15,6 +15,7 @@ function CameraCaliCapture() {
   const [step, setStep] = useState("posture");
   const [message, setMessage] = useState(""); // 상태 메시지 표시
 
+  const token = sessionStorage.getItem("accessToken");
 
   /*const expectedPoseYMap = {
     // 정자세
@@ -155,6 +156,9 @@ function CameraCaliCapture() {
       try {
         const res = await fetch("http://localhost:8000/analyze", {
           method: "POST",
+          headers:{
+            "Authorization": "Bearer " + token,
+          },
           body: formData,
         });
         const result = await res.json();
@@ -259,27 +263,27 @@ function CameraCaliCapture() {
 
 
     let frameCount = 0;
-let lastTimestamp = performance.now();
+    let lastTimestamp = performance.now();
 
-const cam = new Camera(videoRef.current, {
-  onFrame: async () => {
-    frameCount++;
-    const now = performance.now();
-    const elapsed = now - lastTimestamp;
+    const cam = new Camera(videoRef.current, {
+      onFrame: async () => {
+        frameCount++;
+        const now = performance.now();
+        const elapsed = now - lastTimestamp;
 
-    if (elapsed >= 1000) {
-      console.log(`📸 FPS: ${frameCount} frames/sec`);
-      frameCount = 0;
-      lastTimestamp = now;
-    }
+        if (elapsed >= 1000) {
+          console.log(`FPS: ${frameCount} frames/sec`);
+          frameCount = 0;
+          lastTimestamp = now;
+        }
 
-    try {
-      await pose.send({ image: videoRef.current });
-    } catch (err) {
-      console.error("❌ pose.send 중 에러:", err);
-    }
-  },
-});
+        try {
+          await pose.send({ image: videoRef.current });
+        } catch (err) {
+          console.error("❌ pose.send 중 에러:", err);
+        }
+      },
+    });
 
     cam.start();
   }, [step]);
@@ -305,8 +309,9 @@ const cam = new Camera(videoRef.current, {
           )}
         <canvas
           ref={guideCanvasRef}
-          width="1200"
-          height="675"
+          width="640"
+          height="360"
+          style={{ width: "1200px", height: "675px" }}
           className="absolute top-0 left-0 z-10 pointer-events-none"
         />
         <canvas

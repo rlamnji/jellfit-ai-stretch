@@ -160,7 +160,7 @@ class Pose(Base):
     # 포즈 테이블 관계
     category = relationship('Category', back_populates='poses')
     characters = relationship('Character', back_populates='pose')
-    fav_poses = relationship('RoutinePose', back_populates='pose')
+    fav_poses = relationship('FavPose', back_populates='pose')
 
 
 class Category(Base):
@@ -183,7 +183,7 @@ class Routine(Base):
 
     # 루틴 테이블 관계
     user = relationship("User", back_populates="routines")
-    fav_poses = relationship('RoutinePose', back_populates='routine')
+    fav_poses = relationship('FavPose', back_populates='routine')
 
 # 즐겨찾기 테이블
 class FavPose(Base):
@@ -192,8 +192,10 @@ class FavPose(Base):
     fav_pose_id = Column(Integer, primary_key=True, autoincrement=True)
     user_id = Column(Integer, ForeignKey('users.user_id'))
     pose_id = Column(Integer, ForeignKey('poses.pose_id'))
+    routine_id = Column(Integer, ForeignKey('routines.routine_id'))
 
     # 즐겨찾기 테이블 관계
     routine = relationship('Routine', back_populates='fav_poses')
     user = relationship('User', back_populates='fav_poses')
     pose = relationship('Pose', back_populates='fav_poses')
+    
