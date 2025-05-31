@@ -19,7 +19,7 @@ function CameraStretchingConsent({ onAllow }) {
   };
 
   return (
-    <div className="w-full h-screen flex flex-col items-center justify-center bg-gray-100">
+    <div className="w-[60%] h-full flex flex-col items-center justify-center bg-gray-100 rounded-xl">
       <h1 className="text-2xl font-bold mb-4">카메라 권한 요청</h1>
       <p className="text-gray-600 mb-6">카메라를 사용하려면 권한을 허용해주세요.</p>
       <button

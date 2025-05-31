@@ -1,6 +1,6 @@
 import { useRef, useEffect, useState } from "react";
 import StretchingFeedback from "../stretching/stretching_feedback";
-function CameraStretchingCapture({ handleIsStretching, sendFrameTime , stretchingId}) {
+function CameraStretchingCapture({ handleIsCompleted, handleElapsedTime, sendFrameTime , stretchingId}) {
   const videoRef = useRef(null);
   const canvasRef = useRef(null); // canvasRef 초기화
   const streamRef = useRef(null); // 스트림을 저장할 ref
@@ -72,13 +72,14 @@ function CameraStretchingCapture({ handleIsStretching, sendFrameTime , stretchin
         if(res.ok){
           const data = await res.json(); // ✅ 실제 응답 JSON 받아오기
           console.log("✅ 서버 응답:", data);
+          handleElapsedTime(data.currentSide, data.elapsedTime);
 
-          if (data.completed) {
+          // 둘다 완료되어야 스트레칭 완료 처리해야함.
+          if (data.isCompleted) {
             console.log("스트레칭 완료!!");
-            handleIsStretching(true);
+            handleIsCompleted(true, data.currentSide);
           } else {
-            console.log("스트레칭 아직ing");
-            handleIsStretching(false);
+            console.log("스트레칭 아직 ing");
           }
         }
       } catch (err) {
@@ -97,7 +98,7 @@ function CameraStretchingCapture({ handleIsStretching, sendFrameTime , stretchin
 }, [stretchingId]);
 
   return (
-    <div className="flex flex-col items-center py-4 w-full ">
+    <div className="flex flex-col items-center justify-center w-[60%] h-full rounded-xl">
         {/* 시작합니다 메시지 - 중앙 */}
         {showStart && (
           <div className="opacity-90 absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 
@@ -111,7 +112,7 @@ function CameraStretchingCapture({ handleIsStretching, sendFrameTime , stretchin
         <video
           ref={videoRef}
           autoPlay
-          className="w-[1200px] h-[720px] border rounded-xl transform scale-x-[-1] "
+          className="w-full h-auto border rounded-xl transform scale-x-[-1] "
         />
 
         {/* 👻 서버 전송용 캔버스 (사용자에겐 숨김) */}
@@ -119,7 +120,7 @@ function CameraStretchingCapture({ handleIsStretching, sendFrameTime , stretchin
           ref={canvasRef} // canvasRef 연결
           width="1200"
           height="720"
-          className="hidden"
+          className="hidden w-full h-auto"
         />
 
       </div>
