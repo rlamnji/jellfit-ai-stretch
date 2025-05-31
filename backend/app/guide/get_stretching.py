@@ -14,6 +14,7 @@ class StretchingDetail(BaseModel):
     time: Optional[int]
     repeatCount: Optional[int]
     videoURL: Optional[str]
+    haveDirection: Optional[bool]
 
 @router.get("/{stretchingId}", response_model=StretchingDetail)
 def get_stretching_detail(stretchingId: int, db: Session = Depends(get_db)):
@@ -25,6 +26,7 @@ def get_stretching_detail(stretchingId: int, db: Session = Depends(get_db)):
         name=pose.name,
         time=pose.duration,
         repeatCount=pose.count,
-        videoURL=pose.video_url
+        videoURL=pose.video_url,
+        haveDirection=pose.have_direction
     )
 

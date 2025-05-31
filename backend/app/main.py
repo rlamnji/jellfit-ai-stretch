@@ -1,6 +1,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from app.get import get_poses, get_characters, get_user, get_usage, get_log
+from app.get import get_poses, get_characters, get_user, get_usage
+# , get_log
 from app.post import post_poses, post_user_character, post_modal
 from app.auth import login, signup, logout
 from app.get_image import get_stretching_image
@@ -31,7 +32,7 @@ app.include_router(get_poses.router, tags=["Pose"])
 app.include_router(get_characters.router, tags=["Character"]) 
 app.include_router(get_user.router)
 app.include_router(get_usage.router)
-app.include_router(get_log.router)
+# app.include_router(get_log.router)
 app.include_router(update_user.router)
 app.include_router(update_user.router)
 app.include_router(update_user_stretch.router, prefix="/guide", tags=["Guide"])

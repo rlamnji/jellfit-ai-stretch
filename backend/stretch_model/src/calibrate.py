@@ -6,7 +6,7 @@ import os
 from pathlib import Path
 from typing import Dict, List, Optional
 from datetime import datetime
-from utils import load_config, extract_features, segment_holds
+from .utils import load_config, extract_features, segment_holds
 import yaml
 import cv2
 import mediapipe as mp

@@ -155,6 +155,7 @@ class Pose(Base):
     video_url = Column(String, nullable=True)
     thumbnail_url = Column(String, nullable=True)
     category_id = Column(Integer, ForeignKey('categories.category_id'))
+    have_direction = Column(Boolean, default=False) # 포즈에 방향이 있는지 여부
 
     # 포즈 테이블 관계
     category = relationship('Category', back_populates='poses')
