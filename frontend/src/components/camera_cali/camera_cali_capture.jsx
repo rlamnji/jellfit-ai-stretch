@@ -17,20 +17,9 @@ function CameraCaliCapture() {
 
   const token = sessionStorage.getItem("accessToken");
 
-  /*const expectedPoseYMap = {
-    // 정자세
-    posture: {
-      leftShoulder: 0.66,
-      rightShoulder: 0.66,
-    },
-    // T자세
-    tpose: {
-      leftShoulder: 0.55,
-      rightShoulder: 0.55,
-      leftWrist: 0.52,
-      rightWrist: 0.52,
-    },
-  };*/
+  const postureStableCount = useRef(0);
+  const tposeStableCount = useRef(0);
+  const successFlags = useRef({ posture: false, tpose: false });
 
 
   // 카메라 켜기
@@ -66,155 +55,67 @@ function CameraCaliCapture() {
     }
   };
 
-  // 페이지이동 테스트 (인식 X)
-  /*useEffect(() => {
-  if (isCameraOn) {
-    const timer = setTimeout(() => {
-      stopCamera();
-      alert("캘리브레이션 종료 (임시 테스트)");
-      navigate("/login");
-    }, 5000);
+  // 📌 프레임 전송
+  const sendFrame = async () => {
+    const canvas = canvasRef.current;
+    const video = videoRef.current;
+    if (!canvas || !video) return null;
 
-    return () => clearTimeout(timer); // 컴포넌트 언마운트 시 정리
-  }
-}, [isCameraOn]);*/
+    const ctx = canvas.getContext("2d");
+    ctx?.setTransform(1, 0, 0, 1, 0, 0);
+    ctx?.drawImage(video, 0, 0, canvas.width, canvas.height);
 
-  // 가이드선 그리기
-  useEffect(() => {
-    const guideCanvas = guideCanvasRef.current;
-    if (!guideCanvas) return;
-      const ctx = guideCanvas.getContext("2d");
-    if (!ctx) return;
-    
+    return new Promise((resolve) => {
+      canvas.toBlob(async (blob) => {
+        if (!blob) return resolve(null);
 
-    const drawGuide = () => {
-      if (!guideCanvas || !ctx) return;
-      ctx.clearRect(0, 0, guideCanvas.width, guideCanvas.height);
-      if (!isCameraOn) return; 
+        const formData = new FormData();
+        formData.append("file", blob, "frame.jpg");
+        formData.append("pose_type", step);
 
-      ctx.lineWidth = 4;
+        try {
+          const res = await fetch("http://localhost:8000/analyze", {
+            method: "POST",
+            headers: { Authorization: "Bearer " + token },
+            body: formData,
+          });
 
-      if (step === "tpose") {
-        ctx.strokeStyle = "rgba(255, 165, 0, 0.5)";
-        const y = guideCanvas.height * 0.55;
+          const result = await res.json();
+          console.log("📥 서버 응답:", result);
+          resolve(result);
+        } catch (err) {
+          console.error("❌ 전송 실패:", err);
+          resolve(null);
+        }
+      }, "image/jpeg");
+    });
+  };
 
-        ctx.beginPath();
-        ctx.moveTo(guideCanvas.width * 0.1, y);
-        ctx.lineTo(guideCanvas.width * 0.9, y);
-        ctx.stroke();
+  // 📌 목표 프레임 수 도달할 때까지 반복 전송
+  const sendUntilCollected = async (target = 30, interval = 300) => {
+    let collected = 0;
+    let result = null;
 
-        ctx.beginPath();
-        ctx.moveTo(guideCanvas.width / 2, y - 100);
-        ctx.lineTo(guideCanvas.width / 2, y + 120);
-        ctx.stroke();
-
-      } else if (step === "posture") {
-        ctx.strokeStyle = "rgba(0, 200, 255, 0.4)";
-        const y = guideCanvas.height * 0.5;
-
-        ctx.beginPath();
-        ctx.moveTo(guideCanvas.width * 0.4, y);
-        ctx.lineTo(guideCanvas.width * 0.6, y);
-        ctx.stroke();
-
-        ctx.beginPath();
-        ctx.moveTo(guideCanvas.width / 2, y - 80);
-        ctx.lineTo(guideCanvas.width / 2, y + 100);
-        ctx.stroke();
-      }
-    };
-
-    drawGuide();
-  }, [step, isCameraOn]);
-
-
-// 📌 프레임 한 장 전송
-const sendFrame = async () => {
-  const canvas = canvasRef.current;
-  const video = videoRef.current;
-
-  if (!canvas || !video) {
-    console.warn("⛔ canvas 또는 video 요소가 null입니다.");
-    return null;
-  }
-
-  const ctx = canvas.getContext("2d");
-  if (!ctx) {
-    console.warn("⛔ canvas 2D context를 가져올 수 없습니다.");
-    return null;
-  }
-
-  ctx.setTransform(1, 0, 0, 1, 0, 0);
-  ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
-
-  return new Promise((resolve) => {
-    canvas.toBlob(async (blob) => {
-      if (!blob) return resolve(null);
-
-      const formData = new FormData();
-      formData.append("file", blob, "frame.jpg");
-      formData.append("pose_type", step);  // e.g., "neutral" or "tpose"
-
-      try {
-        const res = await fetch("http://localhost:8000/analyze", {
-          method: "POST",
-          headers: {
-            "Authorization": "Bearer " + token,
-          },
-          body: formData,
-        });
-
-        const result = await res.json();
-        console.log("📥 서버 응답:", result);
-        resolve(result);
-      } catch (err) {
-        console.error("❌ 전송 실패:", err);
-        resolve(null);
-      }
-    }, "image/jpeg");
-  });
-};
-
-// 📌 정해진 수 만큼 프레임 전송 (기존 용도 유지)
-const sendMultipleFrames = async (count = 5, interval = 500) => {
-  for (let i = 0; i < count; i++) {
-    await sendFrame();
-    await new Promise((res) => setTimeout(res, interval));
-  }
-};
-
-// ✅ 서버 수신된 유효 프레임 수(`collected_frames`)가 target 될 때까지 반복 전송
-const sendUntilCollected = async (target = 30, interval = 300, maxTry = 100) => {
-  let collected = 0;
-  let tries = 0;
-
-  while (collected < target && tries < maxTry) {
-    const result = await sendFrame();
-
-    if (result && result.collected_frames !== undefined) {
-      collected = result.collected_frames;
-      console.log(`✅ 누적 유효 프레임 수: ${collected}/${target}`);
-    } else {
-      console.warn("⚠️ 응답에 collected_frames 없음 또는 실패");
+        if (result?.current_pose) {
+      console.log("📍 current_pose:", result.current_pose);
     }
 
-    await new Promise((r) => setTimeout(r, interval));
-    tries++;
-  }
+    while (collected < target) {
+      result = await sendFrame();
+      if (result?.collected_frames !== undefined) {
+        collected = result.collected_frames;
+        console.log(`✅ 누적 유효 프레임 수: ${collected}/${target}`);
+      } else {
+        console.warn("⚠️ 응답에 collected_frames 없음 또는 실패");
+      }
+      await new Promise((r) => setTimeout(r, interval));
+    }
 
-  if (collected >= target) {
-    console.log("🎯 포즈 수집 완료!");
-  } else {
-    console.warn("🕰 최대 시도 횟수 초과, 수집 미완료");
-  }
-};
+    return result;
+  };
 
+  // 📌 Mediapipe Pose 세팅
   useEffect(() => {
-    // 1. Mediapipe Pose 모델 초기화
-    // 2. 정자세 인식 로직
-    // 3. T자세 인식 로직
-    // 4. 일정 시간 자세 유지되면 -> 프레임 전송 -> 다음 단계로 전환
-
     if (!videoRef.current) return;
 
     const pose = new Pose({
@@ -228,63 +129,47 @@ const sendUntilCollected = async (target = 30, interval = 300, maxTry = 100) => 
       minTrackingConfidence: 0.5,
     });
 
-    let postureStableCount = 0;
-    let postureSuccess = false;
-
-    let tposeStableCount = 0;
-    let tposeSuccess = false;
-
-    pose.onResults( async (results) => {
+    pose.onResults(async (results) => {
       if (!results.poseLandmarks) return;
-
       const landmarks = results.poseLandmarks;
 
-      // ✅ 정자세 인식
-      if (step === "posture" && !postureSuccess) {
+      if (step === "posture" && !successFlags.current.posture) {
         if (isPostureAligned(landmarks)) {
-          postureStableCount++;
-          console.log(`정자세 정렬 프레임 수: ${postureStableCount}`);
+          postureStableCount.current++;
           setMessage("정자세 인식을 시작합니다! 다음 안내까지 자세를 유지해주세요!");
 
-          // 정렬프레임 30 넘어가면 화면 찍음
-          if (postureStableCount >= 30) {
-            postureSuccess = true;
-            console.log("✅ 정자세 연속 인식 성공 → 프레임 전송 시작");
-            setMessage("✅ 정자세 연속 인식 성공 → 프레임 전송 시작");
-            await sendUntilCollected(30, 300);
-            setTimeout(() => {
-              console.log("👉 T자세로 전환");
-              setMessage("👉 T자세로 전환");
-              setStep("tpose");
-            }, 2000);
+          if (postureStableCount.current >= 30) {
+            successFlags.current.posture = true;
+            const result = await sendUntilCollected(30, 300);
+
+            if (result?.message) setMessage(result.message);
+            if (result?.current_pose) setStep(result.current_pose); // 💡 백 기준으로 다음 단계
           }
         } else {
-          if (postureStableCount > 0) console.log("↩ 정자세 흐트러짐, 카운트 초기화");
-          postureStableCount = 0;
+          postureStableCount.current = 0;
         }
       }
 
-      // ✅ T자세 인식
-      if (step === "tpose" && !tposeSuccess) {
+      if (step === "tpose" && !successFlags.current.tpose) {
         if (isTPoseAligned(landmarks)) {
-          tposeStableCount++;
-          console.log(`T자세 정렬 프레임 수: ${tposeStableCount}`);
+          tposeStableCount.current++;
           setMessage("T자 자세 인식을 시작합니다! 다음 안내까지 자세를 유지해주세요!");
 
-          if (tposeStableCount >= 30) {
-            tposeSuccess = true;
-            console.log("✅ T자세 연속 인식 성공 → 프레임 전송 시작");
-            setMessage("✅ T자세 연속 인식 성공 → 프레임 전송 시작");
-            await sendUntilCollected(30, 500);
-            setTimeout(() => {
-              console.log("🎉 캘리브레이션 종료");
-              setMessage("캘리브레이션 종료");
-              navigate("/login");
-            }, 2000);
+          if (tposeStableCount.current >= 30) {
+            successFlags.current.tpose = true;
+            const result = await sendUntilCollected(30, 500);
+
+            if (result?.message) setMessage(result.message);
+
+            if (result?.current_pose === "done") {
+              setMessage("🎉 캘리브레이션 종료");
+              setTimeout(() => navigate("/login"), 2000);
+            } else {
+              setStep(result.current_pose); // 혹시 다른 단계가 있으면
+            }
           }
         } else {
-          if (tposeStableCount > 0) console.log("↩ T자세 흐트러짐, 카운트 초기화");
-          tposeStableCount = 0;
+          tposeStableCount.current = 0;
         }
       }
     });
@@ -317,6 +202,54 @@ const sendUntilCollected = async (target = 30, interval = 300, maxTry = 100) => 
 
     cam.start();
   }, [step]);
+
+
+    // 📌 가이드선 그리기
+  useEffect(() => {
+    const guideCanvas = guideCanvasRef.current;
+    const ctx = guideCanvas?.getContext("2d");
+    if (!guideCanvas || !ctx) return;
+
+    let animationFrameId;
+
+    const drawGuide = () => {
+      ctx.clearRect(0, 0, guideCanvas.width, guideCanvas.height);
+      if (!isCameraOn) return;
+
+      ctx.lineWidth = 4;
+
+      if (step === "tpose") {
+        ctx.strokeStyle = "rgba(255, 165, 0, 0.5)";
+        const y = guideCanvas.height * 0.55;
+        ctx.beginPath();
+        ctx.moveTo(guideCanvas.width * 0.1, y);
+        ctx.lineTo(guideCanvas.width * 0.9, y);
+        ctx.stroke();
+        ctx.beginPath();
+        ctx.moveTo(guideCanvas.width / 2, y - 100);
+        ctx.lineTo(guideCanvas.width / 2, y + 120);
+        ctx.stroke();
+      } else if (step === "posture") {
+        ctx.strokeStyle = "rgba(0, 200, 255, 0.4)";
+        const y = guideCanvas.height * 0.5;
+        ctx.beginPath();
+        ctx.moveTo(guideCanvas.width * 0.4, y);
+        ctx.lineTo(guideCanvas.width * 0.6, y);
+        ctx.stroke();
+        ctx.beginPath();
+        ctx.moveTo(guideCanvas.width / 2, y - 80);
+        ctx.lineTo(guideCanvas.width / 2, y + 100);
+        ctx.stroke();
+      }
+
+      animationFrameId = requestAnimationFrame(drawGuide);
+    };
+
+    drawGuide();
+
+    return () => cancelAnimationFrame(animationFrameId);
+  }, [step, isCameraOn]);
+
 
   return (
     <div className="w-full flex flex-col items-center py-4 overflow-y-hidden">
