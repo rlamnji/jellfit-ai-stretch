@@ -47,10 +47,11 @@ function SelfStretchPage({ stretchingOrder, completedStretchings, setCompletedSt
           // 좌우 없는 스트레칭
           setIsLeftDone(true); 
         }
-      };
+    };
 
     // 좌우 스트레칭 완료 여부에 따라 전체 완료 상태 업데이트
     useEffect(() => {
+        console.log("좌측 완료:", isLeftDone, "우측 완료:", isRightDone);
         if (isLeftDone && isRightDone) {
             setIsAllCompleted(true);
         } else if (isLeftDone && !stretching.haveDirection) {
@@ -60,6 +61,7 @@ function SelfStretchPage({ stretchingOrder, completedStretchings, setCompletedSt
 
     // 스트레칭 전체 완료할 경우에 대한 처리
     useEffect(() => {
+        console.log("모든 스트레칭 완료 여부:", isAllCompleted);
         const handleIsAllCompleted = async (isAllCompleted) => {
             if (isAllCompleted) {
                 const currentIdx = stretchingOrder.indexOf(Number(stretchingId));
@@ -387,9 +389,13 @@ function SelfStretchPage({ stretchingOrder, completedStretchings, setCompletedSt
                 </button>
 
                 <ModalManager modalType={modalType} setModalType={setModalType} completedStretchings={completedStretchings} duration={duration} pendingJelly={pendingJelly} setPendingJelly={setPendingJelly}/>
+                <div className="buttonArea absolute flex items-center">
+                    <button className="w-8 h-4 flex items-center justify-center bg-[#FBF2E6] text-[#463C3C] rounded-xl">다시보기</button>
+                    <button className="w-8 h-4 flex items-center justify-center bg-[#FBF2E6] text-[#463C3C] rounded-xl">인식오류</button>
+                    <button className="w-8 h-4 flex items-center justify-center bg-[#FBF2E6] text-[#463C3C] rounded-xl">넘어가기</button>
+                </div>
             </div>
-
-            </div>
+        </div>
     );
     }
 

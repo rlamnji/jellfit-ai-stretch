@@ -80,7 +80,7 @@ async def analyze_image(
         currentSide=result.get("current_side") or "정보없음",  # None 방지
         elapsedTime=result.get("elapsed_time", 0),
         count=list(result.get("counts", {None: 0}).values())[0],  # ✅ dict → int 값만 추출
-        isCompleted=bool(result.get("completed", False)),
+        isCompleted=True if result.get("completed") is True else False,
         feedbackMsg=result.get("feedback_messages", '정보없음'),
         feedbackType=result.get("feedback_type", '정보없음')
     )
