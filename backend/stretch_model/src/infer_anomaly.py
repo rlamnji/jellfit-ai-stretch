@@ -148,6 +148,17 @@ class StretchTracker:
             'feedback_messages': [],  # 피드백 메시지 추가
             'feedback_type': 'error'
         }
+
+        # if self.done_sides == set(self.sides):
+        #     return {
+        #         'exercise': self.exercise,
+        #         'current_side': self.current_side,
+        #         'elapsed_time': 0.0,
+        #         'counts': dict(self.counts),
+        #         'completed': True,
+        #         'feedback_messages': ["동작을 모두 완료했습니다!"],
+        #         'feedback_type': 'success'
+        #     }
         
         if feats is None:
             result['feedback_messages'] = ["포즈를 감지할 수 없습니다. 카메라 앞에 서주세요."]
@@ -265,6 +276,7 @@ class StretchTracker:
                 if self.counts[side] < self.target_count:
                     self.counts[side] += 1
                     result['counts'][side] = self.counts[side]
+                    print(f"{side} 수행! 현재 횟수: {self.counts[side]}, 목표 횟수: {self.target_count}")
 
                     # 해당 방향 완료 체크
                     if self.counts[side] >= self.target_count:
@@ -272,9 +284,11 @@ class StretchTracker:
 
                         # 아직 다른 방향 남아 있음
                         remaining_sides = [s for s in self.sides if s not in self.done_sides]
+                        print(f"완료된 방향: {self.done_sides}, 남은 방향: {remaining_sides}")
                         if remaining_sides:
                             result['feedback_messages'] = ["다른 방향으로 동작해주세요!"]
                         else:
+                            print("Completed True 로 변경경")
                             result['completed'] = True
                             result['feedback_messages'] = ["완료! 잘하셨습니다!"]
                     
