@@ -1,6 +1,8 @@
 from sqlalchemy import Column, Integer, String, ForeignKey, Boolean, Date, Float, JSON
 from sqlalchemy.orm import relationship, declarative_base
-from datetime import datetime, timezone
+from datetime import datetime, timezone, timedelta
+
+KST = timezone(timedelta(hours=9))
 
 Base = declarative_base()
 
@@ -113,7 +115,7 @@ class DailyUsageLog(Base):
 
     log_id = Column(Integer, primary_key=True, autoincrement=True)
     user_id = Column(Integer, ForeignKey('users.user_id'), nullable=False)
-    date = Column(Date, default=lambda: datetime.now(timezone.utc).date())
+    date = Column(Date, default=lambda: datetime.now(KST).date()) # KST 기준 날짜
     usage_time = Column(Integer, nullable=False)  # 하루 동안의 총 스트레칭 시간 (초)
     
 

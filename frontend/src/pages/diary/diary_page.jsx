@@ -2,7 +2,6 @@ import { useState, useEffect } from 'react';
 import background from '../../../src/assets/images/etc/basic_background2.png';
 import TopBar from '../../components/top_bar';
 
-
 function DiaryPage(){
     const token = sessionStorage.getItem('accessToken');
     const [usageTime, setUsageTime] = useState("로딩중 ...");
@@ -16,11 +15,13 @@ function DiaryPage(){
     }); // 현재 날짜 포맷팅 (예: 2025년 6월 1일)
 
     useEffect(() => {
+        console.log("📆 월 선택:", selectedDateMonth);
         if (selectedDateMonth) {
             fetchStretchingTimeByDate(selectedDateMonth);
         }
     }, [selectedDateMonth]);
 
+    
     // 스트레칭 총 누적시간 api (특정 월의 누적시간 조회)
     // 입력데이터 : 2025-05
     const fetchStretchingTimeByDate = async (date) => {
@@ -41,6 +42,7 @@ function DiaryPage(){
 
             // 출력 데이터
             console.group(`1. 조회한 월: ${date}`);
+            console.log("🎯 API 호출 날짜 파라미터:", date);
             console.log("2. 총 스트레칭 시간:", data.total_usage_time + "초");
 
             if (data.daily_records && data.daily_records.length > 0) {
@@ -62,15 +64,20 @@ function DiaryPage(){
         }
     };
 
-    // 최근 6개월 옵션을 반환
     const getMonthOptions = () => {
         const options = [];
-        const today = new Date();
 
         for (let i = 0; i < 6; i++) {
-            const date = new Date(today.getFullYear(), today.getMonth() - i, 1);
-            const value = date.toISOString().slice(0, 7); // '2025-06'
-            const label = `${date.getFullYear()}년 ${date.getMonth() + 1}월`;
+            // i만큼 빼기 전에 바로 new Date()에서 setMonth
+            const localDate = new Date();
+            localDate.setMonth(localDate.getMonth() - i);
+
+            const year = localDate.getFullYear();
+            const month = (localDate.getMonth() + 1).toString().padStart(2, '0');
+
+            const value = `${year}-${month}`;
+            const label = `${year}년 ${month}월`;
+
             options.push({ value, label });
         }
 
@@ -97,10 +104,11 @@ function DiaryPage(){
                                 value={selectedDateMonth}
                                 onChange={(e) => {
                                     const newMonth = e.target.value;
+                                    console.log("📅 선택한 월:", newMonth);
                                     setSelectedDateMonth(newMonth);
-                                    fetchStretchingTimeByDate(newMonth);
                                 }}
                             >
+                            
                                 {getMonthOptions().map((opt) => (
                                     <option key={opt.value} value={opt.value}>
                                     {opt.label}
@@ -133,12 +141,25 @@ function DiaryPage(){
                             <div className='textLine w-[300px] h-[1px] mt-1 bg-[#D9D9D9]'></div>
                         </section>
                             <div className='flex flex-col items-center gap-2 mt-2 w-[300px] h-[500px] overflow-y-auto'>
-                                {detailMonthData.map((record, idx) => (
-                                    <div key={idx} className='flex flex-row gap-8 mb-2'>
-                                        <div className='bg-[#868361] opacity-40 w-10 h-10 flex items-center justify-center text-white rounded-full mr-8'>{record.date}</div>
-                                        <div className='text-[#535353] text-2xl'>{Math.floor(record.usage_time / 60)}m {record.usage_time % 60}s</div>
-                                    </div>
-                                ))}
+                                {detailMonthData.map((record, idx) => {
+                                    const [month, day] = record.date.split('/').map(Number);
+                                    const correctedDate = new Date(2025, month - 1, day);
+                                    correctedDate.setDate(correctedDate.getDate() + 1); // 하루 추가(6/2에 한 스트레칭이 6/1로 저장됨..)
+
+                                    const correctedMonth = correctedDate.getMonth() + 1;
+                                    const correctedDay = correctedDate.getDate();
+
+                                    return (
+                                        <div key={idx} className='flex flex-row gap-8 mb-2'>
+                                            <div className='bg-[#868361] opacity-40 w-10 h-10 flex items-center justify-center text-white rounded-full mr-8'>
+                                                {correctedMonth}/{correctedDay}
+                                            </div>
+                                            <div className='text-[#535353] text-2xl'>
+                                                {Math.floor(record.usage_time / 60)}m {record.usage_time % 60}s
+                                            </div>
+                                        </div>
+                                    );
+                                })}
                             </div>                        
                     </div>
                 </div>
