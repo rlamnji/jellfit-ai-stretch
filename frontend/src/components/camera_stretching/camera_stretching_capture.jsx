@@ -8,6 +8,12 @@ function CameraStretchingCapture({ handleIsCompleted, handleElapsedTime, sendFra
   const [showStart, setShowStart] = useState(true);
   const intervalRef = useRef(null);
   const [message, setMessage] = useState('');
+  // const [feedback, setFeedback] = useState('');
+  const SHOW_FEEDBACK_TIME = 2000; //2초 이상 피드백 반복되면 피드백 UI에 출력.
+  const [repeatedFeedback, setRepeatedFeedback] = useState(null);
+  const feedbackDurationRef = useRef(0);
+  const prevFeedbackRef = useRef(null);
+  
 
   useEffect(() => {
     // 시작 메시지 먼저 보여줌
@@ -73,11 +79,12 @@ function CameraStretchingCapture({ handleIsCompleted, handleElapsedTime, sendFra
           const data = await res.json(); // ✅ 실제 응답 JSON 받아오기
           console.log("✅ 서버 응답:", data);
           handleElapsedTime(data.currentSide, data.elapsedTime);
-
+          handleFeedback(data.feedbackMsg, data.feedbackType);
           // 둘다 완료되어야 스트레칭 완료 처리해야함.
           if (data.isCompleted) {
             console.log("스트레칭 완료!!");
-            handleIsCompleted(true, data.currentSide);
+            handleIsCompleted(true);
+            stopCamera();
           } else {
             console.log("스트레칭 아직 ing");
           }
@@ -90,12 +97,61 @@ function CameraStretchingCapture({ handleIsCompleted, handleElapsedTime, sendFra
 
   // 3. 일정 간격으로 프레임 전송
   useEffect(() => {
-  const interval = setInterval(() => {
-    sendFrame({ stretchingId });  // sendFrame 자체가 async이므로 여기선 그냥 호출만
-  }, sendFrameTime);
+    intervalRef.current = setInterval(() => {
+      sendFrame({ stretchingId });
+    }, sendFrameTime);
+  
+    return () => {
+      clearInterval(intervalRef.current);
+      intervalRef.current = null;
+    };
+  }, [stretchingId]);
+  
 
-  return () => clearInterval(interval);
-}, [stretchingId]);
+
+
+  //SHOW_FEEDBACK_TIME 이상 같은 피드백 메세지가 반복되면 화면에 출력.
+  const handleFeedback = (feedbackMsg, feedbackType) => {
+    if (feedbackType !== 'warning') return;
+  
+    if (prevFeedbackRef.current === feedbackMsg) {
+      feedbackDurationRef.current += sendFrameTime;
+  
+      if (feedbackDurationRef.current >= SHOW_FEEDBACK_TIME) {
+        setRepeatedFeedback(feedbackMsg);  // 화면에 보여줄 피드백 메시지 설정
+      }
+    } else {
+      // 새로운 메시지 들어온 경우 초기화
+      prevFeedbackRef.current = feedbackMsg;
+      feedbackDurationRef.current = 0;
+      setRepeatedFeedback(null); // 다른 피드백 오면 숨김 처리
+    }
+  };
+
+  // repeatedFeedback이 설정되면 4초 후 null로 자동 초기화
+  useEffect(() => {
+    if (repeatedFeedback) {
+      const timeout = setTimeout(() => {
+        setRepeatedFeedback(null);
+      }, 4000); // 4초 동안 메시지 보여준 뒤 사라짐
+
+      return () => clearTimeout(timeout); // 메시지가 바뀌거나 컴포넌트 unmount 시 타이머 정리
+    }
+  }, [repeatedFeedback]);
+
+  //카메라 스트림 정지
+  const stopCamera = () => {
+    if (streamRef.current) {
+      streamRef.current.getTracks().forEach(track => track.stop());
+      console.log("✅ 카메라 스트림 정지됨");
+    }
+  
+    if (intervalRef.current) {
+      clearInterval(intervalRef.current);
+      intervalRef.current = null;
+      console.log("🛑 프레임 전송 중단됨");
+    }
+  };
 
   return (
     <div className="flex flex-col items-center justify-center w-[60%] h-full rounded-xl">
@@ -123,12 +179,11 @@ function CameraStretchingCapture({ handleIsCompleted, handleElapsedTime, sendFra
           height="720"
           className="hidden w-full h-auto"
         />
-
+        {/*해파리 피드백*/}
+        <StretchingFeedback feedbackMsg={repeatedFeedback}/>
       </div>
       {/* ✅ 사용자에게 거울처럼 보이는 비디오 */}
 
-      {/*해파리 피드백*/}
-        <StretchingFeedback/>
     </div>
   );
 }

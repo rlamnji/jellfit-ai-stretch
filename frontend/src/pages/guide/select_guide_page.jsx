@@ -236,7 +236,7 @@ function SelectGuidePage({ setStretchingOrder, setCompletedStretchings }) {
     }, [selectFav]);
 
     return(
-        <div className="w-full h-screen bg-[#E5D2D2]">
+        <div className="w-full h-screen min-w-[800px] bg-[#E5D2D2]">
             <TopBar />
             <div className="header mt-4 ml-12 mb-4">
                 <h1 className="mb-4 font-bold text-3xl text-[#522B2B]">가이드 루틴을 골라볼까요?</h1>

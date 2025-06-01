@@ -32,66 +32,40 @@ function SelfStretchPage({ stretchingOrder, completedStretchings, setCompletedSt
     const [leftElapsedTime, setLeftElapsedTime] = useState(0); // 왼쪽 스트레칭 시간,좌우없으면 왼쪽으로.
     const [rightElapsedTime, setRightElapsedTime] = useState(0); // 오른쪽 스트레칭 시간
 
-    const [isAllCompleted, setIsAllCompleted] = useState(false); // 모든 스트레칭 완료 여부
-    const [isLeftDone, setIsLeftDone] = useState(false); // 왼쪽 스트레칭 완료 여부
-    const [isRightDone, setIsRightDone] = useState(false); // 오른쪽 스트레칭 완료 여부
+    const [isCompleted, setIsCompleted] = useState(false); // 모든 스트레칭 완료 여부
 
 
-    const handleIsCompleted = (isCompleted, currentSide) => {
-        if (!isCompleted) return;
-      
-        if (currentSide === "left") {
-          setIsLeftDone(true);
-        } else if (currentSide === "right") {
-          setIsRightDone(true);
-        } else {
-          // 좌우 없는 스트레칭
-          setIsLeftDone(true); 
-        }
-    };
 
-    // 좌우 스트레칭 완료 여부에 따라 전체 완료 상태 업데이트
-    useEffect(() => {
-        console.log("좌측 완료:", isLeftDone, "우측 완료:", isRightDone);
-        if (isLeftDone && isRightDone) {
-            setIsAllCompleted(true);
-        } else if (isLeftDone && !stretching.haveDirection) {
-            setIsAllCompleted(true); // 좌우 없는 스트레칭의 경우 왼쪽만 완료되면 전체 완료로 간주
-        }
-    }, [isLeftDone, isRightDone]);
 
     // 스트레칭 전체 완료할 경우에 대한 처리
-    useEffect(() => {
-        console.log("모든 스트레칭 완료 여부:", isAllCompleted);
-        const handleIsAllCompleted = async (isAllCompleted) => {
-            if (isAllCompleted) {
-                const currentIdx = stretchingOrder.indexOf(Number(stretchingId));
-                // 스트레칭 완료되면 해당 자세 총 시간 계산해서 누적.
-                if (currentIdx === stretchingOrder.length - 1) {
-                console.log("모든 완료된 스트레칭", completedStretchings);
-                const result = endSession(); // 종료 시간 계산
-                console.log("현재 누적 시간", result.duration, "초");
-                setDuration(result.duration); 
+    const handleIsCompleted = async (isCompleted) => {
+        console.log("모든 스트레칭 완료 여부:", isCompleted);
+        if (isCompleted) {
+            const currentIdx = stretchingOrder.indexOf(Number(stretchingId));
+            // 스트레칭 완료되면 해당 자세 총 시간 계산해서 누적.
+            if (currentIdx === stretchingOrder.length - 1) {
+            console.log("모든 완료된 스트레칭", completedStretchings);
+            const result = endSession(); // 종료 시간 계산
+            console.log("현재 누적 시간", result.duration, "초");
+            setDuration(result.duration); 
 
-                await timeUpdate(result.duration); // 누적 시간 기록 api 호출
-                setModalType("complete"); // 완료 모달 띄우기
-                await recordUpdate(completedStretchings); // 누적 횟수 기록 api 호출
-                
-                const charResult = await checkGetCharacters();
-                if (charResult?.unlocked_character_ids?.length > 0) {
-                    setSelectedIds(charResult.unlocked_character_ids);  
-                    setPendingJelly(charResult.unlocked_character_ids);
-                }
-
-                postCharacters(charResult.unlocked_character_ids);
-                } else {
-                const nextStretchingId = stretchingOrder[currentIdx + 1];
-                navigate(`/guide/video/${nextStretchingId}`);
-                }
+            await timeUpdate(result.duration); // 누적 시간 기록 api 호출
+            setModalType("complete"); // 완료 모달 띄우기
+            await recordUpdate(completedStretchings); // 누적 횟수 기록 api 호출
+            
+            const charResult = await checkGetCharacters();
+            if (charResult?.unlocked_character_ids?.length > 0) {
+                setSelectedIds(charResult.unlocked_character_ids);  
+                setPendingJelly(charResult.unlocked_character_ids);
             }
-        };
-        handleIsAllCompleted(isAllCompleted);
-    },[isAllCompleted]);
+
+            postCharacters(charResult.unlocked_character_ids);
+            } else {
+            const nextStretchingId = stretchingOrder[currentIdx + 1];
+            navigate(`/guide/video/${nextStretchingId}`);
+            }
+        }
+    };
 
 
     useEffect(() => {
@@ -330,6 +304,7 @@ function SelfStretchPage({ stretchingOrder, completedStretchings, setCompletedSt
             navigate(`/guide/video/${nextStretchingId}`);
         }
     }
+
     return (
         <div className="w-full h-screen flex flex-col items-center bg-space">
 
