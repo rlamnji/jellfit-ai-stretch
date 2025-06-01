@@ -9,7 +9,7 @@ function CameraStretchingCapture({ handleIsCompleted, handleElapsedTime, sendFra
   const intervalRef = useRef(null);
   const [message, setMessage] = useState('');
   // const [feedback, setFeedback] = useState('');
-  const SHOW_FEEDBACK_TIME = 2000; //2초 이상 피드백 반복되면 피드백 UI에 출력.
+  const SHOW_FEEDBACK_TIME = 1000; //N초 이상 피드백 반복되면 피드백 UI에 출력.
   const [repeatedFeedback, setRepeatedFeedback] = useState(null);
   const feedbackDurationRef = useRef(0);
   const prevFeedbackRef = useRef(null);
@@ -118,6 +118,7 @@ function CameraStretchingCapture({ handleIsCompleted, handleElapsedTime, sendFra
       feedbackDurationRef.current += sendFrameTime;
   
       if (feedbackDurationRef.current >= SHOW_FEEDBACK_TIME) {
+        console.log("@@2초 이상 반복된 피드백 메세지 @@:", feedbackMsg);
         setRepeatedFeedback(feedbackMsg);  // 화면에 보여줄 피드백 메시지 설정
       }
     } else {
@@ -154,7 +155,7 @@ function CameraStretchingCapture({ handleIsCompleted, handleElapsedTime, sendFra
   };
 
   return (
-    <div className="flex flex-col items-center justify-center w-[60%] h-full rounded-xl">
+    <div className="flex flex-col items-center justify-center w-full h-full rounded-xl">
         {/* 시작합니다 메시지 - 중앙 */}
         {showStart && (
           <div className="opacity-90 absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2
@@ -165,11 +166,11 @@ function CameraStretchingCapture({ handleIsCompleted, handleElapsedTime, sendFra
           </div>
         )}
 
-      <div className="mb-6">
+      <div className="relative w-[60%] h-auto mb-6 border">
         <video
           ref={videoRef}
           autoPlay
-          className="w-full h-auto border rounded-xl transform scale-x-[-1] "
+          className="w-full h-auto border rounded-xl transform scale-x-[-1]"
         />
 
         {/* 👻 서버 전송용 캔버스 (사용자에겐 숨김) */}
@@ -181,6 +182,7 @@ function CameraStretchingCapture({ handleIsCompleted, handleElapsedTime, sendFra
         />
         {/*해파리 피드백*/}
         <StretchingFeedback feedbackMsg={repeatedFeedback}/>
+
       </div>
       {/* ✅ 사용자에게 거울처럼 보이는 비디오 */}
 

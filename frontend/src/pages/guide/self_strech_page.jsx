@@ -327,7 +327,7 @@ function SelfStretchPage({ stretchingOrder, completedStretchings, setCompletedSt
                     />
                 }
             </div>
-            <div className="main w-full h-screen flex items-center justify-center relative pt-2 pb-8">
+            <div className="main w-full h-full flex items-center justify-center relative pt-2 pb-8">
 
                 <CameraStretchingScreen
                     handleIsCompleted={handleIsCompleted}
@@ -381,6 +381,6 @@ function SelfStretchPage({ stretchingOrder, completedStretchings, setCompletedSt
             </div>
         </div>
     );
-    }
+}
 
     export default SelfStretchPage;
