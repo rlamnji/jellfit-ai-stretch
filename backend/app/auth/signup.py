@@ -1,6 +1,7 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 from passlib.context import CryptContext
+from .login import create_access_token
 
 from db.database import get_db
 from db.models import User
@@ -33,4 +34,6 @@ def join(user_in: UserCreate, db: Session = Depends(get_db)):
     db.commit()
     db.refresh(new_user)
 
-    return {"msg": "회원가입 성공", "userId": new_user.user_id}
+    access_token = create_access_token(data={"sub": new_user.id})
+
+    return {"msg": "회원가입 성공", "userId": new_user.user_id, "access_token": access_token}

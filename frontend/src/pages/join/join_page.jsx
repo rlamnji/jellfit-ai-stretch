@@ -58,8 +58,10 @@ function JoinPage (){
             e.preventDefault();
         }
         const res = await sendUserJoinData(id, password, nickname);
-        const { msg, userId } = await res.json();
+        const { msg, userId, access_token } = await res.json();
         console.log(`${msg} userId : ${userId}`);
+        console.log("access_token:", access_token);
+        sessionStorage.setItem("accessToken", access_token); //토큰 저장.
         navigate(`/condition/${userId}`); //캘리브레이션 페이지로 이동.
     };
 

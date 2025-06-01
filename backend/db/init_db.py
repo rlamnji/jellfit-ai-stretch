@@ -3,7 +3,7 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
-from db.models import Base, User, Category, Pose, Routine, RoutinePose, Character, UserCharacter, UsageRecord, Calibration, UserCalibration, UserCalibrationLandmark, DailyUsageLog
+from db.models import Base, User, Category, Pose, Routine, Character, UserCharacter, UsageRecord, Calibration, UserCalibration, UserCalibrationLandmark, DailyUsageLog
 from passlib.context import CryptContext
 
 # 비밀번호 해싱을 위한 패스리브 컨텍스트
@@ -126,14 +126,14 @@ db.add(Pose(name="뒷목걸고고개젖히기", duration=10, count=1,
             have_direction=False))  # 목
 
 
-db.add(Routine(user_id=1, image_url="https://example.com/routine1.jpg"))
-db.add(Routine(user_id=2))
+#db.add(Routine(user_id=1, image_url="https://example.com/routine1.jpg"))
+#db.add(Routine(user_id=2))
 
-db.add(RoutinePose(routine_id=1, pose_id=1, order=1))
-db.add(RoutinePose(routine_id=1, pose_id=2, order=2))
-db.add(RoutinePose(routine_id=2, pose_id=3, order=1))
-db.add(RoutinePose(routine_id=2, pose_id=5, order=2))
-db.add(RoutinePose(routine_id=2, pose_id=4, order=3))
+#db.add(RoutinePose(routine_id=1, pose_id=1, order=1))
+#db.add(RoutinePose(routine_id=1, pose_id=2, order=2))
+#db.add(RoutinePose(routine_id=2, pose_id=3, order=1))
+#db.add(RoutinePose(routine_id=2, pose_id=5, order=2))
+#db.add(RoutinePose(routine_id=2, pose_id=4, order=3))
 
 # 해파리 정보 등록
 db.add(Character(name="기본 해파리", description="기본 해파리.", acquisition_num=3, image_url="/images/models/jelly1.png", pose_id=1))

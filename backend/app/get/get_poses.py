@@ -31,11 +31,3 @@ def get_all_poses(db: Session = Depends(get_db)):
             "category_id": p.category_id
         } for p in poses
     ]
-
-#@router.post("/analyze")
-#async def analyze_image(file: UploadFile = File(...)):
-#    content = await file.read()
-#    print(f"이미지 수신 완료: {len(content)} bytes, filename={file.filename}")
-
-    # 여기에 추후 AI 분석 넣을 수 있음
-    #return JSONResponse(content={"result": "received", "filename": file.filename})
