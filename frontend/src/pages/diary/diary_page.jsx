@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import background from '../../../src/assets/images/etc/basic_background2.png';
 import TopBar from '../../components/top_bar';
 
+
 function DiaryPage(){
     const token = sessionStorage.getItem('accessToken');
     const [usageTime, setUsageTime] = useState("로딩중 ...");
@@ -15,8 +16,10 @@ function DiaryPage(){
     }); // 현재 날짜 포맷팅 (예: 2025년 6월 1일)
 
     useEffect(() => {
-        fetchStretchingTimeByDate(selectedDateMonth);
-    }, []);
+        if (selectedDateMonth) {
+            fetchStretchingTimeByDate(selectedDateMonth);
+        }
+    }, [selectedDateMonth]);
 
     // 스트레칭 총 누적시간 api (특정 월의 누적시간 조회)
     // 입력데이터 : 2025-05
@@ -139,8 +142,7 @@ function DiaryPage(){
                             </div>                        
                     </div>
                 </div>
-
-            </div>
+            </div>           
         </div>
     );
 }

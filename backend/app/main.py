@@ -17,7 +17,9 @@ from db.database import get_db
 from db.models import User, DailyUsageLog
 
 
+
 app = FastAPI()
+
 
 # CORS 설정
 app.add_middleware(
