@@ -9,7 +9,7 @@ function CameraStretchingCapture({ handleIsCompleted, handleElapsedTime, sendFra
   const intervalRef = useRef(null);
   const [message, setMessage] = useState('');
   // const [feedback, setFeedback] = useState('');
-  const SHOW_FEEDBACK_TIME = 1000; //N초 이상 피드백 반복되면 피드백 UI에 출력.
+  const SHOW_FEEDBACK_TIME = 2000; //N초 이상 피드백 반복되면 피드백 UI에 출력.
   const [repeatedFeedback, setRepeatedFeedback] = useState(null);
   const feedbackDurationRef = useRef(0);
   const prevFeedbackRef = useRef(null);
@@ -118,28 +118,42 @@ function CameraStretchingCapture({ handleIsCompleted, handleElapsedTime, sendFra
   //SHOW_FEEDBACK_TIME 이상 같은 피드백 메세지가 반복되면 화면에 출력.
   const handleFeedback = (feedbackMsg, feedbackType) => {
     if (feedbackType !== 'warning') return;
+    const feedbackStr = Array.isArray(feedbackMsg) ? feedbackMsg.join(' / ') : feedbackMsg;
   
-    if (prevFeedbackRef.current === feedbackMsg) {
+    console.log("🟡 새로운 피드백 도착:", feedbackStr);
+  
+    if (prevFeedbackRef.current === null) {
+      console.log("🟢 처음 받은 피드백입니다. 추적 시작:", feedbackStr);
+      prevFeedbackRef.current = feedbackStr;
+      feedbackDurationRef.current = sendFrameTime;
+      return;
+    }
+  
+    if (prevFeedbackRef.current === feedbackStr) {
       feedbackDurationRef.current += sendFrameTime;
+      console.log("🔁 같은 피드백 반복 중. 누적 시간:", feedbackDurationRef.current, "ms");
   
       if (feedbackDurationRef.current >= SHOW_FEEDBACK_TIME) {
-        console.log("@@2초 이상 반복된 피드백 메세지 @@:", feedbackMsg);
-        setRepeatedFeedback(feedbackMsg);  // 화면에 보여줄 피드백 메시지 설정
+        console.log("✅ 반복된 피드백이 기준 시간 초과. 출력합니다:", feedbackStr);
+        setRepeatedFeedback(feedbackStr);
       }
     } else {
-      // 새로운 메시지 들어온 경우 초기화
-      prevFeedbackRef.current = feedbackMsg;
+      console.log("🔄 피드백이 바뀌었습니다.");
+      console.log("    이전:", prevFeedbackRef.current);
+      console.log("    현재:", feedbackStr);
+      prevFeedbackRef.current = feedbackStr;
       feedbackDurationRef.current = 0;
-      setRepeatedFeedback(null); // 다른 피드백 오면 숨김 처리
+      setRepeatedFeedback(null);
     }
   };
+    
 
-  // repeatedFeedback이 설정되면 4초 후 null로 자동 초기화
+  // repeatedFeedback이 설정되면 6초 후 null로 자동 초기화
   useEffect(() => {
     if (repeatedFeedback) {
       const timeout = setTimeout(() => {
         setRepeatedFeedback(null);
-      }, 4000); // 4초 동안 메시지 보여준 뒤 사라짐
+      }, 6000); // 6초 동안 메시지 보여준 뒤 사라짐
 
       return () => clearTimeout(timeout); // 메시지가 바뀌거나 컴포넌트 unmount 시 타이머 정리
     }
