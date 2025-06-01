@@ -32,7 +32,12 @@ function CameraStretchingCapture({ handleIsCompleted, handleElapsedTime, sendFra
 
   // 1. 카메라 연결
   useEffect(() => {
-    navigator.mediaDevices.getUserMedia({ video: true })
+    navigator.mediaDevices.getUserMedia({
+      video: {
+        width: { ideal: 1280 },
+        height: { ideal: 720 },
+      },
+    })
       .then((stream) => {
         streamRef.current = stream; // 스트림 저장
         if (videoRef.current) {
@@ -166,11 +171,11 @@ function CameraStretchingCapture({ handleIsCompleted, handleElapsedTime, sendFra
           </div>
         )}
 
-      <div className="relative w-[60%] h-auto mb-6 border">
+      <div className="relative w-[66%] h-auto mb-6">
         <video
           ref={videoRef}
           autoPlay
-          className="w-full h-auto border rounded-xl transform scale-x-[-1]"
+          className="w-full h-auto aspect-video object-contain border rounded-xl transform scale-x-[-1]"
         />
 
         {/* 👻 서버 전송용 캔버스 (사용자에겐 숨김) */}

@@ -28,15 +28,15 @@ function StretchingFeedback({ feedbackMsg }) {
   }, [feedbackMsg]);
 
     return (
-        <div className="absolute bottom-0 flex items-center justify-center w-full h-[140px] mt-0">
+        <div className="absolute bottom-[-56px] left-1/2 transform -translate-x-1/2 flex items-center justify-center w-full h-[140px] z-10">
           {/* 해파리 이미지 */}
-          <div className="w-[160px] h-[160px]">
+          <div className="w-[180px] h-[180px]">
             <img src="/images/models/jelly23.png" alt="해파리" className="w-full h-full object-contain" />
           </div>
     
           {/* 피드백 메시지 박스 */}
-          <div className="flex items-center justify-center w-full max-w-[800px] h-auto bg-white border-4 border-[#975D5D] rounded-full shadow-lg px-6">
-            <span className="text-[#694444] font-bold text-[32px] leading-tight text-center">
+          <div className="flex items-center justify-center w-full h-16 px-8 bg-white border-4 border-[#975D5D] rounded-full shadow-lg">
+            <span className="text-[#694444] py-2 px-12 font-bold text-2xl leading-tight text-center">
               {message}
             </span>
           </div>

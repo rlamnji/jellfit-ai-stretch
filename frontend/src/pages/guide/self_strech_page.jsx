@@ -306,7 +306,7 @@ function SelfStretchPage({ stretchingOrder, completedStretchings, setCompletedSt
     }
 
     return (
-        <div className="w-full h-screen flex flex-col items-center bg-space">
+        <div className="w-full h-screen overflow-hidden flex flex-col items-center bg-space">
 
             <div className='topBar w-full h-14 flex justify-between'>      
                 <img src={arrowLeft} className="w-8 h-8 m-4 cursor-pointer" 
@@ -327,7 +327,7 @@ function SelfStretchPage({ stretchingOrder, completedStretchings, setCompletedSt
                     />
                 }
             </div>
-            <div className="main w-full h-full flex items-center justify-center relative pt-2 pb-8">
+            <div className="main w-full h-full flex items-center justify-center relative pt-2 pb-12 mb-4">
 
                 <CameraStretchingScreen
                     handleIsCompleted={handleIsCompleted}
