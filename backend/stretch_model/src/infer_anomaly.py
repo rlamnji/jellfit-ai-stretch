@@ -149,16 +149,8 @@ class StretchTracker:
             'feedback_type': 'error'
         }
 
-        # if self.done_sides == set(self.sides):
-        #     return {
-        #         'exercise': self.exercise,
-        #         'current_side': self.current_side,
-        #         'elapsed_time': 0.0,
-        #         'counts': dict(self.counts),
-        #         'completed': True,
-        #         'feedback_messages': ["동작을 모두 완료했습니다!"],
-        #         'feedback_type': 'success'
-        #     }
+        if self.done_sides == set(self.sides):
+            self.reset()
         
         if feats is None:
             result['feedback_messages'] = ["포즈를 감지할 수 없습니다. 카메라 앞에 서주세요."]

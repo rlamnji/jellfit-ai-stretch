@@ -75,6 +75,9 @@ async def analyze_image(
     result = tracker.is_performing(image, outlier_threshold=outlier_threshold)
     print("get_stretching_image에서 is_performing 사용 결과:", result)
 
+    if result.get("completed") is True:
+        tracker_cache.pop(exercise, None)
+
     return StretchingAnalyzeResult(
         name=result.get("exercise", '정보없음'),
         currentSide=result.get("current_side") or "정보없음",  # None 방지
