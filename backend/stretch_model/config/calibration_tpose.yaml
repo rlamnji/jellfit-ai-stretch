@@ -50,6 +50,33 @@ thresholds:
   min_shoulder_alignment: -0.06
   max_shoulder_alignment: 0.06
 
+  min_frames_needed: 30
+
+#thresholds:
+  # 손목 간격이 충분히 벌어져 있어야 함
+#  min_wrist_distance: 0.6
+#  max_wrist_distance: 1.2
+  
+  # 팔꿈치가 펴진 상태여야 함
+#  min_left_elbow_angle: 160
+#  min_right_elbow_angle: 160
+
+  # 어깨와 손목이 수평해야 함
+#  min_left_arm_vertical: -0.05
+#  min_right_arm_vertical: -0.05
+
+#  max_left_arm_vertical: 0.05
+#  max_right_arm_vertical: -0.05
+
+#  min_arms_vertical: -0.1
+#  max_arms_vertical: -0.1
+  
+  # 어깨가 수평이어야 함
+#  min_shoulder_alignment: -0.05
+#  max_shoulder_alignment: 0.05
+  
+  # 최소 수집 프레임 수
+#  min_frames_needed: 30
 
 cycles:
   type: calibration
