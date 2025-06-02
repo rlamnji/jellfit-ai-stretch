@@ -6,7 +6,7 @@ import os
 from pathlib import Path
 from typing import Dict, List, Optional
 from datetime import datetime
-from utils import load_config, extract_features
+from .utils import load_config, extract_features
 import yaml
 
 class TestCalibrationProcessor:
