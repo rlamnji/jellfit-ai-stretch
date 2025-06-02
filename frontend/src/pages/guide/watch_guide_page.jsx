@@ -30,10 +30,11 @@ function WatchGuidePage({ stretchingOrder }){
             return null;
         }
     }
+
+    
     if (!stretching) {
         return <div>데이터를 불러오고 있습니다...</div>; // 데이터가 로드될 때까지 로딩 화면 표시
     }
-
 
     return(
         <div className="w-full h-screen flex flex-col items-center bg-space">
