@@ -36,7 +36,7 @@ POSE_ID_TO_EXERCISE = {
 # pose_id에 따른 이상치 임계값 설정
 POSE_ID_TO_OUTLIER_THRESHOLD = {
     1: -0.25,  # 등_팔꿈치
-    2: -0.1,   # 가슴_T자
+    2: -0.02,   # 가슴_T자
     3: -0.1,  # 가슴_Y자
     4: -0.13,  # 등_날개뼈
     5: -0.2,   # 등_위
@@ -73,6 +73,7 @@ async def analyze_image(
     tracker = get_tracker(exercise or "등_위")
     outlier_threshold = POSE_ID_TO_OUTLIER_THRESHOLD.get(pose_id, -0.2)
     result = tracker.is_performing(image, outlier_threshold=outlier_threshold)
+    #result = tracker.is_performing(image)
     print("get_stretching_image에서 is_performing 사용 결과:", result)
 
     if result.get("completed") is True:
