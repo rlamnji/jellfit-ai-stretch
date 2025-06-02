@@ -5,7 +5,7 @@ sys.path.append(os.path.dirname(os.path.abspath(os.path.dirname(__file__))))
 
 from sqlalchemy.orm import Session
 from db.database import SessionLocal
-from db.models import User, Character
+from db.models import User, Character, Pose
 
 def get_all_users():
     db: Session = SessionLocal()
@@ -19,6 +19,12 @@ def get_all_characters():
     db.close()
     return characters
 
+def get_all_poses():
+    db: Session = SessionLocal()
+    poses = db.query(Pose).all()
+    db.close()
+    return poses
+
 if __name__ == "__main__":
     users = get_all_users()
     for user in users:
@@ -27,3 +33,7 @@ if __name__ == "__main__":
     characters = get_all_characters()
     for character in characters:
         print(f"ID: {character.character_id}, Name: {character.name}, Description: {character.description}")
+
+    poses = get_all_poses()
+    for pose in poses:
+        print(f"ID: {pose.pose_id}, Name: {pose.name}, Description: {pose.description}")
