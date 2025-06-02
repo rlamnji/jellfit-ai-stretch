@@ -1,7 +1,7 @@
 import InputField from '../../components/input_field';
 import { useNavigate } from 'react-router-dom';
 import { useState } from 'react';
-import imgLogo from '../../assets/images/etc/logo_title.png';
+import imgJoinLogo from '../../assets/images/etc/join_title.png';
 import imgCloudLeft from '../../assets/images/etc/cloud_left.png';
 import imgCloudRight from '../../assets/images/etc/cloud_right.png';
 import TopBar from '../../components/top_bar';
@@ -31,7 +31,6 @@ function JoinPage (){
         setNickname(value);
     }
 
-    // 여기서부터 서버 연결하면 주석 해제.
     const sendUserJoinData = async (id, password, nickname) =>{
         const res = await fetch("http://localhost:8000/auth/join", {
             method : "POST",
@@ -75,7 +74,7 @@ function JoinPage (){
             <div className='w-full h-screen flex flex-col items-center'>
                 <TopBar />
                 <div className='header w-fit h-fit p-1'>
-                    <img className='w-[400px] h-[200px]' src={imgLogo} alt="타이틀 로고" />
+                    <img className='w-[400px] h-[160px]' src={imgJoinLogo} alt="회원가입 타이틀" />
                 </div>
 
                 <div className="relative w-[350px] h-auto">
@@ -99,7 +98,7 @@ function JoinPage (){
                                 className={`font-semibold text-white text-xl ${isValid ? '' : 'pointer-events-none'}`}
                                 type='submit'
                             >
-                                완료
+                                계정 생성하기
                             </button>
                         </div>
                     </form>
