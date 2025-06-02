@@ -1,6 +1,8 @@
 from sqlalchemy import Column, Integer, String, ForeignKey, Boolean, Date, Float, JSON
 from sqlalchemy.orm import relationship, declarative_base
-from datetime import datetime, timezone
+from datetime import datetime, timezone, timedelta
+
+KST = timezone(timedelta(hours=9))
 
 Base = declarative_base()
 
@@ -23,6 +25,7 @@ class User(Base):
     routines = relationship("Routine", back_populates="user")
     user_calibrations = relationship("UserCalibration", back_populates="user")
     calibration_landmarks = relationship("UserCalibrationLandmark", back_populates="user")
+    fav_poses = relationship('FavPose', back_populates='user')
 
 # 캘리브레이션 종류
 class Calibration(Base):
@@ -112,7 +115,7 @@ class DailyUsageLog(Base):
 
     log_id = Column(Integer, primary_key=True, autoincrement=True)
     user_id = Column(Integer, ForeignKey('users.user_id'), nullable=False)
-    date = Column(Date, default=lambda: datetime.now(timezone.utc).date())
+    date = Column(Date, default=lambda: datetime.now(KST).date()) # KST 기준 날짜
     usage_time = Column(Integer, nullable=False)  # 하루 동안의 총 스트레칭 시간 (초)
     
 
@@ -159,7 +162,7 @@ class Pose(Base):
     # 포즈 테이블 관계
     category = relationship('Category', back_populates='poses')
     characters = relationship('Character', back_populates='pose')
-    routine_poses = relationship('RoutinePose', back_populates='pose')
+    fav_poses = relationship('FavPose', back_populates='pose')
 
 
 class Category(Base):
@@ -171,7 +174,8 @@ class Category(Base):
     # 카테고리 테이블 관계
     poses = relationship('Pose', back_populates='category')
 
-
+# 사용자마다 루틴이 여러개일 수 잇으니까~
+# 없어질 가능성 100
 class Routine(Base):
     __tablename__ = 'routines'
 
@@ -181,17 +185,19 @@ class Routine(Base):
 
     # 루틴 테이블 관계
     user = relationship("User", back_populates="routines")
-    routine_poses = relationship('RoutinePose', back_populates='routine')
+    fav_poses = relationship('FavPose', back_populates='routine')
 
 # 즐겨찾기 테이블
-class RoutinePose(Base):
-    __tablename__ = 'routine_poses'
+class FavPose(Base):
+    __tablename__ = 'fav_poses'
 
-    routine_pose_id = Column(Integer, primary_key=True, autoincrement=True)
-    routine_id = Column(Integer, ForeignKey('routines.routine_id'))
+    fav_pose_id = Column(Integer, primary_key=True, autoincrement=True)
+    user_id = Column(Integer, ForeignKey('users.user_id'))
     pose_id = Column(Integer, ForeignKey('poses.pose_id'))
-    order = Column(Integer, nullable=True) # 포즈 순서, 나중에 nullable=False로 변경
+    routine_id = Column(Integer, ForeignKey('routines.routine_id'))
 
-    # 루틴 포즈 테이블 관계
-    routine = relationship('Routine', back_populates='routine_poses')
-    pose = relationship('Pose', back_populates='routine_poses')
+    # 즐겨찾기 테이블 관계
+    routine = relationship('Routine', back_populates='fav_poses')
+    user = relationship('User', back_populates='fav_poses')
+    pose = relationship('Pose', back_populates='fav_poses')
+    

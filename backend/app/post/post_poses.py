@@ -14,6 +14,7 @@ from db.models import User
 import numpy as np
 
 router = APIRouter()
+processor = CalibrationProcessor()
 
 # csv로 추출 함수 ????
 def extract_landmarks_to_csv(image_path: str, csv_path: str):
@@ -37,22 +38,22 @@ def extract_landmarks_to_csv(image_path: str, csv_path: str):
     df = pd.DataFrame([data])
     df.to_csv(csv_path, index=False)
 
-processor = CalibrationProcessor()
+
 
 # 이미지 파일 받아서 csv 파일로 변환
 @router.post("/analyze")
 async def analyze_image(
     file: UploadFile = File(...), 
     pose_type: str = Form(...),
-    # current_user: User = Depends(get_current_user)
+    current_user: User = Depends(get_current_user)
 ):
     content = await file.read()
     image_array = np.asarray(bytearray(content), dtype=np.uint8)
     image = cv2.imdecode(image_array, cv2.IMREAD_COLOR)
 
     # 프레임 처리
-    # result = processor.process_frame(current_user, image)
-    result = processor.process_frame(1, image)
+    result = processor.process_frame(current_user.user_id, image)
+    #result = processor.process_frame(1, image)
     print(f"Processed frame for {pose_type}: {result}")
 
     return result

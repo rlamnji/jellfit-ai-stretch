@@ -1,0 +1,6 @@
+calibration:
+  face_x_spread: 0.0006272209648889987
+  left_eye_ear_y_diff: -0.027496606111526434
+  right_eye_ear_y_diff: -0.03786218166351324
+generated_at: '2025-05-30T04:10:06.442945'
+source: test_calibration

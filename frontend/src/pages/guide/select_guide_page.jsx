@@ -17,6 +17,8 @@ function SelectGuidePage({ setStretchingOrder, setCompletedStretchings }) {
     const [subCategory, setSubCategory] = useState('목');
     const [stretchingList, setStretchingList] = useState([]); 
     const [selectedStretchingList, setSelectedStretchingList] = useState([]);
+    const token = sessionStorage.getItem("accessToken"); // 로그인 토큰
+    const [myFavorites, setMyFavorites] = useState([]); // 즐겨찾기 목록 상태 저장
     const navigate = useNavigate();
 
     const subCategories = {
@@ -91,11 +93,12 @@ function SelectGuidePage({ setStretchingOrder, setCompletedStretchings }) {
 
     // 카테고리 별 스트레칭 출력
     const showStretchingList = (stretchingList) => { 
+        if (!Array.isArray(stretchingList)) return null;
         return stretchingList.map((stretching) => (
             <li 
                 key={stretching.id}
                 className="m-2 w-[160px] h-[180px]">
-                <Stretching stretching={stretching} onClick={handleStrechingSelect}/>
+                <Stretching stretching={stretching} onClick={handleStrechingSelect} mainCategory={mainCategory} onDelete={handleDeleteStretching}/>
             </li>
         ));
     }
@@ -204,39 +207,95 @@ function SelectGuidePage({ setStretchingOrder, setCompletedStretchings }) {
     }, [randomGuideSelect]);
 
 
-    // 즐겨찾기
-    const favGuideSelect = () =>{
-        // 만약 selectFav 가 true면
-        // 지금 있는 해당 리스트들을 '내 스트레칭' 카테고리로 넣기
-        // 리스트가 없다면 alert 창
-        if(selectFav == true){
-            if (selectedStretchingList.length === 0) {
-                alert("스트레칭이 없습니다.");
-                return;
-            }
-            
-            // 기존 즐겨찾기 불러오기
-            const prev = JSON.parse(localStorage.getItem("myStretchings")) || [];
-
-            // 중복 제거 (id 기준)
-            const newList = [...prev, ...selectedStretchingList].filter(
-            (pose, index, self) =>
-                index === self.findIndex(p => p.id === pose.id)
-            );
-
-            localStorage.setItem("myStretchings", JSON.stringify(newList));
-            console.log("저장완료")
-
+    // 즐겨찾기 목록 불러오기
+    const fetchMyFavorites = async () => {
+        try {
+            const res = await fetch("http://localhost:8000/favorites", {
+            headers: {
+                "Authorization": "Bearer " + token,
+            },
+            });
+            if (!res.ok) throw new Error("불러오기 실패");
+            const data = await res.json();
+            setMyFavorites(data); // ← 백엔드 응답 구조에 맞게
+            console.log("✅ 즐겨찾기 불러오기 성공:", data);
+        } catch (err) {
+            console.error("❌ 즐겨찾기 불러오기 실패:", err.message);
         }
     };
-    useEffect(() => {
-        if (selectFav === true) {
-            favGuideSelect();
+
+    // 즐겨찾기 탭을 클릭했을 때
+    const handleFavoritesTabClick = () => {
+        fetchMyFavorites();
+    };
+
+    // 즐겨찾기 등록 API 함수
+    const postFavorites = async (poseIdList) => {
+        try {
+            const response = await fetch("http://localhost:8000/favorites", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization": "Bearer " + token, // 로그인 토큰 필요
+            },
+            body: JSON.stringify({ pose_id: poseIdList }),
+            });
+
+            if (!response.ok) {
+            throw new Error("즐겨찾기 등록 실패");
+            }
+
+            const data = await response.json();
+            console.log("즐겨찾기 등록 완료:", data.registered);
+        } catch (error) {
+            console.error("API 오류:", error.message);
+            alert("즐겨찾기 등록 중 문제가 발생했습니다.");
         }
+    };
+
+    // 즐겨찾기 등록
+    const favGuideSelect = async () => {
+    if (selectFav === true) {
+        if (selectedStretchingList.length === 0) {
+            alert("스트레칭이 없습니다.");
+        return;
+        }
+        const poseIdList = selectedStretchingList.map((pose) => pose.id);
+        await postFavorites(poseIdList);
+    }
+    };
+
+    useEffect(() => {
+    if (selectFav === true) {
+        favGuideSelect();
+    }
     }, [selectFav]);
 
+    // 즐겨찾기 삭제
+    const handleDeleteStretching = async (stretching) => {
+        try {
+            const res = await fetch(`http://localhost:8000/favorites/${stretching.pose_id}`, {
+                method: "DELETE",
+                headers: {
+                    "Authorization": "Bearer " + token,
+                },
+            });
+
+            if (!res.ok) throw new Error("삭제 실패");
+
+            // 성공적으로 삭제되었으면 프론트 목록도 업데이트
+            const updated = myFavorites.filter(fav => fav.pose_id !== stretching.pose_id);
+            setMyFavorites(updated);
+
+            console.log("✅ 즐겨찾기 삭제 완료");
+        } catch (err) {
+            console.error("❌ 즐겨찾기 삭제 오류:", err.message);
+            alert("삭제 중 오류가 발생했습니다.");
+        }
+    };
+
     return(
-        <div className="w-full h-screen bg-[#E5D2D2]">
+        <div className="w-full h-screen min-w-[800px] bg-[#E5D2D2]">
             <TopBar />
             <div className="header mt-4 ml-12 mb-4">
                 <h1 className="mb-4 font-bold text-3xl text-[#522B2B]">가이드 루틴을 골라볼까요?</h1>
@@ -261,7 +320,7 @@ function SelectGuidePage({ setStretchingOrder, setCompletedStretchings }) {
                                 </button>
                             </li>
                             <li>
-                                <button className={`${mainCategory === '내 스트레칭' ? 'text-[#1D1D1D]' : 'text-[#7C7B7B]'}`} onClick={() =>{handleMainCategory('내 스트레칭')}}>
+                                <button className={`${mainCategory === '내 스트레칭' ? 'text-[#1D1D1D]' : 'text-[#7C7B7B]'}`} onClick={() =>{handleMainCategory('내 스트레칭'); handleFavoritesTabClick();}}>
                                     내 스트레칭
                                 </button>
                             </li>
@@ -270,8 +329,11 @@ function SelectGuidePage({ setStretchingOrder, setCompletedStretchings }) {
                             {showSubCategories()}    
                         </ul>
                     </div>
-                    <ul className="stretchingList p-2 flex flex-wrap items-start">
-                        {showStretchingList(stretchingList)} 
+                    <ul className="stretchingList p-2 flex flex-wrap items-start">          
+                          {mainCategory === "내 스트레칭"
+                            ? showStretchingList(myFavorites)
+                            : showStretchingList(stretchingList)
+                        }
                     </ul>
                 </div>
                 <div className="selectedPart w-[30%]">

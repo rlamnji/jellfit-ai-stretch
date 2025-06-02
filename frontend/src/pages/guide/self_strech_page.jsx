@@ -1,16 +1,17 @@
 
 import CameraStretchingScreen from "../../components/camera_stretching/camera_stretching_screen";
-import TopBar from "../../components/top_bar";
+import playImg from "../../assets/images/icons/play.png";
+import questionImg from "../../assets/images/icons/question_mark.png";
 import SoundBtn from "../../components/buttons/sound_btn";
 import { useParams, useNavigate } from "react-router-dom";
-import { useEffect, useState } from "react";
+import { use, useEffect, useState } from "react";
 import { startOrResumeSession, pauseSession, endSession } from "../../utils/guide_timer";
 import arrowLeft from '../../assets/images/icons/arrow_left.png';
 
 import ModalManager from "../../components/stretching/modal/modal_manager";
+import LongTimer from "../../components/stretching/long_timer";
+import ShortTimer from "../../components/stretching/short_timer";
 
-//좌우 여부 DB에 추가해서 해야하나?
-//좌우 여부에 대한 것 아직 반영 안함. 추후 구현 해야 함.
 function SelfStretchPage({ stretchingOrder, completedStretchings, setCompletedStretchings }) {
 
     const navigate = useNavigate();
@@ -20,7 +21,6 @@ function SelfStretchPage({ stretchingOrder, completedStretchings, setCompletedSt
 
     const sendFrameTime = 300; // 0.3초마다 프레임 전송
     const [currentStretchingTime, setCurrentStretchingTime] = useState(0);
-    const [isStretching, setIsStretching] = useState(false);
     const [currentRepeat, setCurrentRepeat] = useState(0);
 
     // 스트레칭 모달
@@ -29,22 +29,20 @@ function SelfStretchPage({ stretchingOrder, completedStretchings, setCompletedSt
     const [duration, setDuration] = useState(0);
     const [pendingJelly, setPendingJelly] = useState(null);
 
-    const handleIsStretching = (isStretching) => {
-        setIsStretching(isStretching);
+    const [leftElapsedTime, setLeftElapsedTime] = useState(0); // 왼쪽 스트레칭 시간,좌우없으면 왼쪽으로.
+    const [rightElapsedTime, setRightElapsedTime] = useState(0); // 오른쪽 스트레칭 시간
 
-        if (isStretching) {
-        if (stretching?.time != null) {
-            setCurrentStretchingTime((prev) => prev + sendFrameTime);
-        } else if (stretching?.repeatCount != null) {
-            setCurrentRepeat((prev) => prev + 1);
-        }
-        }
-    };
+    const [isCompleted, setIsCompleted] = useState(false); // 모든 스트레칭 완료 여부
 
-    /*const handleIsStretching = async (isCompleted) => {
+
+
+
+    // 스트레칭 전체 완료할 경우에 대한 처리
+    const handleIsCompleted = async (isCompleted) => {
+        console.log("모든 스트레칭 완료 여부:", isCompleted);
         if (isCompleted) {
             const currentIdx = stretchingOrder.indexOf(Number(stretchingId));
-
+            // 스트레칭 완료되면 해당 자세 총 시간 계산해서 누적.
             if (currentIdx === stretchingOrder.length - 1) {
             console.log("모든 완료된 스트레칭", completedStretchings);
             const result = endSession(); // 종료 시간 계산
@@ -67,7 +65,7 @@ function SelfStretchPage({ stretchingOrder, completedStretchings, setCompletedSt
             navigate(`/guide/video/${nextStretchingId}`);
             }
         }
-    };*/
+    };
 
 
     useEffect(() => {
@@ -75,8 +73,8 @@ function SelfStretchPage({ stretchingOrder, completedStretchings, setCompletedSt
 
         async function fetchStretchingData() {
             const data = await getStretchingData(stretchingId);
-            console.log("스트레칭 id", stretchingId)
-            console.log("스트레칭 응답 데이터:", data);
+            console.log("스트레칭 id", stretchingId);
+            console.log("스트레칭 데이터", data);
             setStretching(data);
 
             // 스트레칭 응답 데이터가 스트레칭 하나당 각각 들어와서 이를 배열로 묶음
@@ -154,18 +152,18 @@ function SelfStretchPage({ stretchingOrder, completedStretchings, setCompletedSt
     // 스트레칭 데이터 조회
     async function getStretchingData(stretchingId) {
         const res = await fetch(`http://localhost:8000/guide/stretching/${stretchingId}`, {
-        method: "GET",
-        headers: {
-            "Content-Type": "application/json",
-        },
+            method: "GET",
+            headers: {
+                "Content-Type": "application/json",
+            },
         });
 
         if (res.ok) {
-        const data = await res.json();
-        return data;
+            const data = await res.json();
+            return data;
         } else {
-        console.error("스트레칭 데이터를 가져오지 못했습니다.");
-        return null;
+            console.error("스트레칭 데이터를 가져오지 못했습니다.");
+            return null;
         }
     }
 
@@ -261,109 +259,128 @@ function SelfStretchPage({ stretchingOrder, completedStretchings, setCompletedSt
             return null;
         }
     }
-    
-    return (
-        <div className="w-full h-full flex flex-col items-center bg-space">
 
-            {/*<TopBar/> ==> (05.16_rlamnji) 뒤로가기 컴포에 아예 Link가 있어서 setModalType 설정이 안되더라고!*/}
-            <div className='w-full h-14 flex justify-between'>      
+    function handleElapsedTime(currentSide, elapsedTime) {
+
+        if (currentSide === "left") {
+            setLeftElapsedTime(elapsedTime);
+
+        } else if (currentSide === "right") {
+            setRightElapsedTime(elapsedTime);
+
+        } else { //좌우없는 스트레칭의 경우
+            setLeftElapsedTime(elapsedTime);
+        }
+    }
+
+    const handleNextOrComplete = async () => {
+        const currentIdx = stretchingOrder.indexOf(Number(stretchingId));
+
+        if (currentIdx === stretchingOrder.length - 1) {
+            console.log("모든 완료된 스트레칭", completedStretchings);
+            const result = endSession(); // 종료 시간 계산
+            console.log("현재 누적 시간", result.duration, "초");
+            setDuration(result.duration); 
+
+            await timeUpdate(result.duration); // 누적 시간 기록 api 호출
+            setModalType("complete"); // 완료 모달 띄우기
+            await recordUpdate(completedStretchings); // 누적 횟수 기록 api 호출
+            
+            // 캐릭터 획득 가능한지 조건 검사 api
+            const charResult = await checkGetCharacters();
+            
+            if (charResult?.unlocked_character_ids?.length > 0) {
+                setSelectedIds(charResult.unlocked_character_ids);  // pose_id 배열 저장
+                console.log("획득 가능한 캐릭터 아이디", charResult.unlocked_character_ids);
+                setPendingJelly(charResult.unlocked_character_ids);
+            }
+
+            // 캐릭터 등록 api
+            postCharacters(charResult.unlocked_character_ids);
+
+
+        } else {
+            const nextStretchingId = stretchingOrder[currentIdx + 1];
+            navigate(`/guide/video/${nextStretchingId}`);
+        }
+    }
+
+    return (
+        <div className="w-full h-screen overflow-hidden flex flex-col items-center bg-space">
+
+            <div className='topBar w-full h-14 flex justify-between'>      
                 <img src={arrowLeft} className="w-8 h-8 m-4 cursor-pointer" 
                     onClick={() => {setModalType('confirmQuit'); }} />
                 <SoundBtn />
             </div>
 
-
-                <div className="relative group inline-block">
-                    <div className="bg-[#F7EDAD] px-3 py-1 rounded-2xl cursor-pointer font-bold" onClick={()=>navigate("/condition/:id")}>
-                        인식 오류?
-                    </div>
-
-                    {/* 툴팁 */}
-                    <div className="absolute left-1/2 -translate-x-1/2 mt-2 w-max px-2 py-2 leading-relaxed bg-black text-white text-sm rounded opacity-0 group-hover:opacity-100 transition-opacity z-10">
-                        스트레칭 중 자세 인식이 잘 되지 않는다면<br />
-                        <b className="text-[16px]">클릭하여 캘리브레이션 화면</b>으로 이동해<br />
-                        기준 자세를 다시 맞춰주세요.
-                    </div>
-                </div>
-        
-
-            <div className="text-xl font-bold mt-4 text-center mx-auto w-max">{stretching.name}</div>
-            {stretching.time != null && (
-                <>
-                <div className="mt-4">현재 시간 / 전체 시간</div>
-                <div>
-                    00 : {Math.floor(currentStretchingTime / 1000)} / 00 :{" "}
-                    {stretching.time}
-                </div>
-                </>
-            )}
-
-            {stretching.repeatCount != null && (
-                <>
-                <div className="mt-4">반복 횟수</div>
-                <div>
-                    {currentRepeat} / {stretching.repeatCount}
-                </div>
-                </>
-            )}
-
+            <div className="header flex items-center justify-center w-full h-[20%] border-white">
+                { stretching.haveDirection ?
+                    <LongTimer 
+                        className="flex items-center justify-center relative w-[320px] h-[120px]"
+                        leftElapsedTime={leftElapsedTime} rightElapsedTime={rightElapsedTime} totalTime={stretching.time}
+                    /> 
+                    : 
+                    <ShortTimer 
+                        className="flex items-center justify-center relative w-[240px] h-[144px]"
+                        leftElapsedTime={leftElapsedTime} totalTime={stretching.time}
+                    />
+                }
+            </div>
+            <div className="main w-full h-full flex items-center justify-center relative pt-2 pb-12 mb-4">
 
                 <CameraStretchingScreen
-                    handleIsStretching={handleIsStretching}
+                    handleIsCompleted={handleIsCompleted}
+                    handleElapsedTime={handleElapsedTime}
                     sendFrameTime={sendFrameTime}
                     stretchingId = {stretchingId}
                 />
 
+                {/* 임시용 버튼 == 넘어가기> 버튼 */}
+
+                {/* ✅ 임시용 버튼 */}
+                {/* 임시용 버튼을 없애고 true --> 끝 --> 모달창 까지 연결해야함*/}
+                {/* 로직은 backend */}
+                {/* 최종 완료는 true를 받았을 때 / 임시버튼은 현재까지 한대로만 */}
+
+                {/* 서버에서 true를 받았을 시 동작 완료 */}
 
 
+                <ModalManager modalType={modalType} setModalType={setModalType} completedStretchings={completedStretchings} duration={duration} pendingJelly={pendingJelly} setPendingJelly={setPendingJelly}/>
+                <div className="buttonArea w-[56%] h-auto absolute top-5 flex items-center gap-4">
+                    <button 
+                        className="w-24 h-8 flex items-center justify-center bg-[#FBF2E6] text-[#463C3C] font-semibold rounded-2xl shadow-lg"
+                        onClick={()=>{navigate(-1)}}
+                    >
+                        <img src={playImg} alt="재생버튼 아이콘" className="w-4 h-4 mr-1"/>
+                        다시보기
+                    </button>
+                    <div className="relative group w-24 h-8">
+                        <button 
+                            className="w-full h-full flex items-center cursor-pointer justify-center bg-[#FBF2E6] text-[#463C3C] font-semibold rounded-2xl shadow-lg"
+                            onClick={() => navigate("/condition/:id")}  // 이동 경로 적절히 수정
+                        >
+                            <img src={questionImg} alt="물음표 아이콘" className="w-4 h-4 mr-1" />
+                            인식오류
+                        </button>
 
-            {/* ✅ 임시용 버튼 */}
-            {/* 임시용 버튼을 없애고 true --> 끝 --> 모달창 까지 연결해야함*/}
-            {/* 로직은 backend */}
-            {/* 최종 완료는 true를 받았을 때 / 임시버튼은 현재까지 한대로만 */}
-
-            {/* 서버에서 true를 받았을 시 동작 완료 */}
-
-            <button
-                className="mt-4 px-4 py-2 bg-gray-600 text-white rounded hover:bg-gray-700"
-                onClick={async () => {
-                    const currentIdx = stretchingOrder.indexOf(Number(stretchingId));
-
-                    if (currentIdx === stretchingOrder.length - 1) {
-                        console.log("모든 완료된 스트레칭", completedStretchings);
-                        const result = endSession(); // 종료 시간 계산
-                        console.log("현재 누적 시간", result.duration, "초");
-                        setDuration(result.duration); 
-
-                        await timeUpdate(result.duration); // 누적 시간 기록 api 호출
-                        setModalType("complete"); // 완료 모달 띄우기
-                        await recordUpdate(completedStretchings); // 누적 횟수 기록 api 호출
-                        
-                        // 캐릭터 획득 가능한지 조건 검사 api
-                        const charResult = await checkGetCharacters();
-                        
-                        if (charResult?.unlocked_character_ids?.length > 0) {
-                            setSelectedIds(charResult.unlocked_character_ids);  // pose_id 배열 저장
-                            console.log("획득 가능한 캐릭터 아이디", charResult.unlocked_character_ids);
-                            setPendingJelly(charResult.unlocked_character_ids);
-                        }
-
-                        // 캐릭터 등록 api
-                        postCharacters(charResult.unlocked_character_ids);
-
-
-                    } else {
-                        const nextStretchingId = stretchingOrder[currentIdx + 1];
-                        navigate(`/guide/video/${nextStretchingId}`);
-                    }
-                }}
-                >
-                다음으로 넘어가기 (임시)
-            </button>
-
-            <ModalManager modalType={modalType} setModalType={setModalType} completedStretchings={completedStretchings} duration={duration} pendingJelly={pendingJelly} setPendingJelly={setPendingJelly}/>
+                        {/* 툴팁 */}
+                        <div className="absolute top-full left-1/2 -translate-x-1/2 mt-2 w-max px-2 py-2 leading-relaxed bg-black text-white text-sm rounded opacity-0 group-hover:opacity-100 transition-opacity z-10">
+                            스트레칭 중 자세 인식이 잘 되지 않는다면<br />
+                            <b className="text-[16px]">클릭하여 캘리브레이션 화면</b>으로 이동해<br />
+                            기준 자세를 다시 맞춰주세요.
+                        </div>
+                    </div>                    
+                    <button 
+                        className="w-24 h-8 flex items-center justify-center bg-[#FBF2E6] text-[#463C3C] font-semibold rounded-2xl shadow-lg"
+                        onClick= {handleNextOrComplete}
+                    >
+                        넘어가기 &gt;
+                    </button>
+                </div>
+            </div>
         </div>
     );
-    }
+}
 
     export default SelfStretchPage;

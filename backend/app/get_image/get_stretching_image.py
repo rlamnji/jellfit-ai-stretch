@@ -1,3 +1,5 @@
+from pydantic import BaseModel
+from typing import Union, Optional
 from fastapi import APIRouter, UploadFile, File, HTTPException, Form, Depends
 from fastapi.responses import JSONResponse
 import numpy as np
@@ -9,6 +11,15 @@ from db.models import User, Pose
 # from dependencies import get_current_user
 
 router = APIRouter(prefix="/guide/analyze", tags=["Stretching_Analyze"])
+
+class StretchingAnalyzeResult(BaseModel):
+    name: str
+    currentSide: Optional[str] = None  # None 허용
+    count: int
+    elapsedTime: float
+    isCompleted: bool
+    feedbackMsg: Union[str, list[str]]
+    feedbackType: Union[str, list[str]]
 
 # pose_id에 따른 StretchTracker 모델 이름 매핑
 POSE_ID_TO_EXERCISE = {
@@ -27,7 +38,7 @@ POSE_ID_TO_OUTLIER_THRESHOLD = {
     1: -0.25,  # 등_팔꿈치
     2: -0.1,   # 가슴_T자
     3: -0.1,  # 가슴_Y자
-    4: -0.14,  # 등_날개뼈
+    4: -0.13,  # 등_날개뼈
     5: -0.2,   # 등_위
     6: -0.2,   # 등_앞
     7: -0.2,   # 등_날개뼈
@@ -64,4 +75,15 @@ async def analyze_image(
     result = tracker.is_performing(image, outlier_threshold=outlier_threshold)
     print("get_stretching_image에서 is_performing 사용 결과:", result)
 
-    return {"completed": bool(result.get("completed", False))}
+    if result.get("completed") is True:
+        tracker_cache.pop(exercise, None)
+
+    return StretchingAnalyzeResult(
+        name=result.get("exercise", '정보없음'),
+        currentSide=result.get("current_side") or "정보없음",  # None 방지
+        elapsedTime=result.get("elapsed_time", 0),
+        count=list(result.get("counts", {None: 0}).values())[0],  # ✅ dict → int 값만 추출
+        isCompleted=True if result.get("completed") is True else False,
+        feedbackMsg=result.get("feedback_messages", '정보없음'),
+        feedbackType=result.get("feedback_type", '정보없음')
+    )

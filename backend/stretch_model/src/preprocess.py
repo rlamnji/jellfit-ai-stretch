@@ -4,7 +4,7 @@ import glob
 import argparse
 import pandas as pd
 import yaml
-from utils import load_config, segment_reps, segment_holds, segment_reps_by_peaks, extract_features
+from utils import load_config, segment_holds, extract_features
 from typing import Union, Dict, List, Tuple
 
 
@@ -41,21 +41,21 @@ def process_exercise(df_filt, base, exercise, cfg, out_dir, fps):
             # hold + direction
             segments_by_direction = segment_holds(feat_df, cfg, fps)
             process_direction_segments(feat_df, segments_by_direction, base, exercise, out_dir, fps, ctype)
-        else:
-            # rep + direction
-            arr = feat_df[cycles_cfg['feature']].values
-            segments = segment_reps_by_peaks(arr, cycles_cfg, fps)
-            process_direction_reps(feat_df, segments, base, exercise, out_dir, fps, cfg)
+        # else:
+        #     # rep + direction
+        #     arr = feat_df[cycles_cfg['feature']].values
+        #     segments = segment_reps_by_peaks(arr, cycles_cfg, fps)
+        #     process_direction_reps(feat_df, segments, base, exercise, out_dir, fps, cfg)
     else:
         if ctype == 'hold':
             # hold only
             segments = segment_holds(feat_df, cfg, fps)
             process_hold_segments(feat_df, segments, base, exercise, out_dir, fps)
-        else:
-            # rep only
-            arr = feat_df[cycles_cfg['feature']].values
-            segments = segment_reps_by_peaks(arr, cycles_cfg, fps)
-            process_rep_segments(feat_df, segments, base, exercise, out_dir, fps, cfg)
+        # else:
+        #     # rep only
+        #     arr = feat_df[cycles_cfg['feature']].values
+        #     segments = segment_reps_by_peaks(arr, cycles_cfg, fps)
+        #     process_rep_segments(feat_df, segments, base, exercise, out_dir, fps, cfg)
 
 
 def process_direction_segments(feat_df, segments_by_direction, base, exercise, out_dir, fps, ctype):
@@ -99,44 +99,6 @@ def process_direction_segments(feat_df, segments_by_direction, base, exercise, o
         print(f"  Saved summary: {exercise}/{sum_name}")
 
 
-def process_direction_reps(feat_df, segments, base, exercise, out_dir, fps, cfg):
-    """Process rep segments with direction detection."""
-    summaries = []
-    for idx, (s, e) in enumerate(segments, start=1):
-        segment_df = feat_df.iloc[s:e].reset_index(drop=True)
-        
-        # 방향 판단
-        eye_diff = segment_df['eye_level_diff'].mean()
-        shoulder_diff = segment_df['shoulder_level_diff'].mean()
-        
-        if eye_diff > 0 and shoulder_diff > 0:
-            direction = 'left'
-        elif eye_diff < 0 and shoulder_diff < 0:
-            direction = 'right'
-        else:
-            direction = 'neutral'
-        
-        feat_name = f"{base}_{direction}_rep{idx}_features.csv"
-        segment_df.to_csv(os.path.join(out_dir, feat_name), index=False)
-        print(f"  Saved: {exercise}/{feat_name}")
-        
-        summ = {'segment': idx, 'direction': direction}
-        for agg in cfg.get('aggregate', []):
-            agg_name = agg['name']
-            if agg['type'] == 'amplitude':
-                vals = segment_df[agg['target_feature']]
-                summ[agg_name] = vals.max() - vals.min()
-            elif agg['type'] == 'duration':
-                summ[agg_name] = (e - s) / fps
-        summaries.append(summ)
-    
-    if summaries:
-        sum_df = pd.DataFrame(summaries)
-        sum_name = f"{base}_rep_summary.csv"
-        sum_df.to_csv(os.path.join(out_dir, sum_name), index=False)
-        print(f"  Saved summary: {exercise}/{sum_name}")
-
-
 def process_hold_segments(feat_df, segments, base, exercise, out_dir, fps):
     """Process hold segments without direction."""
     summaries = []
@@ -155,32 +117,6 @@ def process_hold_segments(feat_df, segments, base, exercise, out_dir, fps):
     if summaries:
         sum_df = pd.DataFrame(summaries)
         sum_name = f"{base}_hold_summary.csv"
-        sum_df.to_csv(os.path.join(out_dir, sum_name), index=False)
-        print(f"  Saved summary: {exercise}/{sum_name}")
-
-
-def process_rep_segments(feat_df, segments, base, exercise, out_dir, fps, cfg):
-    """Process rep segments without direction."""
-    summaries = []
-    for idx, (s, e) in enumerate(segments, start=1):
-        segment_df = feat_df.iloc[s:e].reset_index(drop=True)
-        feat_name = f"{base}_rep{idx}_features.csv"
-        segment_df.to_csv(os.path.join(out_dir, feat_name), index=False)
-        print(f"  Saved: {exercise}/{feat_name}")
-        
-        summ = {'segment': idx}
-        for agg in cfg.get('aggregate', []):
-            agg_name = agg['name']
-            if agg['type'] == 'amplitude':
-                vals = segment_df[agg['target_feature']]
-                summ[agg_name] = vals.max() - vals.min()
-            elif agg['type'] == 'duration':
-                summ[agg_name] = (e - s) / fps
-        summaries.append(summ)
-    
-    if summaries:
-        sum_df = pd.DataFrame(summaries)
-        sum_name = f"{base}_rep_summary.csv"
         sum_df.to_csv(os.path.join(out_dir, sum_name), index=False)
         print(f"  Saved summary: {exercise}/{sum_name}")
 

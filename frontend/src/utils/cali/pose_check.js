@@ -66,29 +66,25 @@ export const isTPoseAligned = (landmarks) => {
   const getY = (idx) => landmarks[idx]?.y ?? 0;
 
   const noseX = getX(0);
+
   const lShoulderX = getX(11);
   const rShoulderX = getX(12);
   const lShoulderY = getY(11);
   const rShoulderY = getY(12);
-  const lElbowY = getY(15);
-  const rElbowY = getY(16);
+
+  const lElbowY = getY(13);
+  const rElbowY = getY(14);
 
   const shoulderMidX = (lShoulderX + rShoulderX) / 2;
   const shoulderAvgY = (lShoulderY + rShoulderY) / 2;
   const elbowAvgY = (lElbowY + rElbowY) / 2;
 
-  // 몸통 중심이 화면 중앙 근처 (화면 기준 X: 0.5)
-  const isBodyCentered = Math.abs(shoulderMidX - 0.5) < 0.05;
+  const isBodyCentered = Math.abs(shoulderMidX - 0.5) < 0.08;           // ↑ 0.07 → 0.08
+  const isShoulderLevel = Math.abs(lShoulderY - rShoulderY) < 0.07;     // ↑ 0.05 → 0.07
+  const isElbowLevel = Math.abs(lElbowY - rElbowY) < 0.08;              // ↑ 0.06 → 0.08
+  const isArmHorizontal = Math.abs(shoulderAvgY - elbowAvgY) < 0.08;    // ↑ 0.07 → 0.08
+  const isNoseCentered = Math.abs(noseX - shoulderMidX) < 0.05;         // ↑ 0.04 → 0.05
 
-  // 어깨와 팔이 수평 (어깨와 팔꿈치 Y 값이 유사하고 좌우 대칭)
-  const isShoulderLevel = Math.abs(lShoulderY - rShoulderY) < 0.03;
-  const isElbowLevel = Math.abs(lElbowY - rElbowY) < 0.03;
-  const isArmHorizontal = Math.abs(shoulderAvgY - elbowAvgY) < 0.05;
-
-  // 코가 어깨 중심선에 가까움 (고개 기울이거나 틀어졌는지 확인)
-  const isNoseCentered = Math.abs(noseX - shoulderMidX) < 0.03;
-
-  // 디버깅 로그
   if (!isBodyCentered) console.log("❌ 몸통이 화면 중앙에서 벗어남");
   if (!isShoulderLevel) console.log("❌ 어깨 수평 아님");
   if (!isElbowLevel) console.log("❌ 팔꿈치 수평 아님");
@@ -103,3 +99,4 @@ export const isTPoseAligned = (landmarks) => {
     isNoseCentered
   );
 };
+

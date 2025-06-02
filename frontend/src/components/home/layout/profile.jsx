@@ -9,6 +9,9 @@ function ProfileCard() {
 
   const navigate = useNavigate();
   const [userData, setUserData] = useState(null);
+  const currentDate_apiType = new Date().toISOString().split("T")[0];
+  const [usageTime, setUsageTime] = useState("로딩중...");
+  const token = sessionStorage.getItem('accessToken');
   
   useEffect(()=>{
     // 사용자 정보 조회
@@ -35,6 +38,38 @@ function ProfileCard() {
 
   },[])
 
+  useEffect(() => {
+    fetchStretchingTimeByDate(currentDate_apiType);
+  }, []);
+
+
+  // 스트레칭 총 누적시간 api (오늘날짜)
+  const fetchStretchingTimeByDate = async (date) => {
+        try {
+            const response = await fetch(`http://localhost:8000/users/stretch-time?date=${date}`, {
+                method: "GET",
+                headers: {
+                    "Authorization": "Bearer " + token,  // 필요한 경우
+                    "Content-Type": "application/json",
+                },
+            });
+
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+
+            const data = await response.json();
+            setUsageTime(data.usage_time);
+            console.log("📅 조회한 날짜:", date);
+            console.log("⏱️ 스트레칭 시간:", data.usage_time + "초");
+
+            return data;  // 필요하면 반환
+
+        } catch (error) {
+            console.error("⚠️ 날짜별 스트레칭 시간 조회 실패:", error);
+        }
+    };
+
 
   return (
   <div className="relative w-[300px] h-[300px] p-2">
@@ -56,7 +91,7 @@ function ProfileCard() {
       {/* 오른쪽: 스트레칭 정보 */}
       <div className="flex flex-col items-center justify-center">
         <div className="text-[14px] text-[#969696]">오늘의 스트레칭 시간</div>
-        <div className="text-[20px] font-bold">12m 32s</div>
+        <div className="text-[20px] font-bold">{Math.floor(usageTime / 60)}분 {usageTime % 60}초</div> 
         <div className="bg-gray-300 h-[1px] w-[100px] my-2"></div>
         {userData ? (<div className="text-[12px] text-[#969696] text-center">{userData.introduction}</div>) : <div className="text-[12px] text-[#969696] text-center">로딩중</div>}
       </div>
