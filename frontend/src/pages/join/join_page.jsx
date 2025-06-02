@@ -6,6 +6,7 @@ import imgCloudLeft from '../../assets/images/etc/cloud_left.png';
 import imgCloudRight from '../../assets/images/etc/cloud_right.png';
 import TopBar from '../../components/top_bar';
 import background from '../../assets/images/etc/basic_background2.png';
+import SuccessModal from '../../components/success_modal';
 
 
 
@@ -17,6 +18,7 @@ function JoinPage (){
     const [passwordConfirm, setPasswordConfirm] = useState('');
     const [nickname, setNickname] = useState('');
     const isValid = id.length >= 1 && password.length >= 1 && passwordConfirm === password && nickname.length >= 1;
+    const [showSuccessModal, setShowSuccessModal] = useState(false);
 
     const handleIdInput = (value) =>{
         setId(value);
@@ -54,15 +56,26 @@ function JoinPage (){
     }
     const handleJoin = async (e) => {
         if (!isValid){
-            e.preventDefault();
+          e.preventDefault();
+          return;
         }
+      
         const res = await sendUserJoinData(id, password, nickname);
+        if (!res) return; // 실패한 경우 빠르게 종료
+      
         const { msg, userId, access_token } = await res.json();
         console.log(`${msg} userId : ${userId}`);
         console.log("access_token:", access_token);
-        sessionStorage.setItem("accessToken", access_token); //토큰 저장.
-        navigate(`/condition/${userId}`); //캘리브레이션 페이지로 이동.
-    };
+      
+        sessionStorage.setItem("accessToken", access_token);
+      
+        setShowSuccessModal(true);
+      
+        setTimeout(() => {
+          navigate(`/condition/${userId}`);
+        }, 1500);
+      };
+      
 
     return (
         <div>
@@ -93,16 +106,16 @@ function JoinPage (){
                         <div
                             className={`loginBtn w-[266px] h-[60px] mt-10 mb-4 flex justify-center items-center rounded-[40px] 
                             ${isValid ? 'bg-button-color' : 'bg-disabled-button-color cursor-not-allowed'}`}
-                        >
-                            <button
+                                                        >
+                                <button
                                 className={`font-semibold text-white text-xl ${isValid ? '' : 'pointer-events-none'}`}
                                 type='submit'
-                            >
+                                >
                                 계정 생성하기
-                            </button>
+                                </button>
                         </div>
                     </form>
-
+                    {showSuccessModal && <SuccessModal message="회원가입이 완료되었습니다!" />}            
                     <img className="absolute w-[600px] h-[200px] -left-60 top-40" src={imgCloudLeft} alt="왼쪽 구름" />
                     <img className="absolute w-[500px] h-[200px] -right-80 -top-10" src={imgCloudRight} alt="오른쪽 구름" />
                 </div>
