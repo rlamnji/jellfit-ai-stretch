@@ -7,7 +7,7 @@ from typing import Dict, List, Tuple
 from collections import deque
 from pathlib import Path
 import pandas as pd
-from utils import extract_features
+from .utils import extract_features
 import time
 
 
@@ -37,15 +37,16 @@ class StretchTracker:
         self.frame_idx = 0
         self.hold_start_time = None  # 실제 시간 기반으로 변경
         self.counts = {}
+        self.done_sides = set()
         
         # 방향을 가지는 동작인지 판단
         self.has_direction = 'direction' in self.cfg and self.cfg['direction']
-        sides = self.cfg['direction'] if self.has_direction else [None]
+        self.sides = self.cfg['direction'] if self.has_direction else [None]
 
         # 모델 로딩
         model_dir = base_dir / "models"
         self.models = {}
-        for side in sides:
+        for side in self.sides:
             suffix = f"_{side}" if side else ""
             m_path = model_dir / f"{exercise}{suffix}_anomaly.joblib"
             s_path = model_dir / f"{exercise}{suffix}_scaler.joblib"
@@ -122,7 +123,7 @@ class StretchTracker:
                 return side
         return None
 
-    def is_performing(self, image: np.ndarray) -> Dict:
+    def is_performing(self, image: np.ndarray, outlier_threshold: float = -0.2) -> Dict:
         self.frame_idx += 1
         current_time = time.time()
         
@@ -143,8 +144,7 @@ class StretchTracker:
             return result
 
         # DataFrame으로 변환하여 임계값 검사용으로 사용
-        df = pd.DataFrame([feats])
-        feat_df = extract_features(df, self.cfg['features'])
+        feat_df = pd.DataFrame([feats])
 
         # 1) 방향 결정
         side = self.detect_direction(feats)
@@ -187,8 +187,7 @@ class StretchTracker:
                 print(f"Anomaly score: {score:.3f}")
                 
                 # 임계값 기반 판정 (조정 가능)
-                threshold = self.cfg.get('model', {}).get('anomaly_threshold', -0.2)
-                performing = score >= threshold
+                performing = score >= outlier_threshold
                 
             except AttributeError:
                 prediction = model.predict(X_scaled)[0]
@@ -229,26 +228,16 @@ class StretchTracker:
                 if self.counts[side] < self.target_count:
                     self.counts[side] += 1
                     result['counts'][side] = self.counts[side]
-                    print("방향들", self.sides) ##
-                    
+                
+                if self.counts[side] >= self.target_count:
+                    self.done_sides.add(side)
 
-                    # 해당 방향 완료 체크
-                    if self.counts[side] >= self.target_count:
-                        print(f"{side} 완료! 현재 횟수: {self.counts[side]}, 목표 횟수: {self.target_count}") ##
-                        self.done_sides.add(side)
-                        print("완료된 방향들:", self.done_sides) ##
-                        print("남은 방향들:", [s for s in self.sides if s not in self.done_sides]) ##
-
-                        # 아직 다른 방향 남아 있음
-                        remaining_sides = [s for s in self.sides if s not in self.done_sides]
-                        if remaining_sides:
-                            print("해야하는 방향 아직 남아있음") ##
+                    remaining_sides = [s for s in self.sides if s not in self.done_sides]
+                    if remaining_sides:
                             result['feedback_messages'] = ["다른 방향으로 동작해주세요!"]
-                        else:
-                            print("complete True로 변경경") ##
-                            result['completed'] = True
-                            result['feedback_messages'] = ["완료! 잘하셨습니다!"]
-                    
+                    else:
+                        result['completed'] = True
+                        result['feedback_messages'] = ["완료! 잘하셨습니다!"]
         else:
             # 자세가 틀렸을 때는 시간 초기화
             self.hold_start_time = None
@@ -256,7 +245,6 @@ class StretchTracker:
             if not result['feedback_messages']:
                 result['feedback_messages'] = ["자세를 다시 확인해주세요."]
 
-        print(result['completed']) ##
         result['feedback_type'] = self.categorize_feedback_type(
             result['feedback_messages'], 
             performing, 
