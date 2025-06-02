@@ -39,26 +39,26 @@ direction:
   left:
     eye_level_diff: 
       sign: positive  # 양수면 왼쪽
-      threshold: 0  # 최소 레벨 차이
+      threshold: 0.01  # 최소 레벨 차이
     shoulder_level_diff:
       sign: positive
-      threshold: 0.03
+      threshold: 0.01
     left_pull_distance:  # 팔꿈치를 잡은 상태 확인
-      sign: positive
-      threshold: 0.05
+      sign: negative
+      threshold: -0.5
     left_pull_alignment:
       sign: positive
       threshold: 0.05
   right:
     eye_level_diff:
       sign: negative  # 음수면 오른쪽
-      threshold: 0
+      threshold: 0.01
     shoulder_level_diff:
       sign: negative
-      threshold: 0.03
+      threshold: 0.01
     right_pull_distance: 
-      sign: positive
-      threshold: 0.05
+      sign: negative
+      threshold: -0.5
     right_pull_alignment:
       sign: positive
       threshold: 0.05
