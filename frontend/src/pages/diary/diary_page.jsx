@@ -144,7 +144,7 @@ function DiaryPage(){
                                 {detailMonthData.map((record, idx) => {
                                     const [month, day] = record.date.split('/').map(Number);
                                     const correctedDate = new Date(2025, month - 1, day);
-                                    correctedDate.setDate(correctedDate.getDate() + 1); // 하루 추가(6/2에 한 스트레칭이 6/1로 저장됨..)
+                                    correctedDate.setDate(correctedDate.getDate());
 
                                     const correctedMonth = correctedDate.getMonth() + 1;
                                     const correctedDay = correctedDate.getDate();

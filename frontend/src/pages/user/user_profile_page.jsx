@@ -33,11 +33,11 @@ function UserProfilePage() {
             </div>
 
             <div className="flex  absolute inset-0  h-[170px] top-[290px] w-[300px] left-[50px]">
-                <Symptom setIsSymptomModalOpen={setIsSymptomModalOpen}/>
+                <Terms />
             </div>
 
             <div className="flex  absolute inset-0  h-[170px] top-[480px] w-[300px] left-[50px] ">
-              <Terms />
+              <Symptom setIsSymptomModalOpen={setIsSymptomModalOpen}/>
             </div> 
 
 
