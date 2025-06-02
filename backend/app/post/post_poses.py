@@ -8,13 +8,13 @@ import pandas as pd
 
 from fastapi import APIRouter, UploadFile, File, FastAPI, Form, Depends
 from fastapi.responses import JSONResponse
-from stretch_model.src.calibrate import CalibrationProcessor
+from stretch_model.src.test_cali import TestCalibrationProcessor
 from dependencies import get_current_user
 from db.models import User
 import numpy as np
 
 router = APIRouter()
-processor = CalibrationProcessor()
+processor = TestCalibrationProcessor()
 
 # csv로 추출 함수 ????
 def extract_landmarks_to_csv(image_path: str, csv_path: str):

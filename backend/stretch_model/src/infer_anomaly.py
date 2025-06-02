@@ -7,7 +7,7 @@ from typing import Dict, List, Tuple
 from collections import deque
 from pathlib import Path
 import pandas as pd
-from utils import extract_features
+from .utils import extract_features
 import time
 
 
@@ -226,14 +226,29 @@ class StretchTracker:
             print(f"elapsed={elapsed}, min_hold={self.min_hold}")
 
             if elapsed >= self.min_hold:
-                self.counts[side] += 1
-                result['counts'][side] = self.counts[side]
-                result['completed'] = True
-                result['feedback_messages'] = ["완료! 잘하셨습니다!"]
+                if self.counts[side] < self.target_count:
+                    self.counts[side] += 1
+                    result['counts'][side] = self.counts[side]
+                    print("방향들", self.sides) ##
+                    
 
-                # 완료 후 reset
-                self.current_side = None
-                self.hold_start_time = None
+                    # 해당 방향 완료 체크
+                    if self.counts[side] >= self.target_count:
+                        print(f"{side} 완료! 현재 횟수: {self.counts[side]}, 목표 횟수: {self.target_count}") ##
+                        self.done_sides.add(side)
+                        print("완료된 방향들:", self.done_sides) ##
+                        print("남은 방향들:", [s for s in self.sides if s not in self.done_sides]) ##
+
+                        # 아직 다른 방향 남아 있음
+                        remaining_sides = [s for s in self.sides if s not in self.done_sides]
+                        if remaining_sides:
+                            print("해야하는 방향 아직 남아있음") ##
+                            result['feedback_messages'] = ["다른 방향으로 동작해주세요!"]
+                        else:
+                            print("complete True로 변경경") ##
+                            result['completed'] = True
+                            result['feedback_messages'] = ["완료! 잘하셨습니다!"]
+                    
         else:
             # 자세가 틀렸을 때는 시간 초기화
             self.hold_start_time = None
@@ -241,6 +256,7 @@ class StretchTracker:
             if not result['feedback_messages']:
                 result['feedback_messages'] = ["자세를 다시 확인해주세요."]
 
+        print(result['completed']) ##
         result['feedback_type'] = self.categorize_feedback_type(
             result['feedback_messages'], 
             performing, 
