@@ -7,7 +7,7 @@ from typing import Dict, List, Tuple
 from collections import deque
 from pathlib import Path
 import pandas as pd
-from .utils import extract_features
+from .utils import extract_features, load_user_calibration
 import time
 
 
@@ -75,7 +75,7 @@ class StretchTracker:
         # 추적 결과 저장
         self.landmark_history = []
 
-    def extract_landmarks(self, image: np.ndarray) -> Dict[str, float] | None:
+    def extract_landmarks(self, image: np.ndarray, user_id : int) -> Dict[str, float] | None:
         """
         한 프레임에서 상체 랜드마크를 뽑아 config에 정의된 feature를 계산
         """
@@ -99,10 +99,11 @@ class StretchTracker:
             row[f'x{idx}'], row[f'y{idx}'], row[f'z{idx}'] = coords
         df = pd.DataFrame([row])
 
+        
         feat_df = extract_features(
             df,
             self.feature_defs,
-            calibration=self.calibration,
+            calibration=load_user_calibration(user_id),
             z_scale=self.z_scale
         )
 
@@ -123,11 +124,11 @@ class StretchTracker:
                 return side
         return None
 
-    def is_performing(self, image: np.ndarray, outlier_threshold: float = -0.2) -> Dict:
+    def is_performing(self, user_id : int, image: np.ndarray, outlier_threshold: float = -0.2) -> Dict:
         self.frame_idx += 1
         current_time = time.time()
         
-        feats = self.extract_landmarks(image)
+        feats = self.extract_landmarks(image, user_id)
 
         result = {
             'exercise': self.exercise,
