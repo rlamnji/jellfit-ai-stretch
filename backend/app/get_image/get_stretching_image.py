@@ -35,7 +35,7 @@ POSE_ID_TO_EXERCISE = {
 POSE_ID_TO_OUTLIER_THRESHOLD = {
     1: 0,  # 등_팔꿈치 
     2: -0.04,   # 가슴_T자 O
-    3: -0.02,  # 가슴_Y자 O
+    3: 0,  # 가슴_Y자 O
     4: -0.13,  # 등_날개뼈 O
     5: 0,   # 등_위 O
     6: 0,   # 목_젖히기 O
