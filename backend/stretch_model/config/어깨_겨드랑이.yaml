@@ -91,7 +91,7 @@ direction:
       sign: negative
       threshold: -0.1
       
-    right_Lhand_eye_y_diff:
+    right_Rhand_eye_y_diff:
       sign: positive
       threshold: 0.05
     right_Rhand_Lhand_y_diff:
