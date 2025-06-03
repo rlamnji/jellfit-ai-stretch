@@ -7,35 +7,30 @@ from typing import Dict, List, Tuple
 from collections import deque
 from pathlib import Path
 import pandas as pd
-
 from .utils import extract_features, load_user_calibration
 import time
 
 
-
 class StretchTracker:
     """
-    실시간 스트레칭 추적기 + 이상 탐지 모델 연동
-    - 연속 landmark 특징을 모델에 입력하여 수행 여부 판단
+    실시간 스트레칭 추적기 + 프레임별 이상 탐지 모델 연동
+    - 각 프레임을 개별적으로 모델에 입력하여 올바른 자세인지 판단
     """
 
     def __init__(self, exercise: str, frame_interval_ms: int = 30):
-        # stretch_model/
         base_dir = Path(__file__).resolve().parent.parent
 
-        # config 로드 (yaml)
-        cfg_path = base_dir / "config" / f"{exercise}.yaml" # config 파일 경로
+        # config 로드
+        cfg_path = base_dir / "config" / f"{exercise}.yaml"
         with cfg_path.open(encoding="utf-8") as f:
-            self.cfg = yaml.safe_load(f) # config 파일의 yaml을 읽어옴
+            self.cfg = yaml.safe_load(f)
         
-        self.exercise = exercise # 운동 이름
-        self.frame_interval_ms = frame_interval_ms # 초당 프레임 수 -> 운동 지속 시간(초) 계산할 때 사용
+        self.exercise = exercise
+        self.frame_interval_ms = frame_interval_ms
 
-        # threshold (yaml에서 보고 가져옴)
-        '''추후 최소 시간이 없는 경우도 추가해야 할 수도 있음'''
-        self.min_hold = self.cfg['thresholds']['min_hold_duration_sec'] # 최소 유지 시간
-        self.target_count = self.cfg['cycles']['count'] # 목표 반복 횟수
-        self.required_window = self.cfg.get('model', {}).get('window_size', 10) # 필요한 윈도우 크기 (모델에 따라 다름, 기본값 10)
+        # threshold
+        self.min_hold = self.cfg['thresholds']['min_hold_duration_sec']
+        self.target_count = self.cfg['cycles']['count']
 
         # 상태 변수
         self.current_side = None
@@ -43,19 +38,15 @@ class StretchTracker:
         self.hold_start_time = None  # 실제 시간 기반으로 변경
         self.counts = {}
         self.done_sides = set()
-
         
-        # 모델 로딩 전 방향을 가지는 동작인지 판단 후 결과에 따라 다른 방식으로 로딩
+        # 방향을 가지는 동작인지 판단
         self.has_direction = 'direction' in self.cfg and self.cfg['direction']
         self.sides = self.cfg['direction'] if self.has_direction else [None]
 
         # 모델 로딩
-        model_dir = base_dir / "models" # 모델 경로
+        model_dir = base_dir / "models"
         self.models = {}
         for side in self.sides:
-
-            # 만약 방향이 없으면 model filenames 에 "_<side>"라는 suffix(접미사)가 생략됨 
-
             suffix = f"_{side}" if side else ""
             m_path = model_dir / f"{exercise}{suffix}_anomaly.joblib"
             s_path = model_dir / f"{exercise}{suffix}_scaler.joblib"
@@ -64,7 +55,6 @@ class StretchTracker:
                     "model":  joblib.load(m_path),
                     "scaler": joblib.load(s_path),
                 }
-                # 각 방향 별 횟수 지정
                 self.counts[side] = 0
             else:
                 print(f"Warning: model/scaler missing for side={side}: {m_path.name}, {s_path.name}")
@@ -87,28 +77,23 @@ class StretchTracker:
 
     def extract_landmarks(self, image: np.ndarray, user_id : int) -> Dict[str, float] | None:
         """
-        한 프레임(image)에서 상체 랜드마크를 뽑아
-        config에 정의된 feature를 계산한 후
-        {feature_name: value} dict로 반환한다.
-        사람이 검출되지 않으면 None을 반환.
+        한 프레임에서 상체 랜드마크를 뽑아 config에 정의된 feature를 계산
         """
         image_rgb = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
-        # 결과는 init에 생성해 둔 self.pose 사용 (매번 재사용)
         result = self.pose.process(image_rgb)
-        # 프레임에 사람이 없는 경우를 예외처리
+        
         if not result.pose_landmarks:
-            result['feedback_messages'] = ["포즈를 감지할 수 없습니다. 카메라 앞에 서주세요."]
             return None
 
-        # landmarks dict 만들기: { index: (x, y, z) }
+        # landmarks dict 만들기
         allowed = set(self.cfg.get('landmarks', []))
         lm = {
             idx: (pt.x, pt.y, pt.z)
             for idx, pt in enumerate(result.pose_landmarks.landmark)
-            if idx in allowed # config에 정의된 랜드마크만 사용
+            if idx in allowed
         }
 
-        # landmarks를 DataFrame으로 변환 (각 landmark의 x, y, z 좌표를 열로)
+        # landmarks를 DataFrame으로 변환
         row = {}
         for idx, coords in lm.items():
             row[f'x{idx}'], row[f'y{idx}'], row[f'z{idx}'] = coords
@@ -125,9 +110,7 @@ class StretchTracker:
         return feat_df.iloc[0].astype(float).to_dict()
 
     def detect_direction(self, feats: Dict[str, float]) -> str:
-        """
-        방향 판단: left/right/None
-        """
+        """방향 판단: left/right/None"""
         for side, rules in self.direction_cfg.items():
             ok = True
             for feat, cond in rules.items():
@@ -153,12 +136,9 @@ class StretchTracker:
             'elapsed_time': 0.0,
             'counts': dict(self.counts),
             'completed': False,
-            'feedback_messages': [],  # 피드백 메시지 추가
+            'feedback_messages': [],
             'feedback_type': 'error'
         }
-
-        if self.done_sides == set(self.sides):
-            self.reset()
         
         if feats is None:
             result['feedback_messages'] = ["포즈를 감지할 수 없습니다. 카메라 앞에 서주세요."]
@@ -172,8 +152,7 @@ class StretchTracker:
         result['current_side'] = side
 
         if side is None and self.has_direction:
-            self.feature_buffer.clear() 
-            self.hold_start = None
+            self.hold_start_time = None
             result['feedback_messages'] = ["올바른 자세를 취해주세요."]
             return result
 
@@ -192,23 +171,17 @@ class StretchTracker:
         all_feedback = base_feedback + direction_feedback
         result['feedback_messages'] = all_feedback
 
-        # 2) feature_buffer에 벡터 추가
-        vec = np.array([feats[n] for n in self.feature_names])
-        self.feature_buffer.append(vec)
-        
-        # 3) 모델 예측 (윈도우가 찼을 때만)
+        # 2) 프레임별 모델 예측
         performing = False
         model_feedback = []
         
-        if len(self.feature_buffer) == self.required_window:
-            X_win = np.stack(self.feature_buffer, axis=0)
-            X_win_df = pd.DataFrame(X_win, columns=self.feature_names)
+        if side in self.models:
+            scaler = self.models[side]['scaler'] 
+            model  = self.models[side]['model']
             
-            # 모델이 있는 경우에만 모델 예측 사용
-            if side in self.models:
-                scaler = self.models[side]['scaler'] 
-                model  = self.models[side]['model']
-                X_scaled = scaler.transform(X_win_df)
+            # 현재 프레임의 특징 벡터
+            current_frame = np.array([feats[n] for n in self.feature_names]).reshape(1, -1)
+            X_scaled = scaler.transform(current_frame)
             
             try:
                 score = model.decision_function(X_scaled)[0]
@@ -216,24 +189,12 @@ class StretchTracker:
                 
                 # 임계값 기반 판정 (조정 가능)
                 performing = score >= outlier_threshold
-
+                
             except AttributeError:
-                scores = None
-
-            # 이상치 판정
-            if scores is not None:
-                inliers = scores >= outlier_threshold
-                vote_ratio = inliers.mean()
-                print("Inlier flags:", inliers.astype(int))
-            else:
-                preds = model.predict(X_scaled)
-                inliers = (preds == 1)
-                vote_ratio = inliers.mean()
-
-            vote_thr = self.cfg.get('model', {}).get('vote_threshold', 0.6)
-            performing = vote_ratio >= vote_thr
+                prediction = model.predict(X_scaled)[0]
+                performing = (prediction == 1)
+                print(f"Anomaly prediction: {prediction}")
             
-            # 모델 기반 피드백 생성
             if not performing:
                 model_feedback = [f"동작이 부정확합니다. 올바른 {self.exercise} 자세를 확인해주세요."]
         else:
@@ -247,40 +208,27 @@ class StretchTracker:
         # 모델 피드백도 추가
         result['feedback_messages'].extend(model_feedback)
 
-        '''추후 rep 경우 추가해야 할 수도 있음'''
-        # 4) performing 이 True일 때만 hold 로직
+        # 3) performing이 True일 때만 시간 누적
         if performing:
-            if self.current_side != side:
+            if self.current_side != side or self.hold_start_time is None:
                 self.current_side = side
-                try:
-                    if 'inliers' in locals():
-                        first_true_idx = np.argmax(inliers)
-                        self.hold_start = self.frame_idx - self.required_window + 1 + first_true_idx
-                    else:
-                        self.hold_start = self.frame_idx
-                except:
-                    self.hold_start = self.frame_idx  # fallback
+                self.hold_start_time = current_time
 
-
-            if self.hold_start is None:
-                self.hold_start = self.frame_idx
-
-            elapsed = (self.frame_idx - self.hold_start) * (self.frame_interval_ms / 100)
+            elapsed = current_time - self.hold_start_time
             result['elapsed_time'] = elapsed
 
-            # 진행률 피드백 (선택적)
+            # 진행률 피드백
             if elapsed < self.min_hold:
                 progress_feedback = f"좋습니다! {elapsed:.1f}초/{self.min_hold}초 진행 중입니다."
-                result['feedback_messages'] = [progress_feedback]  # 진행 중에는 긍정적 피드백만 표시
+                result['feedback_messages'] = [progress_feedback]
 
-            print(f"hold_start={self.hold_start}, frame_idx={self.frame_idx}, side={side}")
+            print(f"hold_start_time={self.hold_start_time}, current_time={current_time}, side={side}")
             print(f"elapsed={elapsed}, min_hold={self.min_hold}")
 
             if elapsed >= self.min_hold:
                 if self.counts[side] < self.target_count:
                     self.counts[side] += 1
                     result['counts'][side] = self.counts[side]
-
                 
                 if self.counts[side] >= self.target_count:
                     self.done_sides.add(side)
@@ -291,12 +239,10 @@ class StretchTracker:
                     else:
                         result['completed'] = True
                         result['feedback_messages'] = ["완료! 잘하셨습니다!"]
-
         else:
-            # 노이즈 방지를 위해 실패 시 윈도우·hold 초기화
-            self.hold_start = None
+            # 자세가 틀렸을 때는 시간 초기화
+            self.hold_start_time = None
             
-            # 조건 불만족 시 피드백이 비어있다면 기본 메시지 추가
             if not result['feedback_messages']:
                 result['feedback_messages'] = ["자세를 다시 확인해주세요."]
 
