@@ -52,7 +52,7 @@ class UserCalibrationLandmark(Base):
 
     user_calibration_landmark_id = Column(Integer, primary_key=True, autoincrement=True)
     user_id = Column(Integer, ForeignKey('users.user_id'), nullable=False)
-    pose_name = Column(String, nullable=False)  # e.g., 'neutral', 'tpose'
+    pose_name = Column(String(50), nullable=False)  # e.g., 'neutral', 'tpose'
     landmarks = Column(JSON, nullable=False)  # {"x0": 0.1, ..., "z22": -0.3}
 
     user = relationship("User", back_populates="calibration_landmarks")
