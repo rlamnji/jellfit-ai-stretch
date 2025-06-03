@@ -112,9 +112,8 @@ function FriendList({ setSelectedTab }) {
         </div>
       </div>
 
-            
-    <div className='main flex justify-center items-center h-screen bg-slate-200'>
-      <div className="flex flex-col items-center justify-center relative w-[70%] h-[70%] text-center z-0 bg-black">
+
+      <div className="relative top-[2vh] w-[1100px] h-[650px] mx-auto flex justify-center text-center z-0">
         {/* 상위 타이틀 */}
         <img className="absolute top-0 left-0 flex justify-center w-full h-full z-0 pointer-events-none" src={friendsContent}/>
         <div className="absolute top-[40px] z-[1] text-[30px] font-bold text-[#522B2B] backdrop-blur-[0.5px] tracking-[4px]">FRIENDS</div>
@@ -155,8 +154,6 @@ function FriendList({ setSelectedTab }) {
             })}
         </div>
       </div>
-    </div>
-
     </div>
   );
 }
