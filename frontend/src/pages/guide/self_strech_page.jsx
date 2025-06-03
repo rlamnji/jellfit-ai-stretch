@@ -11,6 +11,7 @@ import arrowLeft from '../../assets/images/icons/arrow_left.png';
 import ModalManager from "../../components/stretching/modal/modal_manager";
 import LongTimer from "../../components/stretching/long_timer";
 import ShortTimer from "../../components/stretching/short_timer";
+import StretchingSteps from "../../components/stretching/stretching_steps";
 
 function SelfStretchPage({ stretchingOrder, completedStretchings, setCompletedStretchings }) {
 
@@ -306,8 +307,8 @@ function SelfStretchPage({ stretchingOrder, completedStretchings, setCompletedSt
     }
 
     return (
-        <div className="w-full h-screen overflow-hidden flex flex-col items-center bg-space">
-
+        <div className="w-full h-screen overflow-hidden flex flex-col items-center bg-space min-w-[1144px]">
+            <StretchingSteps className="fixed left-[4%] max-w-[180px] overflow-hidden top-64 z-50" stretchingOrder={stretchingOrder} currentStretchingIndex={stretchingOrder.indexOf(Number(stretchingId))} />
             <div className='topBar w-full h-14 flex justify-between'>      
                 <img src={arrowLeft} className="w-8 h-8 m-4 cursor-pointer" 
                     onClick={() => {setModalType('confirmQuit'); }} />

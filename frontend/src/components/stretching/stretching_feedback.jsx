@@ -7,7 +7,6 @@ function StretchingFeedback({ feedbackMsg }) {
   const [message, setMessage] = useState('');
   const timerRef = useRef(null); // 랜덤 메시지 타이머 제어용
 
-  //피드백 메세지 너무 길어서 해결방안 찾아야 함.
   useEffect(() => {
     // 초기 랜덤 메시지 시작
     timerRef.current = startChangingRandomItem(cheersMessages, setMessage, 4000);

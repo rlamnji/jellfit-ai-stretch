@@ -88,7 +88,7 @@ function CameraStretchingCapture({ handleIsCompleted, handleElapsedTime, sendFra
           console.log("✅ 서버 응답:", data);
           handleElapsedTime(data.currentSide, data.elapsedTime);
           handleFeedback(data.feedbackMsg, data.feedbackType);
-          // 둘다 완료되어야 스트레칭 완료 처리해야함.
+          
           if (data.isCompleted) {
             console.log("스트레칭 완료!!");
             handleIsCompleted(true);
@@ -121,7 +121,7 @@ function CameraStretchingCapture({ handleIsCompleted, handleElapsedTime, sendFra
   //SHOW_FEEDBACK_TIME 이상 같은 피드백 메세지가 반복되면 화면에 출력.
   const handleFeedback = (feedbackMsg, feedbackType) => {
     if (feedbackType !== 'warning') return;
-    const feedbackStr = Array.isArray(feedbackMsg) ? feedbackMsg.join(' / ') : feedbackMsg;
+    const feedbackStr = Array.isArray(feedbackMsg) ? feedbackMsg[0] : feedbackMsg;
   
     console.log("🟡 새로운 피드백 도착:", feedbackStr);
   
@@ -151,12 +151,12 @@ function CameraStretchingCapture({ handleIsCompleted, handleElapsedTime, sendFra
   };
     
 
-  // repeatedFeedback이 설정되면 6초 후 null로 자동 초기화
+  // repeatedFeedback이 설정되면 8초 후 null로 자동 초기화
   useEffect(() => {
     if (repeatedFeedback) {
       const timeout = setTimeout(() => {
         setRepeatedFeedback(null);
-      }, 6000); // 6초 동안 메시지 보여준 뒤 사라짐
+      }, 8000); // 8초 동안 메시지 보여준 뒤 사라짐
 
       return () => clearTimeout(timeout); // 메시지가 바뀌거나 컴포넌트 unmount 시 타이머 정리
     }

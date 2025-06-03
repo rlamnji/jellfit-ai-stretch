@@ -79,6 +79,8 @@ function CameraCaliCapture() {
     const canvas = canvasRef.current;
     const video = videoRef.current;
 
+    if (isCalibrationDone) return Promise.resolve(null);
+
     return new Promise((resolve, reject) => {
       if (!canvas || !video) {
         return resolve(null);
@@ -112,7 +114,8 @@ function CameraCaliCapture() {
           const result = await res.json();
 
           setStep(result.current_pose);
-          //setMessage(result.message);
+          setMessage(result.message);
+          setCollectedFrames(result.collected_frames || 0); // 수집된 프레임 수 업데이트
 
           console.log("📥 서버 응답:", result);
           resolve(result); // ✅ 이제 진짜 반환됨
@@ -126,22 +129,25 @@ function CameraCaliCapture() {
 
   // 여러 프레임 보내는 함수
   const sendMultipleFrames = async (count = 5, interval = 500, poseType = "neutral") => {
-  let lastResult = null;
+    let lastResult = null;
 
-  for (let i = 0; i < count; i++) {
-    lastResult = await sendFrame(poseType);
+    if (isCalibrationDone) return null;
 
-    // ✅ 실패하면 바로 루프 중단
-    if (lastResult?.success === false) {
-      console.warn("📛 서버 응답 실패 → 루프 중단");
-      break;
+    for (let i = 0; i < count; i++) {
+      lastResult = await sendFrame(poseType);
+
+      // ✅ 실패하면 바로 루프 중단
+      if (lastResult?.success === false) {
+        console.warn("📛 서버 응답 실패 → 루프 중단");
+        break;
+      }
+
+      await new Promise((res) => setTimeout(res, interval));
     }
+    
 
-    await new Promise((res) => setTimeout(res, interval));
-  }
-
-  return lastResult;
-};
+    return lastResult;
+  };
 
   useEffect(() => {
     // 1. Mediapipe Pose 모델 초기화
@@ -165,7 +171,7 @@ function CameraCaliCapture() {
     let tposeSuccess = false;
 
     pose.onResults( async (results) => {
-      if (!results.poseLandmarks || step === "") return;
+      if (!results.poseLandmarks || step === "" || step === "done") return;
 
       const landmarks = results.poseLandmarks;
 
@@ -220,26 +226,28 @@ function CameraCaliCapture() {
                 result = await sendMultipleFrames(10, 300, "tpose");
                 collected = result?.collected_frames || 0;
                 //console.log(`📦 누적 수집된 프레임: ${collected}/30`);
+                if (result?.message?.includes("캘리브레이션 완료")) break;
             }
 
-                // 실패 응답일 경우 전체 초기화
-                if (!result || result.collected_frames < 30) {
-                  console.warn("📛 캘리브레이션 실패로 초기화합니다.");
-                  setMessage("충분한 데이터가 없어 측정을 다시 시작합니다.");
+          // ✅ 먼저 조건 체크
+          if (!result || result.collected_frames < 30 || result.success === false) {
+            console.warn("📛 캘리브레이션 실패로 초기화합니다.");
+            setMessage("충분한 데이터가 없어 측정을 다시 시작합니다.");
 
-                  postureStableCount = 0;
-                  postureSuccess = false;
-                  tposeStableCount = 0;
-                  tposeSuccess = false;
-                  setStep("neutral");
-                  return;
-                }
+            postureStableCount = 0;
+            postureSuccess = false;
+            tposeStableCount = 0;
+            tposeSuccess = false;
+            setStep("neutral");
+            return;
+          }
 
-            if (result.message?.includes("캘리브레이션 완료")) {
-              console.log("✅ 서버 메시지로 캘리브레이션 완료 감지");
-              setMessage(result.message);
-              setIsCalibrationDone(true); // 캘리 완료 상태로 변경
-            }
+          // ✅ 조건 통과 시 성공 처리
+          console.log("✅ 캘리브레이션 완료 응답 → 종료");
+          setMessage("캘리브레이션이 성공적으로 완료되었습니다.");
+          setStep("done");
+          setIsCalibrationDone(true); // 이게 useEffect에서 페이지 이동을 트리거함
+          stopCamera();
           }
         } else {
           if (tposeStableCount > 0) console.log("↩ T자세 흐트러짐, 카운트 초기화");
@@ -304,7 +312,7 @@ function CameraCaliCapture() {
 
         {/* 안내 메시지 표시 */}
         {isCameraOn &&(
-          <div className="absolute bottom-2 left-12 opacity-85 rounded-3xl w-[900px] mt-4 font-semibold text-white text-[28px] bg-[#2c1e1e] p-2  text-center">{message}</div>
+          <div className="absolute bottom-2 left-12 opacity-85 rounded-3xl w-[900px] mt-4 font-semibold text-white text-[28px] bg-[#2c1e1e] p-2  text-center">{message}, {collectedFrames}</div>
         )}
 
       </div>
