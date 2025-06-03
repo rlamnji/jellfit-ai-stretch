@@ -4,7 +4,7 @@ import glob
 import argparse
 import pandas as pd
 import yaml
-from utils import load_config, segment_holds, extract_features
+from .utils import load_config, segment_holds, extract_features
 from typing import Union, Dict, List, Tuple
 
 

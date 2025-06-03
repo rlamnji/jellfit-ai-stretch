@@ -377,6 +377,55 @@ def extract_features(df: pd.DataFrame,
                 # 둘 다 만족해야 함
                 feats[nm] = (x_between & y_between).astype(float)
 
+            elif ft == 'distance_comparison' and len(pts) == 4:
+                # 두 거리를 비교: distance(pts[0], pts[1]) vs distance(pts[2], pts[3])
+                # 첫 번째 거리가 더 짧으면 1.0, 두 번째가 더 짧으면 0.0
+                
+                # 첫 번째 거리: pts[0] - pts[1]
+                p1 = df[[f'x{pts[0]}', f'y{pts[0]}']].to_numpy()
+                p2 = df[[f'x{pts[1]}', f'y{pts[1]}']].to_numpy()
+                dist1 = compute_distance(p1, p2)
+                
+                # 두 번째 거리: pts[2] - pts[3]
+                p3 = df[[f'x{pts[2]}', f'y{pts[2]}']].to_numpy()
+                p4 = df[[f'x{pts[3]}', f'y{pts[3]}']].to_numpy()
+                dist2 = compute_distance(p3, p4)
+                
+                # 첫 번째가 더 짧으면 1, 두 번째가 더 짧으면 0
+                feats[nm] = (dist1 < dist2).astype(float)
+
+            elif ft == 'distance_ratio' and len(pts) == 4:
+                # 두 거리의 비율: distance(pts[0], pts[1]) / distance(pts[2], pts[3])
+                
+                # 첫 번째 거리: pts[0] - pts[1]
+                p1 = df[[f'x{pts[0]}', f'y{pts[0]}']].to_numpy()
+                p2 = df[[f'x{pts[1]}', f'y{pts[1]}']].to_numpy()
+                dist1 = compute_distance(p1, p2)
+                
+                # 두 번째 거리: pts[2] - pts[3]
+                p3 = df[[f'x{pts[2]}', f'y{pts[2]}']].to_numpy()
+                p4 = df[[f'x{pts[3]}', f'y{pts[3]}']].to_numpy()
+                dist2 = compute_distance(p3, p4)
+                
+                # 비율 계산 (0으로 나누기 방지)
+                feats[nm] = dist1 / (dist2 + 1e-8)
+
+            elif ft == 'distance_difference' and len(pts) == 4:
+                # 두 거리의 차이: distance(pts[0], pts[1]) - distance(pts[2], pts[3])
+                
+                # 첫 번째 거리: pts[0] - pts[1]
+                p1 = df[[f'x{pts[0]}', f'y{pts[0]}']].to_numpy()
+                p2 = df[[f'x{pts[1]}', f'y{pts[1]}']].to_numpy()
+                dist1 = compute_distance(p1, p2)
+                
+                # 두 번째 거리: pts[2] - pts[3]
+                p3 = df[[f'x{pts[2]}', f'y{pts[2]}']].to_numpy()
+                p4 = df[[f'x{pts[3]}', f'y{pts[3]}']].to_numpy()
+                dist2 = compute_distance(p3, p4)
+                
+                # 차이 계산
+                feats[nm] = dist1 - dist2
+
             else:
                 raise ValueError(f"Unknown feature type or wrong definition: {f}")
 
