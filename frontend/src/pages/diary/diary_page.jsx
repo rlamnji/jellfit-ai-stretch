@@ -144,6 +144,7 @@ function DiaryPage(){
                 {/* 젤리 이미지 */}
                 <img src="/images/models/jelly23.png" alt="jelly" />
             </div>
+            
             <div className='main flex justify-center items-center h-screen'>
             <div className='flex flex-col items-center justify-center relative w-[38%] h-[80%] bg-[#e0ded6] opacity-80 rounded-[3vw] shadow-lg border border-[#532d2d99]'>
                 <h1 className='mb-[3%] mt-[2%] font-bold text-[2.5vw] text-[#532D2D]'>스트레칭 일지</h1>
