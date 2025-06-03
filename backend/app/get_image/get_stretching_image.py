@@ -8,7 +8,7 @@ from stretch_model.src.infer_anomaly import StretchTracker
 from sqlalchemy.orm import Session
 from db.database import get_db
 from db.models import User, Pose
-# from dependencies import get_current_user
+from dependencies import get_current_user
 
 router = APIRouter(prefix="/guide/analyze", tags=["Stretching_Analyze"])
 
@@ -36,7 +36,7 @@ POSE_ID_TO_EXERCISE = {
 # pose_id에 따른 이상치 임계값 설정
 POSE_ID_TO_OUTLIER_THRESHOLD = {
     1: -0.25,  # 등_팔꿈치
-    2: -0.1,   # 가슴_T자
+    2: -0.04,   # 가슴_T자
     3: -0.1,  # 가슴_Y자
     4: -0.13,  # 등_날개뼈
     5: -0.2,   # 등_위
@@ -59,7 +59,7 @@ async def analyze_image(
     file: UploadFile = File(...),
     pose_id: int = Form(None or 7),
     db: Session = Depends(get_db),
-    # current_user: User = Depends(get_current_user)
+    current_user: User = Depends(get_current_user)
 ):
     content = await file.read()
     image_array = np.asarray(bytearray(content), dtype=np.uint8)
@@ -72,7 +72,7 @@ async def analyze_image(
     exercise = POSE_ID_TO_EXERCISE.get(pose_id)
     tracker = get_tracker(exercise or "등_위")
     outlier_threshold = POSE_ID_TO_OUTLIER_THRESHOLD.get(pose_id, -0.2)
-    result = tracker.is_performing(image, outlier_threshold=outlier_threshold)
+    result = tracker.is_performing(current_user.user_id, image, outlier_threshold=outlier_threshold)
     print("get_stretching_image에서 is_performing 사용 결과:", result)
 
     if result.get("completed") is True:

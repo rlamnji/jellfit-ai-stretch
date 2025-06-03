@@ -38,9 +38,11 @@ function ProfileCard() {
 
   },[])
 
-  useEffect(() => {
+useEffect(() => {
+  if (userData) {
     fetchStretchingTimeByDate(currentDate_apiType);
-  }, []);
+  }
+}, [userData]);
 
 
   // 스트레칭 총 누적시간 api (오늘날짜)

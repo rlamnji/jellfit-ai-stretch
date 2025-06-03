@@ -37,4 +37,9 @@ pip install -r requirements.txt
 uvicorn main:app --reload
 ```
 
+## 서버 실행
+cd backend -> uvicorn app.main:app --reload
+cd frontend -> yarn start 
+cd frontend -> yarn electron start
+
 API 문서는 http://localhost:8000/docs 에서 확인할 수 있습니다.
