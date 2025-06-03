@@ -90,7 +90,7 @@ function HomePage() {
           </div>
          
 
-          <div className="bg-transparent fixed top-0 right-0 z-10">
+          <div className="bg-transparent fixed top-0 right-0 z-30">
             <SideWidget /> {/*사이드바 위젯*/}
           </div>
 
