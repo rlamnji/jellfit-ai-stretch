@@ -79,7 +79,7 @@ def get_user_calibration_features(user_id: int, db: Session = None) -> dict:
     사용자의 캘리브레이션 값을 {name: value} 형태로 반환
     """
     if db is None:
-        db = get_db()
+        db = next(get_db())
 
     results = (
         db.query(Calibration.name, UserCalibration.value)
