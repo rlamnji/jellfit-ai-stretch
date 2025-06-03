@@ -133,6 +133,16 @@ function CameraCaliCapture() {
           console.log("📥 서버 응답:", result);
           resolve(result);
 
+          // 캘리브레이션 완료 조건
+          if(result.success === true && result.collected_frames >= result.target_frames) {
+            console.log("🎉 캘리브레이션 완료");
+            setIsCalibrationDone(true);
+            setStep("done");
+            setMessage("캘리브레이션이 완료되었습니다! 로그인 페이지로 이동합니다.");
+          }
+
+          // 이상치 탐지 실패 로직 추가 예정
+
         } catch (err) {
           console.error("❌ 전송 실패:", err);
           reject(err);
@@ -144,6 +154,7 @@ function CameraCaliCapture() {
   // 여러 프레임 보내는 함수
   const sendMultipleFrames = async (count = 5, interval = 300, poseType = "neutral") => {
     if (isCalibrationDone || !isCameraOn || step === "done") return null;
+
 
     const framePromises = [];
 
@@ -159,6 +170,8 @@ function CameraCaliCapture() {
     const lastValid = validResults[validResults.length - 1];
 
     return lastValid || null;
+
+    
   };
 
   useEffect(() => {
@@ -205,13 +218,6 @@ function CameraCaliCapture() {
                 result = await sendMultipleFrames(10, 300, "neutral");
                 collected = result?.collected_frames || 0;
               }
-
-            if(result.collected_frames >= 30){
-              console.log("🎉 정자세 캘리브레이션 완료 → T자세로 전환");
-              setMessage("정자세 캘리브레이션 완료 → T자세로 전환");
-              setStep("tpose");
-            }
-
           }
         } else {
           if (postureStableCount > 0) console.log("↩ 정자세 흐트러짐, 카운트 초기화");
@@ -238,45 +244,27 @@ function CameraCaliCapture() {
               result = await sendMultipleFrames(10, 300, "tpose");
               if (!result) break;
 
-              if (step !== "done") {
-                setStep(result.current_pose); // 현재 단계 업데이트 (단 완료 후 덮어쓰기 방지)
+              setMessage(result.message);
+              setCollectedFrames(result.collected_frames || 0);
+              collected = result.collected_frames || 0;
+
+              if (!result || result.success === false) {
+                console.warn("📛 실패 또는 응답 없음 → 캘리 초기화");
+                setMessage("캘리브레이션 실패 → 다시 측정을 시작합니다.");
+                setStep("neutral");
+
+                // 상태 초기화
+                postureStableCount = 0;
+                postureSuccess = false;
+                tposeStableCount = 0;
+                tposeSuccess = false;
+                return;
               }
 
               setMessage(result.message);
               setCollectedFrames(result.collected_frames || 0);
               collected = result.collected_frames || 0;
-            
-              if (collected >= 30 || result.message?.includes("캘리브레이션 완료")) {
-                console.log("🧪 collected:", collected, "result.success:", result?.success); 
 
-                // ✅ 여기에서 바로 캘리 완료 처리
-                setMessage("캘리브레이션이 성공적으로 완료되었습니다.");
-                setIsCalibrationDone(true);
-                stopCamera();
-                break;
-              }
-
-
-              if (collected === 0) {
-                console.warn("📛 프레임 수집 실패 → 중단");
-                break;
-              }
-
-              /*if (
-                result.code === "INSUFFICIENT_DATA"
-              ) {
-                console.warn("📛 캘리브레이션 실패 → 초기화");
-                setMessage("충분한 데이터가 없어 측정을 다시 시작합니다.");
-                setStep("neutral");
-
-                // 프레임 수 카운트도 초기화
-                postureStableCount = 0;
-                postureSuccess = false;
-                tposeStableCount = 0;
-                tposeSuccess = false;
-
-                return;
-              }*/
             }
 
             console.log("반복문 탈출");
@@ -313,6 +301,7 @@ function CameraCaliCapture() {
 
     return () => {
       cam.stop();
+      pose.reset?.();
       console.log("📴 컴포넌트 언마운트 → pose 중단 및 cam 정지");
     };
   }, [step]);
