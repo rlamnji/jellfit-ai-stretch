@@ -45,7 +45,7 @@ export const isPostureAligned = (landmarks) => {
   if (!isBodyCentered) console.log("몸이 화면 중앙에서 벗어남");
   if (!isArmsDown) console.log("팔이 차렷 상태가 아님 (팔 올려짐)");
   if (!isHandNotVisible) console.log("손 나옴");
-
+    
   return (
     isShoulderLevel &&
     isNoseCentered &&
