@@ -156,8 +156,9 @@ class StretchTracker:
             result['feedback_messages'] = ["올바른 자세를 취해주세요."]
             return result
 
-        # 1.5) 기본 임계값 검사 및 피드백 생성
-        base_conditions, base_feedback = self.check_base_conditions_with_feedback(feat_df)
+        # 1.5) 기본 임계값 검사 및 피드백 생성 (캘리브레이션 우선순위 적용)
+        user_calibration = load_user_calibration(user_id)
+        base_conditions, base_feedback = self.check_base_conditions_with_feedback(feat_df, user_calibration)
         
         # 1.6) 방향별 임계값 검사 및 피드백 생성 (방향이 있는 경우)
         direction_passed = True
@@ -278,56 +279,133 @@ class StretchTracker:
             return 'error'  # 오류/경고
 
 
-    def check_base_conditions_with_feedback(self, feat_df: pd.DataFrame) -> Tuple[np.ndarray, List[str]]:
-        """기본 임계값 조건 확인 및 피드백 생성"""
+    def check_base_conditions_with_feedback(self, feat_df: pd.DataFrame, user_calibration: Dict = None) -> Tuple[np.ndarray, List[str]]:
+        """기본 임계값 조건 확인 및 피드백 생성 (캘리브레이션 우선순위 적용)"""
         thresholds = self.cfg.get('thresholds', {})
         conditions = np.ones(len(feat_df), dtype=bool)
         feedback_messages = []
+        
+        # 캘리브레이션 기반 임계값들을 먼저 수집
+        calibration_thresholds = set()
+        for k in thresholds.keys():
+            if k.startswith('calibration_'):
+                # feature 이름 추출
+                feat_name = k.replace('calibration_min_', '').replace('calibration_max_', '')
+                calibration_thresholds.add(feat_name)
+        
+        print(f"Features with calibration thresholds: {calibration_thresholds}")
         
         for k, v in thresholds.items():
             if k == 'min_hold_duration_sec':
                 continue
             
-            # 새로운 형태 (값 + 메시지) 처리
-            if isinstance(v, dict) and 'value' in v:
-                threshold_value = v['value']
-                feedback_message = v.get('message', f'{k} 조건을 만족하지 않습니다.')
-            else:
-                # 기존 형태 (값만) 처리
-                threshold_value = v
-                feedback_message = f'{k} 조건을 만족하지 않습니다.'
-            
-            # 특징 이름 추출
-            if k.startswith('min_'):
-                feat_name = k[4:]
-                if feat_name in feat_df.columns:
-                    condition = feat_df[feat_name] >= threshold_value
-                    failed_indices = ~condition
+            # 캘리브레이션 기반 임계값 처리
+            if k.startswith('calibration_'):
+                if not user_calibration:
+                    print(f"Warning: No user calibration available for {k}")
+                    continue
                     
+                if not isinstance(v, dict):
+                    print(f"Warning: Invalid calibration threshold {k}")
+                    continue
+                    
+                calibration_key = v.get('calibration_key')
+                operator = v.get('operator', 'greater_than')
+                offset = v.get('offset', 0.0)
+                feedback_message = v.get('message', f'{k} 조건을 만족하지 않습니다.')
+                
+                if calibration_key not in user_calibration:
+                    print(f"Warning: Calibration key {calibration_key} not found in user calibration")
+                    continue
+                
+                # 실제 임계값 = 캘리브레이션 값 + offset
+                baseline_value = user_calibration[calibration_key]
+                threshold_value = baseline_value + offset
+                
+                # feature 이름 추출
+                feat_name = k.replace('calibration_min_', '').replace('calibration_max_', '')
+                
+                if feat_name in feat_df.columns:
+                    if operator == 'greater_than':
+                        condition = feat_df[feat_name] > threshold_value
+                    elif operator == 'greater_equal':
+                        condition = feat_df[feat_name] >= threshold_value
+                    elif operator == 'less_than':
+                        condition = feat_df[feat_name] < threshold_value
+                    elif operator == 'less_equal':
+                        condition = feat_df[feat_name] <= threshold_value
+                    else:
+                        print(f"Warning: Unknown operator {operator}")
+                        continue
+                    
+                    failed_indices = ~condition
                     if failed_indices.any():
                         feedback_messages.append(feedback_message)
                         conditions &= condition
                         
-            elif k.startswith('max_'):
-                feat_name = k[4:]
-                if feat_name in feat_df.columns:
-                    condition = feat_df[feat_name] <= threshold_value
-                    failed_indices = ~condition
-                    
-                    if failed_indices.any():
-                        feedback_messages.append(feedback_message)
-                        conditions &= condition
+                    print(f"[CALIB] {feat_name} {operator} {threshold_value:.4f} (baseline: {baseline_value:.4f}): {'PASS' if condition.all() else 'FAIL'}")
+                else:
+                    print(f"Warning: Feature {feat_name} not found in DataFrame")
+            
+            # 일반 임계값 처리 (캘리브레이션 버전이 없는 경우에만)
+            else:
+                # 새로운 형태 (값 + 메시지) 처리
+                if isinstance(v, dict) and 'value' in v:
+                    threshold_value = v['value']
+                    feedback_message = v.get('message', f'{k} 조건을 만족하지 않습니다.')
+                else:
+                    # 기존 형태 (값만) 처리
+                    threshold_value = v
+                    feedback_message = f'{k} 조건을 만족하지 않습니다.'
+                
+                # 특징 이름 추출
+                feat_name = None
+                if k.startswith('min_'):
+                    feat_name = k[4:]
+                elif k.startswith('max_'):
+                    feat_name = k[4:]
+                elif k.startswith('abs_'):
+                    feat_name = k[4:]
+                
+                # 캘리브레이션 버전이 있는지 확인
+                if feat_name and feat_name in calibration_thresholds:
+                    print(f"[SKIP] Skipping {k} - calibration version exists for {feat_name}")
+                    continue
+                
+                # 일반 임계값 적용
+                if k.startswith('min_'):
+                    if feat_name in feat_df.columns:
+                        condition = feat_df[feat_name] >= threshold_value
+                        failed_indices = ~condition
+                        
+                        if failed_indices.any():
+                            feedback_messages.append(feedback_message)
+                            conditions &= condition
+                            
+                        print(f"[FIXED] {feat_name} >= {threshold_value}: {'PASS' if condition.all() else 'FAIL'}")
+                            
+                elif k.startswith('max_'):
+                    if feat_name in feat_df.columns:
+                        condition = feat_df[feat_name] <= threshold_value
+                        failed_indices = ~condition
+                        
+                        if failed_indices.any():
+                            feedback_messages.append(feedback_message)
+                            conditions &= condition
+                            
+                        print(f"[FIXED] {feat_name} <= {threshold_value}: {'PASS' if condition.all() else 'FAIL'}")
 
-            elif k.startswith('abs_'):
-                feat_name = k[4:]  # 'abs_' 제거
-                if feat_name in feat_df.columns:
-                    # 절댓값이 임계값을 넘어서야 함
-                    condition = np.abs(feat_df[feat_name]) >= threshold_value
-                    failed_indices = ~condition
-                    
-                    if failed_indices.any():
-                        feedback_messages.append(feedback_message)
-                        conditions &= condition
+                elif k.startswith('abs_'):
+                    if feat_name in feat_df.columns:
+                        # 절댓값이 임계값을 넘어서야 함
+                        condition = np.abs(feat_df[feat_name]) >= threshold_value
+                        failed_indices = ~condition
+                        
+                        if failed_indices.any():
+                            feedback_messages.append(feedback_message)
+                            conditions &= condition
+                            
+                        print(f"[FIXED] |{feat_name}| >= {threshold_value}: {'PASS' if condition.all() else 'FAIL'}")
         
         return conditions, feedback_messages
 
