@@ -12,7 +12,7 @@ function CameraCaliConsent({ onAllow }) {
   
     return (
       <div className="w-full flex flex-col items-center py-4 overflow-y-hidden">
-        <div className="relative  w-full max-w-[1500px] h-full max-h-[600px] aspect-[16/9]">
+        <div className="relative w-full max-w-[1000px] h-full max-h-[430px] aspect-[16/9]">
           {/* 권한 요청 안내 영역 (카메라 대신 회색 박스) */}
           <div className="absolute top-0 left-0 w-full h-full rounded-xl transform scale-x-[-1] border-2 border-gray-500 border-dashed opacity-40" />
           

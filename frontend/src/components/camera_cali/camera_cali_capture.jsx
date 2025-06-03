@@ -174,7 +174,7 @@ function CameraCaliCapture() {
           // 이상치 탐지 실패 로직
           if(result.success === false && result.message.includes("충분한 데이터가 없습니다.")){
             console.warn("📛 이상치 탐지 실패 → 캘리 초기화");
-            resetCalibration();
+            navigate("/condition/:id", { replace: true });
             return resolve(null);
           }
 
@@ -339,7 +339,7 @@ function CameraCaliCapture() {
 
   return (
     <div className="w-full flex flex-col items-center py-4 overflow-y-hidden relative">
-      <div className="relative w-full max-w-[1500px] h-full max-h-[600px] aspect-[16/9]">
+      <div className="relative w-full max-w-[1000px] h-full max-h-[430px] aspect-[16/9]">
         <video
           ref={videoRef}
           autoPlay

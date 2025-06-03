@@ -25,9 +25,9 @@ function UserProfilePage() {
           <TopBar/>
         </div>
 
-        <div className="relative w-[1100px] h-[650px] mx-auto flex justify-start items-start mt-[8vh]">
+        <div className="relative w-[1100px] h-[650px] mx-auto flex justify-start items-start">
 
-            <div className="flex justify-end absolute inset-0  top-[320px] left-[650px] pr-5 w-[350px] ">
+            <div className="flex justify-end absolute inset-0  top-[300px] left-[650px] pr-5 w-[350px] ">
               <PwdModify />
             </div>
 
@@ -35,7 +35,7 @@ function UserProfilePage() {
               <Info setIsSymptomModalOpen={setIsSymptomModalOpen}/>
             </div> 
 
-            <div className="flex  absolute inset-0  h-[170px] top-[300px] w-[300px] left-[60px]">
+            <div className="flex  absolute inset-0  h-[170px] top-[290px] w-[300px] left-[60px]">
                 <Terms />
             </div>
 

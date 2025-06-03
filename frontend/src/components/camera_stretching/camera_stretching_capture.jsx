@@ -178,8 +178,25 @@ function CameraStretchingCapture({ isStretchingQuit, handleIsCompleted, handleEl
   };
 
   useEffect(() => {
-  if (!isStretchingQuit) return;
-    stopCamera();
+    if (isStretchingQuit === false) {
+      console.log("🔄 캠 다시 시작됨");
+
+      navigator.mediaDevices.getUserMedia({
+        video: {
+          width: { ideal: 1280 },
+          height: { ideal: 720 },
+        },
+      })
+        .then((stream) => {
+          streamRef.current = stream;
+          if (videoRef.current) {
+            videoRef.current.srcObject = stream;
+          }
+        })
+        .catch((err) => {
+          console.error("❌ 카메라 재시작 실패:", err);
+        });
+    }
   }, [isStretchingQuit]);
 
   return (

@@ -16,14 +16,14 @@ features:
     type: delta_y
     points: [5, 16]
 
-   # 고개 각도 감지를 위한 눈-귀 관계
-  - name: left_eye_ear_y_diff
+   # 고개 각도 감지를 위한 입-귀 관계
+  - name: left_mouth_ear_y_diff
     type: delta_y
-    points: [7, 2]  # 왼쪽 귀 Y - 왼쪽 눈 Y
+    points: [9, 7]  # 
   
-  - name: right_eye_ear_y_diff  
+  - name: right_mouth_ear_y_diff  
     type: delta_y
-    points: [8, 5]  # 오른쪽 귀 Y - 오른쪽 눈 Y
+    points: [8, 10]  
     
 
 
@@ -42,33 +42,31 @@ thresholds:
     value: 0.01     
     message: "오른쪽 팔을 더 위로 올려야 해요."
 
-  min_left_eye_ear_y_diff: 
-    value: 0.015
+  max_left_mouth_ear_y_diff: 
+    value: 0.02
     message: "고개를 더 젖히거나, 카메라와 너무 멀리 떨어져 있을 수 있어요."
-  min_right_eye_ear_y_diff: 
-    value: 0.015
+  max_right_mouth_ear_y_diff: 
+    value: 0.02
     message: "고개를 더 젖히거나, 카메라와 너무 멀리 떨어져 있을 수 있어요."
   
   min_hold_duration_sec: 10    # 자세를 유지해야 하는 최소 시간 (단위: 초)
 
-  calibration_min_left_eye_ear_y_diff:
-    calibration_key: left_eye_ear_y_diff
-    operator: greater_than
-    offset: 0.02
+  calibration_min_left_mouth_ear_y_diff:
+    calibration_key: left_mouth_ear_y_diff
+    operator: less_than
+    offset: 0.005
     message: "고개를 더 젖히거나, 카메라와 너무 멀리 떨어져 있을 수 있어요."
     
-  calibration_min_right_eye_ear_y_diff:
-    calibration_key: right_eye_ear_y_diff
-    operator: greater_than
-    offset: 0.02
+  calibration_min_right_mouth_ear_y_diff:
+    calibration_key: right_mouth_ear_y_diff
+    operator: less_than
+    offset: 0.005
     message: "고개를 더 젖히거나, 카메라와 너무 멀리 떨어져 있을 수 있어요."
-
 
 
 cycles:
   type: hold      # rep vs hold 구분 플래그
   count: 1        # 10초 유지 동작을 1회 수행해야 성공
-
 
   
 calibration:
