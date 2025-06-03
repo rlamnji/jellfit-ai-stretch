@@ -52,6 +52,7 @@ calibration_names = [
     "tpose_wrist_distance",
     "neutral_left_eye_ear_y_diff",
     "neutral_right_eye_ear_y_diff",
+    "neutral_wrist_distance",
     "avg_arm_length",
     "wrist_expansion_ratio",
     "arm_shoulder_ratio",
@@ -68,6 +69,31 @@ calibration_names = [
 
 for name in calibration_names:
     db.add(Calibration(name=name))
+
+# 사용자 캘리브레이션 값 추가
+user_calibration_data = {
+    "shoulder_width": 0.33081463479310574, 
+    "left_arm_length": 0.3842569816357875,
+    "right_arm_length": 0.3681222228558816,
+    "tpose_wrist_distance": 1.0807652487717991,
+    "neutral_left_eye_ear_y_diff": -0.03830407261848445,
+    "neutral_right_eye_ear_y_diff": -0.0381600916385651,
+    "neutral_wrist_distance": 0.5425606955543977,
+    "avg_arm_length": 0.37618960224583453,
+    "wrist_expansion_ratio": 1.9919711428183255,
+    "arm_shoulder_ratio": 1.1371613063040777
+}
+
+temp_cali_id = 1
+
+for name, value in user_calibration_data.items():
+    uc = UserCalibration(
+        user_id=1,
+        calibration_id=temp_cali_id,
+        value=value
+    )
+    db.add(uc)
+    temp_cali_id += 1
 
 
 # 사용자 스트레칭 기록(횟수 + 시간) (더미데이터)

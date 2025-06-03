@@ -7,7 +7,10 @@ from typing import Dict, List, Tuple
 from collections import deque
 from pathlib import Path
 import pandas as pd
-from .utils import extract_features
+
+from .utils import extract_features, load_user_calibration
+import time
+
 
 
 class StretchTracker:
@@ -35,12 +38,12 @@ class StretchTracker:
         self.required_window = self.cfg.get('model', {}).get('window_size', 10) # 필요한 윈도우 크기 (모델에 따라 다름, 기본값 10)
 
         # 상태 변수
-        self.current_side = None # 현재 수행 중인 방향 (left/right/None)
-        self.frame_idx = 0 # 현재 프레임 인덱스
-        self.hold_start = None # hold 시작 프레임 인덱스
-        self.counts = {} # 각 방향별 수행 횟수를 저장할거임
-        self.feature_buffer = deque(maxlen=self.required_window) # 특징 버퍼 (윈도우 크기만큼 저장)
-        self.done_sides = set() # 각 방향별 완료 여부를 저장할 set
+        self.current_side = None
+        self.frame_idx = 0
+        self.hold_start_time = None  # 실제 시간 기반으로 변경
+        self.counts = {}
+        self.done_sides = set()
+
         
         # 모델 로딩 전 방향을 가지는 동작인지 판단 후 결과에 따라 다른 방식으로 로딩
         self.has_direction = 'direction' in self.cfg and self.cfg['direction']
@@ -50,7 +53,9 @@ class StretchTracker:
         model_dir = base_dir / "models" # 모델 경로
         self.models = {}
         for side in self.sides:
+
             # 만약 방향이 없으면 model filenames 에 "_<side>"라는 suffix(접미사)가 생략됨 
+
             suffix = f"_{side}" if side else ""
             m_path = model_dir / f"{exercise}{suffix}_anomaly.joblib"
             s_path = model_dir / f"{exercise}{suffix}_scaler.joblib"
@@ -80,7 +85,7 @@ class StretchTracker:
         # 추적 결과 저장
         self.landmark_history = []
 
-    def extract_landmarks(self, image: np.ndarray) -> Dict[str, float] | None:
+    def extract_landmarks(self, image: np.ndarray, user_id : int) -> Dict[str, float] | None:
         """
         한 프레임(image)에서 상체 랜드마크를 뽑아
         config에 정의된 feature를 계산한 후
@@ -109,10 +114,11 @@ class StretchTracker:
             row[f'x{idx}'], row[f'y{idx}'], row[f'z{idx}'] = coords
         df = pd.DataFrame([row])
 
+        
         feat_df = extract_features(
             df,
             self.feature_defs,
-            calibration=self.calibration,
+            calibration=load_user_calibration(user_id),
             z_scale=self.z_scale
         )
 
@@ -135,9 +141,11 @@ class StretchTracker:
                 return side
         return None
 
-    def is_performing(self, image: np.ndarray, outlier_threshold: float = -0.2) -> Dict:
+    def is_performing(self, user_id : int, image: np.ndarray, outlier_threshold: float = -0.2) -> Dict:
         self.frame_idx += 1
-        feats = self.extract_landmarks(image)
+        current_time = time.time()
+        
+        feats = self.extract_landmarks(image, user_id)
 
         result = {
             'exercise': self.exercise,
@@ -157,7 +165,7 @@ class StretchTracker:
             return result
 
         # DataFrame으로 변환하여 임계값 검사용으로 사용
-        feat_df = pd.DataFrame([feats]) # 추후 calibration과 z_scale도 적용할 수 있음
+        feat_df = pd.DataFrame([feats])
 
         # 1) 방향 결정
         side = self.detect_direction(feats)
@@ -203,8 +211,12 @@ class StretchTracker:
                 X_scaled = scaler.transform(X_win_df)
             
             try:
-                scores = model.decision_function(X_scaled)
-                print("Anomaly scores:", scores)
+                score = model.decision_function(X_scaled)[0]
+                print(f"Anomaly score: {score:.3f}")
+                
+                # 임계값 기반 판정 (조정 가능)
+                performing = score >= outlier_threshold
+
             except AttributeError:
                 scores = None
 
@@ -268,22 +280,18 @@ class StretchTracker:
                 if self.counts[side] < self.target_count:
                     self.counts[side] += 1
                     result['counts'][side] = self.counts[side]
-                    print(f"{side} 수행! 현재 횟수: {self.counts[side]}, 목표 횟수: {self.target_count}")
 
-                    # 해당 방향 완료 체크
-                    if self.counts[side] >= self.target_count:
-                        self.done_sides.add(side)
+                
+                if self.counts[side] >= self.target_count:
+                    self.done_sides.add(side)
 
-                        # 아직 다른 방향 남아 있음
-                        remaining_sides = [s for s in self.sides if s not in self.done_sides]
-                        print(f"완료된 방향: {self.done_sides}, 남은 방향: {remaining_sides}")
-                        if remaining_sides:
+                    remaining_sides = [s for s in self.sides if s not in self.done_sides]
+                    if remaining_sides:
                             result['feedback_messages'] = ["다른 방향으로 동작해주세요!"]
-                        else:
-                            print("Completed True 로 변경경")
-                            result['completed'] = True
-                            result['feedback_messages'] = ["완료! 잘하셨습니다!"]
-                    
+                    else:
+                        result['completed'] = True
+                        result['feedback_messages'] = ["완료! 잘하셨습니다!"]
+
         else:
             # 노이즈 방지를 위해 실패 시 윈도우·hold 초기화
             self.hold_start = None
