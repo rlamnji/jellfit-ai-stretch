@@ -92,14 +92,14 @@ def get_user_calibration_features(user_id: int, db: Session = None) -> dict:
 
 
 # 아래 두 함수는 테스트용 (나중에 삭제할 예정)
-def get_all_calibrations(db: Session) -> List[Calibration]:
-    """
-    DB에 저장된 모든 Calibration 항목을 반환
-    """
-    return db.query(Calibration).all()
+# def get_all_calibrations(db: Session) -> List[Calibration]:
+#     """
+#     DB에 저장된 모든 Calibration 항목을 반환
+#     """
+#     return db.query(Calibration).all()
 
-def get_calibration_by_name(name: str, db: Session) -> Calibration:
-    """
-    Calibration 이름으로 calibration_id와 name을 반환
-    """
-    return db.query(Calibration).filter(Calibration.name == name).first()
+# def get_calibration_by_name(name: str, db: Session) -> Calibration:
+#     """
+#     Calibration 이름으로 calibration_id와 name을 반환
+#     """
+#     return db.query(Calibration).filter(Calibration.name == name).first()

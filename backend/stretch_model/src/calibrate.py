@@ -319,6 +319,7 @@ class CalibrationProcessor:
     def save_calibration(self, calibration_data: Dict):
         """캘리브레이션 데이터 저장"""
         user_id = calibration_data['user_id']
+
         db = next(get_db())
     
         # 캘리브레이션 특징값 저장
