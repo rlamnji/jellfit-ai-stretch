@@ -2,6 +2,7 @@
 import { useState } from "react";
 import github from "../../assets/images/etc/github.png";
 import notion from "../../assets/images/etc/notion.png";
+import developer from "../../assets/images/etc/develop.png";
 
 function Symptom({setIsSymptomModalOpen}){
 
@@ -29,9 +30,9 @@ function Symptom({setIsSymptomModalOpen}){
                         <img src={notion} className='w-[30px] h-[30px] mr-2' alt="Notion Logo" />
                         <div className='text-[20px] text-[#7E6161] text-center' >Notion</div>
                     </div>
-                    <div className='flex w-[150px] h-[50px] bg-[#FFF1D5] opacity-40 rounded-3xl justify-center items-center cursor-pointer' onClick={clickHandler2}>
-                        <img src={notion} className='w-[30px] h-[30px] mr-2' alt="Notion Logo" />
-                        <div className='text-[20px] text-[#7E6161] text-center' >Notion</div>
+                    <div className='flex w-[170px] h-[50px] bg-[#FFF1D5] opacity-40 rounded-3xl justify-center items-center cursor-pointer' onClick={setIsSymptomModalOpen}>
+                        <img src={developer} className='w-[30px] h-[30px] mr-2' alt="developer Logo" />
+                        <div className='text-[20px] text-[#7E6161] text-center' >Developers</div>
                     </div>
                 </div>
                
