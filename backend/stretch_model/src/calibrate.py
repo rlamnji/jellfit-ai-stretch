@@ -230,6 +230,8 @@ class CalibrationProcessor:
         return {
             'success': True,
             'message': '캘리브레이션 완료!',
+            'collected_frames': self.pose_configs['tpose']['cycles']['target_frames'],  # 보통 30
+            'target_frames': self.pose_configs['tpose']['cycles']['target_frames'],
             'features': features
         }
     
@@ -313,6 +315,7 @@ class CalibrationProcessor:
             'total_frames': len(df)
         }
     
+
     def save_calibration(self, calibration_data: Dict):
         """캘리브레이션 데이터 저장"""
         user_id = calibration_data['user_id']
