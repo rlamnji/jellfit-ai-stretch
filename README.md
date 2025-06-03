@@ -23,9 +23,8 @@ source venv/bin/activate  # Linux/Mac
 .\venv\Scripts\activate   # Windows
 ```
 
-2. 의존성 설치:
+2. 의존성 설치: 프로젝트 루트에서
 ```bash
-cd backend
 pip install -r requirements.txt
 ```
 

@@ -1,6 +1,0 @@
-diff --git a/backend/app/get_image/__pycache__/get_stretching_image.cpython-310.pyc b/backend/app/get_image/__pycache__/get_stretching_image.cpython-310.pyc
-index 69af8d5..51313b2 100644
-Binary files a/backend/app/get_image/__pycache__/get_stretching_image.cpython-310.pyc and b/backend/app/get_image/__pycache__/get_stretching_image.cpython-310.pyc differ
-diff --git a/backend/db/__pycache__/database.cpython-310.pyc b/backend/db/__pycache__/database.cpython-310.pyc
-index 512fab0..75a9d22 100644
-Binary files a/backend/db/__pycache__/database.cpython-310.pyc and b/backend/db/__pycache__/database.cpython-310.pyc differ
