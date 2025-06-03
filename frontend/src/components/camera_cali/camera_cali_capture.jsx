@@ -174,7 +174,7 @@ function CameraCaliCapture() {
           // 이상치 탐지 실패 로직
           if(result.success === false && result.message.includes("충분한 데이터가 없습니다.")){
             console.warn("📛 이상치 탐지 실패 → 캘리 초기화");
-            resetCalibration();
+            navigate("/condition/:id", { replace: true });
             return resolve(null);
           }
 
