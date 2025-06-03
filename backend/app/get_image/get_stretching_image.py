@@ -72,7 +72,7 @@ async def analyze_image(
     exercise = POSE_ID_TO_EXERCISE.get(pose_id)
     tracker = get_tracker(exercise or "등_위")
     outlier_threshold = POSE_ID_TO_OUTLIER_THRESHOLD.get(pose_id, -0.2)
-    result = tracker.is_performing(current_user, image, outlier_threshold=outlier_threshold)
+    result = tracker.is_performing(current_user.user_id, image, outlier_threshold=outlier_threshold)
     print("get_stretching_image에서 is_performing 사용 결과:", result)
 
     if result.get("completed") is True:

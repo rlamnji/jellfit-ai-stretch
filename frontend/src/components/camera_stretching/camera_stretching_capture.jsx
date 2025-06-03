@@ -14,7 +14,6 @@ function CameraStretchingCapture({ handleIsCompleted, handleElapsedTime, sendFra
   const feedbackDurationRef = useRef(0);
   const prevFeedbackRef = useRef(null);
   
-
   useEffect(() => {
     // 시작 메시지 먼저 보여줌
     setMessage('시작합니다!');
@@ -75,9 +74,13 @@ function CameraStretchingCapture({ handleIsCompleted, handleElapsedTime, sendFra
       formData.append("file", blob, "frame.jpg");
       formData.append("pose_id", stretchingId);
 
+
       try {
         const res = await fetch("http://localhost:8000/guide/analyze", {
           method: "POST",
+          headers:{
+            "Authorization": "Bearer " + sessionStorage.getItem("accessToken"),
+          },
           body: formData,
         });
         if(res.ok){
