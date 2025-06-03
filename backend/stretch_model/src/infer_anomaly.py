@@ -34,7 +34,6 @@ class StretchTracker:
 
         # 상태 변수
         self.current_side = None
-        self.frame_idx = 0
         self.hold_start_time = None  # 실제 시간 기반으로 변경
         self.counts = {}
         self.done_sides = set()
@@ -42,6 +41,8 @@ class StretchTracker:
         # 방향을 가지는 동작인지 판단
         self.has_direction = 'direction' in self.cfg and self.cfg['direction']
         self.sides = self.cfg['direction'] if self.has_direction else [None]
+
+        self.total_hold_time = {side: 0 for side in self.sides}
 
         # 모델 로딩
         model_dir = base_dir / "models"
@@ -125,7 +126,6 @@ class StretchTracker:
         return None
 
     def is_performing(self, user_id : int, image: np.ndarray, outlier_threshold: float = -0.2) -> Dict:
-        self.frame_idx += 1
         current_time = time.time()
         
         feats = self.extract_landmarks(image, user_id)
@@ -213,19 +213,29 @@ class StretchTracker:
             if self.current_side != side or self.hold_start_time is None:
                 self.current_side = side
                 self.hold_start_time = current_time
+                self.last_time = current_time # 프레임 시간 초기화
 
             elapsed = current_time - self.hold_start_time
-            result['elapsed_time'] = elapsed
+
+            frame_elapsed = current_time - self.last_time if self.last_time else 0
+            self.total_hold_time[side] += frame_elapsed
+
+            result['elapsed_time'] = self.total_hold_time[side]
+            
+            self.last_time = current_time
 
             # 진행률 피드백
-            if elapsed < self.min_hold:
-                progress_feedback = f"좋습니다! {elapsed:.1f}초/{self.min_hold}초 진행 중입니다."
-                result['feedback_messages'] = [progress_feedback]
+            if self.total_hold_time[side] < self.min_hold:
+                result['feedback_messages'] = [
+                    f"좋습니다! {self.total_hold_time[side]:.1f}초/{self.min_hold}초 진행 중입니다."
+                ]
+
+            print(f"total_hold_time={self.total_hold_time[side]:.1f}, min_hold={self.min_hold}")
 
             print(f"hold_start_time={self.hold_start_time}, current_time={current_time}, side={side}")
             print(f"elapsed={elapsed}, min_hold={self.min_hold}")
 
-            if elapsed >= self.min_hold:
+            if self.total_hold_time[side] >= self.min_hold:
                 if self.counts[side] < self.target_count:
                     self.counts[side] += 1
                     result['counts'][side] = self.counts[side]
@@ -242,6 +252,7 @@ class StretchTracker:
         else:
             # 자세가 틀렸을 때는 시간 초기화
             self.hold_start_time = None
+            self.last_time = None
             
             if not result['feedback_messages']:
                 result['feedback_messages'] = ["자세를 다시 확인해주세요."]
