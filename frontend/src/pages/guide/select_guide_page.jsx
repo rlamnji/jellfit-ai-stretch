@@ -29,8 +29,11 @@ function SelectGuidePage({ setStretchingOrder, setCompletedStretchings }) {
 
     const handleMainCategory = (categoryName) => {
         setMainCategory(categoryName);
-
-          if (categoryName === '내 스트레칭') {
+    
+        const firstSub = subCategories[categoryName][0];
+        setSubCategory(firstSub); // 첫 번째 서브카테고리 선택
+    
+        if (categoryName === '내 스트레칭') {
             // 로컬스토리지에서 '내 루틴' 불러오기
             const saved = localStorage.getItem("myStretchings");
             if (saved) {
@@ -39,8 +42,10 @@ function SelectGuidePage({ setStretchingOrder, setCompletedStretchings }) {
                 alert("저장된 내 스트레칭 루틴이 없습니다.");
                 setStretchingList([]);
             }
+            fetchMyFavorites(); // 즐겨찾기 목록 불러오기도 같이 수행
         }
     };
+    
 
     const showSubCategories = () =>{
         return subCategories[mainCategory].map((item) => (
