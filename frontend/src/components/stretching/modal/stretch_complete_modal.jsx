@@ -19,7 +19,7 @@ function StretchModal({onClose, completedStretchings, duration}){
     return(
         <div className="fixed top-0 left-0 w-screen h-screen bg-black bg-opacity-60 z-[9999888] flex justify-center items-center pointer-events-auto">
             <div className="relative overflow-hidden">
-                <img src={stretchModal} className="w-[800px] h-[800px] object-contain block"/>
+                <img src={stretchModal} className="w-[700px] h-[700px] object-contain block"/>
 
                 <div className="flex flex-col absolute top-10 left-1/2 -translate-x-1/2 z-[1000] text-center items-center">
                     <div className='text-[#455970] text-[45px] tracking-widest font-bold'>수고하셨습니다!</div>
@@ -30,7 +30,7 @@ function StretchModal({onClose, completedStretchings, duration}){
                 </div>
                 
                 <div className="abolute z-[1000]">
-                    <div className="flex flex-col absolute top-52 left-1/2 -translate-x-1/2 w-[500px] h-[390px]  overflow-y-auto gap-3 p-2 rounded-xl">
+                    <div className="flex flex-col absolute top-52 left-1/2 -translate-x-1/2 w-[500px] h-[300px]  overflow-y-auto gap-3 p-2 rounded-xl">
                         {completedStretchings.map((stretching, index) => (
                         <div
                             key={index}
@@ -52,7 +52,7 @@ function StretchModal({onClose, completedStretchings, duration}){
                 </div>
 
                 <div className="flex flex-col absolute bottom-28 left-1/2 -translate-x-1/2 z-[1000] text-center items-center">
-                    <div className='text-[#455970] text-[45px] w-[500px] font-semibold'>총 <span className='text-[65px] font-extrabold'>{formatDuration(duration)}</span> 달성!</div>
+                    <div className='text-[#455970] text-[30px] w-[500px] font-semibold'>총 <span className='text-[55px] font-extrabold'>{formatDuration(duration)}</span> 달성!</div>
                 </div>
                 <div className="flex flex-col absolute bottom-10 left-1/2 -translate-x-1/2 z-[1000] text-center items-center">
                     <div className='bg-[#D9D5D3] rounded-2xl text-black font-bold p-2 text-[30px] w-[250px] cursor-pointer'

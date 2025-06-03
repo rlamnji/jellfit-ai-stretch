@@ -121,7 +121,7 @@ class CalibrationProcessor:
                     
                     return {
                         'success': True,
-                        'message': 'neutral 완료! T자세로 이동',
+                        'message': '정자세 완료! T자세로 이동합니다',
                         'pose_completed': 'neutral',
                         'current_pose': 'tpose',
                         'target_frames': self.pose_configs['tpose']['cycles']['target_frames']
@@ -132,7 +132,7 @@ class CalibrationProcessor:
             
             return {
                 'success': True,
-                'message': f'{current_pose} 유효 프레임 추가',
+                'message': f'{current_pose} 인식 성공!',
                 'current_pose': current_pose,
                 'collected_frames': collected_count,
                 'target_frames': target_count,

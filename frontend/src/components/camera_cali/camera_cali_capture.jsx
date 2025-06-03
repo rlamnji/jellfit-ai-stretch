@@ -339,7 +339,7 @@ function CameraCaliCapture() {
 
   return (
     <div className="w-full flex flex-col items-center py-4 overflow-y-hidden relative">
-      <div className="relative w-full max-w-[1500px] h-full max-h-[600px] aspect-[16/9]">
+      <div className="relative w-full max-w-[1000px] h-full max-h-[430px] aspect-[16/9]">
         <video
           ref={videoRef}
           autoPlay
