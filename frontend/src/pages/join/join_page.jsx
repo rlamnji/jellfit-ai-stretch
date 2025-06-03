@@ -72,7 +72,7 @@ function JoinPage (){
         setShowSuccessModal(true);
       
         setTimeout(() => {
-          navigate(`/condition/${userId}`);
+          navigate(`/condition/${userId}`, { state: { from: "signup" } }); // 회원가입 성공 후 캘리브레이션 페이지로 이동
         }, 1500);
       };
       

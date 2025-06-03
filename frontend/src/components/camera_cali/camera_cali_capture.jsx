@@ -36,11 +36,30 @@ function CameraCaliCapture() {
   const [collectedFrames, setCollectedFrames] = useState(0); // 수집된 프레임 수
   const [isCalibrationDone, setIsCalibrationDone] = useState(false); // 캘리브레이션 완료 여부
   const token = sessionStorage.getItem("accessToken");
+  const from = location.state?.from || null;
   let isProcessing = false;
+
+  let postureStableCount = 0;
+  let postureSuccess = false;
+  let tposeStableCount = 0;
+  let tposeSuccess = false;
 
   // 카메라 on off 핸들러
   const handleStopCamera = () => stopCamera(videoRef, guideCanvasRef, setIsCameraOn);
   const handleStartCamera = () => startCamera(videoRef, setIsCameraOn);
+
+  // 캘브 리셋 함수
+  const resetCalibration = () => {
+    console.log("🔄 캘리브레이션 재시작");
+    setCollectedFrames(0);
+    postureSuccess = false;
+    tposeSuccess = false;
+    postureStableCount = 0;
+    tposeStableCount = 0;
+    setStep("neutral");
+    setMessage("자세가 감지되지 않았습니다. 다시 시작해 주세요.");
+    // 필요 시 서버에 세션 초기화 요청도 전송
+  };
 
   useEffect(() => {
     if (!token) {
@@ -52,14 +71,17 @@ function CameraCaliCapture() {
   // 캘리 완료 → 로그인 이동
   useEffect(() => {
     if (isCalibrationDone) {
-      console.log("🎯 useEffect 감지: 캘리 완료 → 로그인 페이지 이동 (3초 대기)");
+      console.log("🎯 캘리 완료 → 이동 처리 (3초 대기)");
 
-      // 3초 후 이동
       const timeout = setTimeout(() => {
-        navigate("/login");
-      }, 3000); 
+        if (from === "signup") {
+          navigate("/login");
+        } else {
+          navigate(-1); // 직전 페이지로
+        }
+      }, 3000);
 
-      return () => clearTimeout(timeout); 
+      return () => clearTimeout(timeout);
     }
   }, [isCalibrationDone]);
 
@@ -149,7 +171,12 @@ function CameraCaliCapture() {
             
           }
 
-          // 이상치 탐지 실패 로직 추가 예정
+          // 이상치 탐지 실패 로직
+          if(result.success === false && result.message.includes("충분한 데이터가 없습니다.")){
+            console.warn("📛 이상치 탐지 실패 → 캘리 초기화");
+            resetCalibration();
+            return resolve(null);
+          }
 
         } catch (err) {
           console.error("❌ 전송 실패:", err);
@@ -196,12 +223,6 @@ function CameraCaliCapture() {
       minDetectionConfidence: 0.5,
       minTrackingConfidence: 0.5,
     });
-
-    let postureStableCount = 0;
-    let postureSuccess = false;
-
-    let tposeStableCount = 0;
-    let tposeSuccess = false;
 
     pose.onResults( async (results) => {
       if (!results.poseLandmarks || step === "" || step === "done" || isCalibrationDone) return;

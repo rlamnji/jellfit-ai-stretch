@@ -366,7 +366,7 @@ function SelfStretchPage({ stretchingOrder, completedStretchings, setCompletedSt
                     <div className="relative group w-24 h-8">
                         <button 
                             className="w-full h-full flex items-center cursor-pointer justify-center bg-[#FBF2E6] text-[#463C3C] font-semibold rounded-2xl shadow-lg"
-                            onClick={() => navigate("/condition/:id")}  // 이동 경로 적절히 수정
+                            onClick={() => navigate("/condition/:id", { state: { from: "stretch" } })}  // 이동 경로 적절히 수정
                         >
                             <img src={questionImg} alt="물음표 아이콘" className="w-4 h-4 mr-1" />
                             인식오류
