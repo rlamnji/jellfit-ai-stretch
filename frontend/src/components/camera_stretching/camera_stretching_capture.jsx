@@ -1,6 +1,6 @@
 import { useRef, useEffect, useState } from "react";
 import StretchingFeedback from "../stretching/stretching_feedback";
-function CameraStretchingCapture({ handleIsCompleted, handleElapsedTime, sendFrameTime , stretchingId}) {
+function CameraStretchingCapture({ isStretchingQuit, handleIsCompleted, handleElapsedTime, sendFrameTime , stretchingId}) {
   const videoRef = useRef(null);
   const canvasRef = useRef(null); // canvasRef 초기화
   const streamRef = useRef(null); // 스트림을 저장할 ref
@@ -13,8 +13,8 @@ function CameraStretchingCapture({ handleIsCompleted, handleElapsedTime, sendFra
   const [repeatedFeedback, setRepeatedFeedback] = useState(null);
   const feedbackDurationRef = useRef(0);
   const prevFeedbackRef = useRef(null);
-  
 
+  
   useEffect(() => {
     // 시작 메시지 먼저 보여줌
     setMessage('시작합니다!');
@@ -75,9 +75,13 @@ function CameraStretchingCapture({ handleIsCompleted, handleElapsedTime, sendFra
       formData.append("file", blob, "frame.jpg");
       formData.append("pose_id", stretchingId);
 
+
       try {
         const res = await fetch("http://localhost:8000/guide/analyze", {
           method: "POST",
+          headers:{
+            "Authorization": "Bearer " + sessionStorage.getItem("accessToken"),
+          },
           body: formData,
         });
         if(res.ok){
@@ -85,7 +89,7 @@ function CameraStretchingCapture({ handleIsCompleted, handleElapsedTime, sendFra
           console.log("✅ 서버 응답:", data);
           handleElapsedTime(data.currentSide, data.elapsedTime);
           handleFeedback(data.feedbackMsg, data.feedbackType);
-          // 둘다 완료되어야 스트레칭 완료 처리해야함.
+          
           if (data.isCompleted) {
             console.log("스트레칭 완료!!");
             handleIsCompleted(true);
@@ -118,7 +122,7 @@ function CameraStretchingCapture({ handleIsCompleted, handleElapsedTime, sendFra
   //SHOW_FEEDBACK_TIME 이상 같은 피드백 메세지가 반복되면 화면에 출력.
   const handleFeedback = (feedbackMsg, feedbackType) => {
     if (feedbackType !== 'warning') return;
-    const feedbackStr = Array.isArray(feedbackMsg) ? feedbackMsg.join(' / ') : feedbackMsg;
+    const feedbackStr = Array.isArray(feedbackMsg) ? feedbackMsg[0] : feedbackMsg;
   
     console.log("🟡 새로운 피드백 도착:", feedbackStr);
   
@@ -148,12 +152,12 @@ function CameraStretchingCapture({ handleIsCompleted, handleElapsedTime, sendFra
   };
     
 
-  // repeatedFeedback이 설정되면 6초 후 null로 자동 초기화
+  // repeatedFeedback이 설정되면 8초 후 null로 자동 초기화
   useEffect(() => {
     if (repeatedFeedback) {
       const timeout = setTimeout(() => {
         setRepeatedFeedback(null);
-      }, 6000); // 6초 동안 메시지 보여준 뒤 사라짐
+      }, 8000); // 8초 동안 메시지 보여준 뒤 사라짐
 
       return () => clearTimeout(timeout); // 메시지가 바뀌거나 컴포넌트 unmount 시 타이머 정리
     }
@@ -172,6 +176,11 @@ function CameraStretchingCapture({ handleIsCompleted, handleElapsedTime, sendFra
       console.log("🛑 프레임 전송 중단됨");
     }
   };
+
+  useEffect(() => {
+  if (!isStretchingQuit) return;
+    stopCamera();
+  }, [isStretchingQuit]);
 
   return (
     <div className="flex flex-col items-center justify-center w-full h-full rounded-xl">

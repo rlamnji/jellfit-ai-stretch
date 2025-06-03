@@ -230,6 +230,11 @@ class CalibrationProcessor:
         return {
             'success': True,
             'message': '캘리브레이션 완료!',
+<<<<<<< HEAD
+=======
+            'collected_frames': self.pose_configs['tpose']['cycles']['target_frames'],  # 보통 30
+            'target_frames': self.pose_configs['tpose']['cycles']['target_frames'],
+>>>>>>> 749e8193bd8e407149c54a23f2b9c3f30c19eb25
             'features': features
         }
     
@@ -313,6 +318,7 @@ class CalibrationProcessor:
             'total_frames': len(df)
         }
     
+<<<<<<< HEAD
     def save_calibration(self, calibration_data: Dict):
         """캘리브레이션 데이터 저장"""
         user_id = calibration_data['user_id']
@@ -346,3 +352,16 @@ class CalibrationProcessor:
         features_df.to_csv(csv_path, index=False)
         
         print(f"캘리브레이션 데이터 저장 완료: {json_path}")
+=======
+
+    def save_calibration(self, calibration_data: Dict):
+        """캘리브레이션 데이터 저장"""
+        user_id = calibration_data['user_id']
+
+        db = next(get_db())
+    
+        # 캘리브레이션 특징값 저장
+        save_user_calibration(db, user_id=int(user_id), calibration_features=calibration_data['features'])
+    
+        print(f"✅ User calibration saved to database for user {user_id}")
+>>>>>>> 749e8193bd8e407149c54a23f2b9c3f30c19eb25

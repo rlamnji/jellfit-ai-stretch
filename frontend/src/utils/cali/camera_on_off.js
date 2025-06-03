@@ -15,6 +15,7 @@ export const startCamera = async (videoRef, setIsCameraOn) => {
 };
 
 export const stopCamera = (videoRef, guideCanvasRef, setIsCameraOn) => {
+  if (!videoRef?.current) return;
   const stream = videoRef.current?.srcObject;
   if (stream) {
     stream.getTracks().forEach((track) => track.stop());

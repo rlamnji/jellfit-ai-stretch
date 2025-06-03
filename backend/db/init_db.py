@@ -52,22 +52,48 @@ calibration_names = [
     "tpose_wrist_distance",
     "neutral_left_eye_ear_y_diff",
     "neutral_right_eye_ear_y_diff",
+    "neutral_wrist_distance",
     "avg_arm_length",
     "wrist_expansion_ratio",
     "arm_shoulder_ratio",
-    "left_arm_angle",
-    "right_arm_angle",
-    "shoulder_alignment",
-    "wrist_distance",
-    "left_elbow_angle",
-    "right_elbow_angle",
-    "left_arm_vertical",
-    "right_arm_vertical",
-    "arms_vertical",
+    # "left_arm_angle",
+    # "right_arm_angle",
+    # "shoulder_alignment",
+    # "wrist_distance",
+    # "left_elbow_angle",
+    # "right_elbow_angle",
+    # "left_arm_vertical",
+    # "right_arm_vertical",
+    # "arms_vertical",
 ]
 
 for name in calibration_names:
     db.add(Calibration(name=name))
+
+# 사용자 캘리브레이션 값 추가
+user_calibration_data = {
+    "shoulder_width": 0.33081463479310574, 
+    "left_arm_length": 0.3842569816357875,
+    "right_arm_length": 0.3681222228558816,
+    "tpose_wrist_distance": 1.0807652487717991,
+    "neutral_left_eye_ear_y_diff": -0.03830407261848445,
+    "neutral_right_eye_ear_y_diff": -0.0381600916385651,
+    "neutral_wrist_distance": 0.5425606955543977,
+    "avg_arm_length": 0.37618960224583453,
+    "wrist_expansion_ratio": 1.9919711428183255,
+    "arm_shoulder_ratio": 1.1371613063040777
+}
+
+temp_cali_id = 1
+
+for name, value in user_calibration_data.items():
+    uc = UserCalibration(
+        user_id=1,
+        calibration_id=temp_cali_id,
+        value=value
+    )
+    db.add(uc)
+    temp_cali_id += 1
 
 
 # 사용자 스트레칭 기록(횟수 + 시간) (더미데이터)
@@ -77,50 +103,51 @@ db.add(UsageRecord(record_id=2, user_id=1, pose_id=2, repeat_cnt=1))
 # 스트레칭(자세) 정보 
 
 db.add(Pose(name="팔꿈치굽혀서옆구리늘리기", duration=10, count=1,
-            video_url="https://www.youtube.com/embed/RobdPJZAXdM",
+            video_url="https://www.youtube.com/embed/q97YjEgBHwQ",
             thumbnail_url="/images/stretching/pkcghsygrnrg",
             category_id=4,
             have_direction=True))  # 등/허리
 
 db.add(Pose(name="T자가슴열기", duration=10, count=1,
-            video_url="https://www.youtube.com/embed/G-1VPhV0Yhl",
+            video_url="https://www.youtube.com/embed/rs-U7xFLVFY",
             thumbnail_url="/images/stretching/tjgsyg",
             category_id=5,
             have_direction=False))  # 가슴
 
 db.add(Pose(name="Y자가슴열기", duration=10, count=1,
-            video_url="https://www.youtube.com/embed/G-1VPhV0Yhl",
+            video_url="https://www.youtube.com/embed/O9znMBD7LF4",
             thumbnail_url="/images/stretching/yjgsyg",
             category_id=5,
             have_direction=False))  # 가슴
 
-db.add(Pose(name="손걸고잡아당기기", duration=5, count=1,
-            video_url="https://www.youtube.com/embed/8q3lHCP3E7g",
+db.add(Pose(name="손걸고잡아당기기", duration=10, count=1,
+            video_url="https://www.youtube.com/embed/K3T4rQ5xhJ4",
             thumbnail_url="/images/stretching/sggjadgg",
             category_id=2,
             have_direction=True))  # 어깨
 
 db.add(Pose(name="팔뻗고옆구리늘리기", duration=10, count=1,
-            video_url="https://www.youtube.com/embed/RobdPJZAxdM",
+            video_url="https://www.youtube.com/embed/8lN9NGHbEPI",
             thumbnail_url="/images/stretching/pfgygrnrg",
             category_id=4,
             have_direction=True))  # 등/허리
 
 
 db.add(Pose(name="겨드랑이향하여목당기기", duration=10, count=1,
-            video_url="https://www.youtube.com/embed/LNwfbj_Sy7M",
+            video_url="https://www.youtube.com/embed/dIOtjf9iMNo",
             thumbnail_url="/images/stretching/gdrihhymdgg",
             category_id=1,
             have_direction=True))  # 목
 
 db.add(Pose(name="어깨늘리기", duration=10, count=1,
-            video_url="https://youtu.be/embed/PfERed6LRmQ?si=W0MIdsg6VFW_QiUX&t=152",
+            video_url="https://youtube/embed/PfERed6LRmQ?si=W0MIdsg6VFW_QiUX&t=152",
             thumbnail_url="/images/stretching/uknrg",
             category_id=2,
             have_direction=True))  # 어깨
 
+
 db.add(Pose(name="뒷목걸고고개젖히기", duration=10, count=1,
-            video_url="https://www.youtube.com/embed/LNwfbj_Sy7M",
+            video_url="https://www.youtube.com/embed/01JXDmzdmXw",
             thumbnail_url="/images/stretching/dmggggjhg",
             category_id=1,
             have_direction=False))  # 목

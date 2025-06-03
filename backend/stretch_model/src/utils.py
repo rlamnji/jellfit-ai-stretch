@@ -10,6 +10,9 @@ from pathlib import Path
 
 from typing import List, Dict, Tuple
 
+from app.services.calibration_service import get_user_calibration_features, save_user_calibration
+from db.database import get_db
+
 
 def load_user_calibration(user_id: str) -> Dict:
     """
@@ -21,53 +24,13 @@ def load_user_calibration(user_id: str) -> Dict:
     Returns:
         캘리브레이션 특징값들의 딕셔너리
     """
-    try:
-        # 데이터베이스 연결 (실제 DB 경로에 맞게 수정 필요)
-        db_path = Path("data") / "calibration" / "calibration.db"
-        
-        if not db_path.exists():
-            print(f"Warning: Calibration database not found at {db_path}")
-            return {}
-        
-        conn = sqlite3.connect(str(db_path))
-        cursor = conn.cursor()
-        
-        # 사용자의 최신 캘리브레이션 데이터 조회
-        query = """
-        SELECT features, timestamp 
-        FROM calibration_data 
-        WHERE user_id = ? 
-        ORDER BY timestamp DESC 
-        LIMIT 1
-        """
-        
-        cursor.execute(query, (user_id,))
-        result = cursor.fetchone()
-        
-        if result:
-            features_json, timestamp = result
-            features = json.loads(features_json)
-            
-            print(f"Loaded calibration for user {user_id} (timestamp: {timestamp})")
-            for key, value in features.items():
-                print(f"  {key}: {value:.6f}")
-            
-            conn.close()
-            return features
-        else:
-            print(f"No calibration data found for user {user_id}")
-            conn.close()
-            return {}
-            
-    except sqlite3.Error as e:
-        print(f"Database error while loading calibration for user {user_id}: {e}")
-        return {}
-    except json.JSONDecodeError as e:
-        print(f"JSON decode error while loading calibration for user {user_id}: {e}")
-        return {}
-    except Exception as e:
-        print(f"Unexpected error while loading calibration for user {user_id}: {e}")
-        return {}
+    db = next(get_db())
+    calib_dict = get_user_calibration_features(user_id=int(user_id), db=db) # {name: value} 형태
+
+    if not calib_dict:
+        raise ValueError(f"❌ user_id={user_id}에 대한 캘리브레이션 데이터가 없습니다.")
+    
+    return calib_dict
 
 
 def load_user_calibration_from_csv(user_id: str) -> Dict:
@@ -125,40 +88,14 @@ def save_user_calibration_to_db(user_id: str, features: Dict):
         user_id: 사용자 ID
         features: 캘리브레이션 특징값 딕셔너리
     """
-    try:
-        # 데이터베이스 디렉토리 생성
-        db_dir = Path("data") / "calibration"
-        db_dir.mkdir(parents=True, exist_ok=True)
-        
-        db_path = db_dir / "calibration.db"
-        conn = sqlite3.connect(str(db_path))
-        cursor = conn.cursor()
-        
-        # 테이블 생성 (존재하지 않는 경우)
-        cursor.execute("""
-        CREATE TABLE IF NOT EXISTS calibration_data (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            user_id TEXT NOT NULL,
-            features TEXT NOT NULL,
-            timestamp DATETIME DEFAULT CURRENT_TIMESTAMP
-        )
-        """)
-        
-        # 기존 데이터 확인 및 업데이트/삽입
-        features_json = json.dumps(features)
-        
-        cursor.execute("""
-        INSERT INTO calibration_data (user_id, features) 
-        VALUES (?, ?)
-        """, (user_id, features_json))
-        
-        conn.commit()
-        conn.close()
-        
-        print(f"Calibration data saved to database for user {user_id}")
-        
-    except Exception as e:
-        print(f"Error saving calibration to database for user {user_id}: {e}")
+    db = next(get_db())
+    
+    # 캘리브레이션 특징값 저장
+    save_user_calibration(db, user_id=int(user_id), calibration_features=features)
+    
+    print(f"✅ User calibration saved to database for user {user_id}")
+    for key, value in features.items():
+        print(f"  {key}: {value:.6f}")
 
 
 def load_config(path: str) -> Dict:
