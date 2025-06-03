@@ -9,9 +9,9 @@ import { drawGuideLines } from "../../utils/cali/draw_guide"; // 가이드 라�
 
 /* 고쳐야 할 것
   1. 함수 분리해서 관리 --- V
-  2. 완료 응답 시 페이지 이동
+  2. 완료 응답 시 페이지 이동  --- V
   3. 이상치 탐지로 인해 캘브 실패시 다시 측정안내
-  4. 완료 응답 내용은 db에 저장할 것
+  4. 완료 응답 내용은 db에 저장할 것 --- V
   5. 관련 ui 확실하게 처리할 것(카메라 크기, 배경 이미지 등)  --- V
   6. 카메라 on off 처리 꼬임 --- V
   7. 각 단계별로 안내 메시지 표시
@@ -52,8 +52,14 @@ function CameraCaliCapture() {
   // 캘리 완료 → 로그인 이동
   useEffect(() => {
     if (isCalibrationDone) {
-      console.log("🎯 useEffect 감지: 캘리 완료 → 로그인 페이지 이동");
-      navigate("/login");
+      console.log("🎯 useEffect 감지: 캘리 완료 → 로그인 페이지 이동 (3초 대기)");
+
+      // 3초 후 이동
+      const timeout = setTimeout(() => {
+        navigate("/login");
+      }, 3000); 
+
+      return () => clearTimeout(timeout); 
     }
   }, [isCalibrationDone]);
 
@@ -136,9 +142,11 @@ function CameraCaliCapture() {
           // 캘리브레이션 완료 조건
           if(result.success === true && result.collected_frames >= result.target_frames) {
             console.log("🎉 캘리브레이션 완료");
+            setMessage("캘리브레이션이 완료되었습니다! 로그인 페이지로 이동합니다.");
+            handleStopCamera();
             setIsCalibrationDone(true);
             setStep("done");
-            setMessage("캘리브레이션이 완료되었습니다! 로그인 페이지로 이동합니다.");
+            
           }
 
           // 이상치 탐지 실패 로직 추가 예정
@@ -207,11 +215,11 @@ function CameraCaliCapture() {
           console.log(`정자세 정렬 프레임 수: ${postureStableCount}`);
           setMessage("정자세 인식을 시작합니다! 다음 안내까지 자세를 유지해주세요!"); // 준비자세 느낌
 
-          // 정렬프레임 30 넘어가면 서버요청 시작
-          if (postureStableCount >= 30) {
+          // 정렬프레임 20 넘어가면 서버요청 시작
+          if (postureStableCount >= 20) {
             postureSuccess = true;
             console.log("✅ 정자세 연속 인식 성공 → 프레임 전송 시작");
-            setMessage("✅ 정자세 연속 인식 성공 → 프레임 전송 시작");
+            setMessage("🙆‍♀️ 정자세 인식 완료! 측정을 진행할게요.");
               let collected = 0;
               let result;
               while (collected < 30) {
@@ -232,10 +240,10 @@ function CameraCaliCapture() {
           console.log(`T자세 정렬 프레임 수: ${tposeStableCount}`);
           setMessage("T자 자세 인식을 시작합니다! 다음 안내까지 자세를 유지해주세요!");
 
-          if (tposeStableCount >= 30) {
+          if (tposeStableCount >= 20) {
             tposeSuccess = true;
             console.log("✅ T자세 연속 인식 성공 → 프레임 전송 시작");
-            setMessage("✅ T자세 연속 인식 성공 → 프레임 전송 시작");
+            setMessage("🙆‍♀️ T자세 인식 완료! 측정을 진행할게요.");
 
             let collected = 0;
             let result;
@@ -309,8 +317,8 @@ function CameraCaliCapture() {
 
 
   return (
-    <div className="w-full flex flex-col items-center py-4 overflow-y-hidden">
-      <div className="relative w-full max-w-[1000px] aspect-[16/9]">
+    <div className="w-full flex flex-col items-center py-4 overflow-y-hidden relative">
+      <div className="relative w-full max-w-[1500px] h-full max-h-[600px] aspect-[16/9]">
         <video
           ref={videoRef}
           autoPlay
@@ -335,14 +343,14 @@ function CameraCaliCapture() {
           className="hidden"
         />
 
+        <div className="absolute top-3 left-3 w-[12%] h-[10%] z-10 pointer-events-none bg-[#353535] p-2 flex items-center text-center justify-center rounded-full text-white text-[1.5vw]">{collectedFrames} / 30</div>
+
         {/* 안내 메시지 표시 */}
         {isCameraOn &&(
-          <div className="absolute bottom-2 left-12 opacity-85 rounded-3xl w-[900px] mt-4 font-semibold text-white text-[28px] bg-[#2c1e1e] p-2  text-center">{message}, {collectedFrames}</div>
+          <div className="absolute bottom-2 left-1/2 transform -translate-x-1/2 opacity-85 rounded-3xl w-[80%] mt-4 font-semibold text-white text-[28px] bg-[#2c1e1e] p-2  text-center">{message}</div>
         )}
 
       </div>
-
-      
 
       <div className="flex flex-row justify-around gap-4">
         <button
