@@ -1,6 +1,6 @@
 import { useRef, useEffect, useState } from "react";
 import StretchingFeedback from "../stretching/stretching_feedback";
-function CameraStretchingCapture({ handleIsCompleted, handleElapsedTime, sendFrameTime , stretchingId}) {
+function CameraStretchingCapture({ isStretchingQuit, handleIsCompleted, handleElapsedTime, sendFrameTime , stretchingId}) {
   const videoRef = useRef(null);
   const canvasRef = useRef(null); // canvasRef 초기화
   const streamRef = useRef(null); // 스트림을 저장할 ref
@@ -13,6 +13,7 @@ function CameraStretchingCapture({ handleIsCompleted, handleElapsedTime, sendFra
   const [repeatedFeedback, setRepeatedFeedback] = useState(null);
   const feedbackDurationRef = useRef(0);
   const prevFeedbackRef = useRef(null);
+
   
   useEffect(() => {
     // 시작 메시지 먼저 보여줌
@@ -175,6 +176,11 @@ function CameraStretchingCapture({ handleIsCompleted, handleElapsedTime, sendFra
       console.log("🛑 프레임 전송 중단됨");
     }
   };
+
+  useEffect(() => {
+  if (!isStretchingQuit) return;
+    stopCamera();
+  }, [isStretchingQuit]);
 
   return (
     <div className="flex flex-col items-center justify-center w-full h-full rounded-xl">
