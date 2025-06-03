@@ -322,7 +322,10 @@ class CalibrationProcessor:
 
         db = next(get_db())
     
-        # 캘리브레이션 특징값 저장
-        save_user_calibration(db, user_id=int(user_id), calibration_features=calibration_data['features'])
-    
-        print(f"✅ User calibration saved to database for user {user_id}")
+        try:
+            # 캘리브레이션 특징값 저장
+            save_user_calibration(db, user_id=int(user_id), calibration_features=calibration_data['features'])
+        
+            print(f"✅ User calibration saved to database for user {user_id}")
+        finally:
+            db.close()

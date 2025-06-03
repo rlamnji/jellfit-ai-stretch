@@ -25,12 +25,15 @@ def load_user_calibration(user_id: str) -> Dict:
         캘리브레이션 특징값들의 딕셔너리
     """
     db = next(get_db())
-    calib_dict = get_user_calibration_features(user_id=int(user_id), db=db) # {name: value} 형태
+    try:
+        calib_dict = get_user_calibration_features(user_id=int(user_id), db=db) # {name: value} 형태
 
-    if not calib_dict:
-        raise ValueError(f"❌ user_id={user_id}에 대한 캘리브레이션 데이터가 없습니다.")
-    
-    return calib_dict
+        if not calib_dict:
+            raise ValueError(f"❌ user_id={user_id}에 대한 캘리브레이션 데이터가 없습니다.")
+        
+        return calib_dict
+    finally:
+        db.close()
 
 
 def load_user_calibration_from_csv(user_id: str) -> Dict:
@@ -90,12 +93,15 @@ def save_user_calibration_to_db(user_id: str, features: Dict):
     """
     db = next(get_db())
     
-    # 캘리브레이션 특징값 저장
-    save_user_calibration(db, user_id=int(user_id), calibration_features=features)
-    
-    print(f"✅ User calibration saved to database for user {user_id}")
-    for key, value in features.items():
-        print(f"  {key}: {value:.6f}")
+    try:
+        # 캘리브레이션 특징값 저장
+        save_user_calibration(db, user_id=int(user_id), calibration_features=features)
+        
+        print(f"✅ User calibration saved to database for user {user_id}")
+        for key, value in features.items():
+            print(f"  {key}: {value:.6f}")
+    finally:
+        db.close()
 
 
 def load_config(path: str) -> Dict:

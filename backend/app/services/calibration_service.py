@@ -13,28 +13,34 @@ def save_user_calibration_landmark(
     사용자 랜드마크 저장
     - (user_id, pose_name) 조합이 있으면 update, 없으면 insert
     """
+    created_local_session = False
     if db is None:
         db = next(get_db())
+        created_local_session = True
 
-    existing = db.query(UserCalibrationLandmark).filter_by(
-        user_id=user_id,
-        pose_name=pose_name
-    ).first()
-
-    if existing:
-        existing.landmarks = landmarks
-        print(f"🔄 Updated existing calibration landmark for user {user_id}, pose {pose_name}")
-    else:
-        existing = UserCalibrationLandmark(
+    try:
+        existing = db.query(UserCalibrationLandmark).filter_by(
             user_id=user_id,
-            pose_name=pose_name,
-            landmarks=landmarks
-        )
-        db.add(existing)
-        print(f"✅ Inserted new calibration landmark for user {user_id}, pose {pose_name}")
-    
-    db.commit()
-    db.refresh(existing)
+            pose_name=pose_name
+        ).first()
+
+        if existing:
+            existing.landmarks = landmarks
+            print(f"🔄 Updated existing calibration landmark for user {user_id}, pose {pose_name}")
+        else:
+            existing = UserCalibrationLandmark(
+                user_id=user_id,
+                pose_name=pose_name,
+                landmarks=landmarks
+            )
+            db.add(existing)
+            print(f"✅ Inserted new calibration landmark for user {user_id}, pose {pose_name}")
+        
+        db.commit()
+        db.refresh(existing)
+    finally:
+        if created_local_session:
+            db.close()
 
 def save_user_calibration(db: Session, user_id: int, calibration_features: dict):
     """
@@ -78,17 +84,22 @@ def get_user_calibration_features(user_id: int, db: Session = None) -> dict:
     """
     사용자의 캘리브레이션 값을 {name: value} 형태로 반환
     """
+    created_local_session = False
     if db is None:
         db = next(get_db())
+        created_local_session = True
 
-    results = (
-        db.query(Calibration.name, UserCalibration.value)
-        .join(UserCalibration, Calibration.calibration_id == UserCalibration.calibration_id)
-        .filter(UserCalibration.user_id == user_id)
-        .all()
-    )
-
-    return {name: value for name, value in results}
+    try:
+        results = (
+            db.query(Calibration.name, UserCalibration.value)
+            .join(UserCalibration, Calibration.calibration_id == UserCalibration.calibration_id)
+            .filter(UserCalibration.user_id == user_id)
+            .all()
+        )
+        return {name: value for name, value in results}
+    finally:
+        if created_local_session:
+            db.close()
 
 
 # 아래 두 함수는 테스트용 (나중에 삭제할 예정)
