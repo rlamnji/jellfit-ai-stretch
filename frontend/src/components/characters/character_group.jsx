@@ -6,6 +6,7 @@ function CharacterGroup({ ownedCharacters }) {
   const containerRef = useRef(null);
   const [areaSize, setAreaSize] = useState({ width: 0, height: 0 });
   const [positions, setPositions] = useState([]);
+  const [selectedCharacters, setSelectedCharacters] = useState([]); // 랜덤 최대 n개까지
 
   useEffect(() => {
     if (containerRef.current) {
@@ -13,6 +14,14 @@ function CharacterGroup({ ownedCharacters }) {
       setAreaSize({ width: offsetWidth, height: offsetHeight });
     }
   }, []);
+
+  useEffect(() => {
+    if (ownedCharacters.length > 0) {
+      const shuffled = [...ownedCharacters].sort(() => Math.random() - 0.5);
+      const picked = shuffled.slice(0, 7); // 최대 7개만
+      setSelectedCharacters(picked);
+    }
+  }, [ownedCharacters]);
 
   useEffect(() => {
     if (areaSize.width > 0 && ownedCharacters.length > 0) {
@@ -28,7 +37,7 @@ function CharacterGroup({ ownedCharacters }) {
         });
       }
 
-      ownedCharacters.forEach(() => {
+      selectedCharacters.forEach(() => {
         let tries = 0;
         let x = 0, y = 0;
 
@@ -43,16 +52,16 @@ function CharacterGroup({ ownedCharacters }) {
 
       setPositions(newPositions);
     }
-  }, [areaSize, ownedCharacters]);
+  }, [areaSize, selectedCharacters]);
 
   return (
     <div className="w-full h-full flex items-center justify-center">
       <div
         ref={containerRef}
-        className="left-52 bottom-16 w-[80vw] h-[65vh] relative overflow-hidden -translate-x-[5vw]"
+        className="left-52 bottom-16 w-[80vw] h-[65vh] relative -translate-x-[5vw] overflow-visible"
       >
         {positions.length > 0 &&
-          ownedCharacters.map((c, i) => (
+          selectedCharacters.map((c, i) => (
             <AnimatedCharacter
               key={c.character_id}
               character={c}

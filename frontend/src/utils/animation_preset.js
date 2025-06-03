@@ -45,5 +45,33 @@ export const animationPresets = (position) => {
       },
     },
     // 필요한 만큼 추가 가능..
+    swaySpin: {
+      animate: {
+        rotate: [0, 10, -10, 0],
+        y: [
+          position.y,
+          position.y - floatRange / 2,
+          position.y + floatRange / 2,
+          position.y,
+        ],
+      },
+    },
+  jellyPulse: {
+    animate: {
+      scaleY: [1, 0.9, 1.1, 1],
+      scaleX: [1, 1.1, 0.95, 1],
+    },
+  },
+  swaySpin: {
+    animate: {
+      rotate: [0, 10, -10, 0],
+      y: [
+        position.y,
+        position.y - floatRange / 2,
+        position.y + floatRange / 2,
+        position.y,
+      ],
+    },
+  }
   };
 };

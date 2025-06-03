@@ -5,6 +5,7 @@ import Stretching from "../../components/stretching/stretching";
 import SelectedStretching from "../../components/stretching/selected_stretching";
 import { useNavigate } from "react-router-dom";
 
+
 import dice from '../../../src/assets/images/icons/guide_dice.png'
 
 function SelectGuidePage({ setStretchingOrder, setCompletedStretchings }) {
@@ -19,11 +20,12 @@ function SelectGuidePage({ setStretchingOrder, setCompletedStretchings }) {
     const [selectedStretchingList, setSelectedStretchingList] = useState([]);
     const token = sessionStorage.getItem("accessToken"); // 로그인 토큰
     const [myFavorites, setMyFavorites] = useState([]); // 즐겨찾기 목록 상태 저장
+    const [msgFav, setMsgFav] = useState(""); // 즐겨찾기 알림 메시지
     const navigate = useNavigate();
 
     const subCategories = {
         '신체부위' : ['목', '어깨', '등/허리', '가슴'],
-        '상황' : ['자기 전', '일어나서', '작업 하기 전', '식사 후'],
+        //'상황' : ['자기 전', '일어나서', '작업 하기 전', '식사 후'],
         '내 스트레칭' : ['']
     };
 
@@ -39,7 +41,7 @@ function SelectGuidePage({ setStretchingOrder, setCompletedStretchings }) {
             if (saved) {
                 setStretchingList(JSON.parse(saved));
             } else {
-                alert("저장된 내 스트레칭 루틴이 없습니다.");
+                //alert("저장된 내 스트레칭 루틴이 없습니다.");
                 setStretchingList([]);
             }
             fetchMyFavorites(); // 즐겨찾기 목록 불러오기도 같이 수행
@@ -252,6 +254,10 @@ function SelectGuidePage({ setStretchingOrder, setCompletedStretchings }) {
 
             const data = await response.json();
             console.log("즐겨찾기 등록 완료:", data.registered);
+            setMsgFav("내 스트레칭에 등록되었습니다!");
+            setTimeout(() => setMsgFav(null), 2000);
+            setSelectFav(prev => !prev); // 다시 빈 별로
+
         } catch (error) {
             console.error("API 오류:", error.message);
             alert("즐겨찾기 등록 중 문제가 발생했습니다.");
@@ -271,9 +277,9 @@ function SelectGuidePage({ setStretchingOrder, setCompletedStretchings }) {
     };
 
     useEffect(() => {
-    if (selectFav === true) {
-        favGuideSelect();
-    }
+        if (selectFav === true) {
+            favGuideSelect();
+        }
     }, [selectFav]);
 
     // 즐겨찾기 삭제
@@ -293,6 +299,8 @@ function SelectGuidePage({ setStretchingOrder, setCompletedStretchings }) {
             setMyFavorites(updated);
 
             console.log("✅ 즐겨찾기 삭제 완료");
+            setMsgFav("내 스트레칭에서 삭제되었습니다!");
+            setTimeout(() => setMsgFav(null), 2000);
         } catch (err) {
             console.error("❌ 즐겨찾기 삭제 오류:", err.message);
             alert("삭제 중 오류가 발생했습니다.");
@@ -319,11 +327,14 @@ function SelectGuidePage({ setStretchingOrder, setCompletedStretchings }) {
                                     신체부위
                                 </button>
                             </li>
+                            {/*
                             <li>
                                 <button className={`${mainCategory === '상황' ? 'text-[#1D1D1D]' : 'text-[#7C7B7B]'}`} onClick={() =>{handleMainCategory('상황')}}>
                                     상황
                                 </button>
                             </li>
+                            */}
+
                             <li>
                                 <button className={`${mainCategory === '내 스트레칭' ? 'text-[#1D1D1D]' : 'text-[#7C7B7B]'}`} onClick={() =>{handleMainCategory('내 스트레칭'); handleFavoritesTabClick();}}>
                                     내 스트레칭
@@ -370,6 +381,11 @@ function SelectGuidePage({ setStretchingOrder, setCompletedStretchings }) {
                     </button>
                 </div>
             </div>
+            {msgFav && (
+            <div className="fixed top-8 left-1/2 -translate-x-1/2 bg-[#333] text-white text-sm px-4 py-2 rounded-xl shadow-lg z-50 animate-fade-in">
+                {msgFav}
+            </div>
+            )}
 
         </div>
 
