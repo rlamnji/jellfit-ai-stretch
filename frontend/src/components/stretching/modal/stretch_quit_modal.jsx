@@ -3,8 +3,14 @@ import { useNavigate } from 'react-router-dom';
 import stretchModal from '../../../assets/images/icons/setting_content.png';
 import charaterGroup from '../../../assets/model/character_group.png';
 
-function StretchQuitModal({onClose}){
+function StretchQuitModal({onClose, setLeftElapsedTime, setRightElapsedTime}){
     const navigator = useNavigate();
+
+    const handleQuit = () => { 
+        setLeftElapsedTime(0);
+        setRightElapsedTime(0);
+        navigator('/home');
+    };
 
     return(
         <div className="fixed top-0 left-0 w-screen h-screen bg-black bg-opacity-60 z-[9999888] flex justify-center items-center pointer-events-auto">
@@ -34,7 +40,7 @@ function StretchQuitModal({onClose}){
                                     onClick={()=>onClose()}
                     >계속하기</div>
                                         <div className='bg-[#343434] rounded-2xl text-white font-bold p-2 text-[30px] w-[250px] cursor-pointer'
-                                    onClick={()=>navigator('/home')}
+                                    onClick={()=>handleQuit()}
                     >그만하기</div>
                 </div>
 

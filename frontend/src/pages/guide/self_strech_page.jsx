@@ -354,7 +354,7 @@ function SelfStretchPage({ stretchingOrder, completedStretchings, setCompletedSt
                 {/* 서버에서 true를 받았을 시 동작 완료 */}
 
 
-                <ModalManager modalType={modalType} setModalType={setModalType} completedStretchings={completedStretchings} duration={duration} pendingJelly={pendingJelly} setPendingJelly={setPendingJelly}/>
+                <ModalManager modalType={modalType} setModalType={setModalType} completedStretchings={completedStretchings} duration={duration} pendingJelly={pendingJelly} setPendingJelly={setPendingJelly} setLeftElapsedTime={setLeftElapsedTime} setRightElapsedTime={setRightElapsedTime}/>
                 <div className="buttonArea w-[56%] h-auto absolute top-5 flex items-center gap-4">
                     <button 
                         className="w-24 h-8 flex items-center justify-center bg-[#FBF2E6] text-[#463C3C] font-semibold rounded-2xl shadow-lg"
