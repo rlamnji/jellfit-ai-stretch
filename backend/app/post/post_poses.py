@@ -3,6 +3,7 @@ from stretch_model.src.calibrate import CalibrationProcessor
 from dependencies import get_current_user
 from db.models import User
 import numpy as np
+import cv2
 
 router = APIRouter()
 processor = CalibrationProcessor()
