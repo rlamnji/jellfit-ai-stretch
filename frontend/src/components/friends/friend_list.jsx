@@ -112,7 +112,7 @@ function FriendList({ setSelectedTab }) {
         </div>
       </div>
 
-
+            
     <div className='main flex justify-center items-center h-screen bg-slate-200'>
       <div className="flex flex-col items-center justify-center relative w-[70%] h-[70%] text-center z-0 bg-black">
         {/* 상위 타이틀 */}

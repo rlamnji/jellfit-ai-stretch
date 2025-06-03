@@ -230,6 +230,8 @@ class CalibrationProcessor:
         return {
             'success': True,
             'message': '캘리브레이션 완료!',
+            'collected_frames': self.pose_configs['tpose']['cycles']['target_frames'],  # 보통 30
+            'target_frames': self.pose_configs['tpose']['cycles']['target_frames'],
             'features': features
         }
     
@@ -313,36 +315,13 @@ class CalibrationProcessor:
             'total_frames': len(df)
         }
     
+
     def save_calibration(self, calibration_data: Dict):
         """캘리브레이션 데이터 저장"""
         user_id = calibration_data['user_id']
-        base_dir = Path(__file__).resolve().parent 
-        output_dir = base_dir / ".." / "data" / "calibration"
-        output_dir.mkdir(parents=True, exist_ok=True)
-
-        """
-        # DB 저장 부분 (우선 ladnmark만 저장)
         db = next(get_db())
-
-        save_user_calibration_landmark(
-            user_id=int(user_id),
-            pose_name= self.sessions[user_id]['current_pose'],
-            landmarks=calibration_data,
-            db=db
-        )
-        """
-
-        # JSON 저장
-        json_path = output_dir / f"calibration_{user_id}.json"
-        with open(json_path, 'w', encoding='utf-8') as f:
-            json.dump(calibration_data, f, indent=2, ensure_ascii=False)
-        
-        # 특징만 CSV로 저장 (DB 연동용)
-        features_df = pd.DataFrame([calibration_data['features']])
-        features_df['user_id'] = user_id
-        features_df['timestamp'] = calibration_data['timestamp']
-        
-        csv_path = output_dir / f"calibration_features_{user_id}.csv"
-        features_df.to_csv(csv_path, index=False)
-        
-        print(f"캘리브레이션 데이터 저장 완료: {json_path}")
+    
+        # 캘리브레이션 특징값 저장
+        save_user_calibration(db, user_id=int(user_id), calibration_features=calibration_data['features'])
+    
+        print(f"✅ User calibration saved to database for user {user_id}")
