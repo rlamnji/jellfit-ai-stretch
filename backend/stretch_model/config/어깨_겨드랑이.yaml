@@ -9,42 +9,43 @@ features:
     points: [12, 14, 16]
 
   # 손 위치 정의하여 자세가 올바른지 판단
-  - name: left_Lhand_y_alignment  # 왼쪽 방향일 때 왼손
+  - name: left_Lhand_eye_y_diff  # 왼쪽 방향일 때 왼손
     type: delta_y
-    points: [15, 11]   # 왼손목, 왼어깨. 절댓값으로 처리
-  # 방향별로 필요...
-  - name: left_Rhand_y_alignment  # 왼쪽 방향 오른손의 높이
+    points: [5, 15]   # 왼쪽 눈보다 왼쪽 손목이 위에 있어야 함. 양수여야 함
+  - name: left_Lhand_Rhand_y_diff  # 왼쪽 손목이 오른쪽 손목보다 위에 있어야 함. 양수
     type: delta_y
-    points: [16, 11]   # 오른손목, 왼어깨. 왼손보다 더 넓은 절댓값으로 처리
+    points: [16, 15]   
 
-  - name: right_Lhand_y_alignment   
+  - name: right_Rhand_eye_y_diff   # 양수
     type: delta_y
-    points: [15, 12]   
-  - name: right_Rhand_y_alignment
+    points: [2, 16]   
+  - name: right_Rhand_Lhand_y_diff   # 양수
     type: delta_y
-    points: [16, 12]   
+    points: [15, 16]   
 
   - name: left_Lhand_x_alignment  # 왼쪽 방향일 때 왼손
     type: delta_x
-    points: [15, 12]   # 왼손목 - 어깨. 왼손목이 더 왼쪽에 있어야 함 (-)
+    points: [15, 0]   # 왼손목 - 코. pos, (-)
   - name: left_Rhand_x_alignment  # 왼쪽 방향 오른손
     type: delta_x
-    points: [16, 15]   # 오른쪽 손목보다 왼손목이 오른쪽에 있어야 함. (+)
+    points: [16, 14]   # 팔꿈치보다 손목을 안으로. 관대하게 설정하는 게 좋을 듯 neg
 
   - name: right_Lhand_x_alignment
     type: delta_x
-    points: [16, 12]    # 왼손목은 오른쪽어깨보다 더 오른쪽에 있어야 함 (+)
+    points: [15, 13]    # pos
   - name: right_Rhand_x_alignment
     type: delta_x
-    points: [16, 11]    # 오른손목은 왼손목보다 왼쪽에 (-)
+    points: [16, 0]    # 오른손목 - 코. neg, (-)
 
 
-  - name: left_nose_ear_
+  - name: left_nose_ear_shorter   # 왼쪽귀-코 거리가 짧으면 1,  오른쪽귀-코 거리가 짧으면 0
+    type: distance_comparison
+    points: [7, 0, 8, 0]
 
 
 thresholds:
 
-  min_hold_duration_sec: 10    # 자세를 유지해야 하는 최소 시간 (단위: 초)
+  min_hold_duration_sec: 5    # 자세를 유지해야 하는 최소 시간 (단위: 초)
 
 
 cycles:
@@ -59,40 +60,46 @@ direction:
       threshold: -100
     right_elbow_angle:
       sign: negative
-      threshold: 150
+      threshold: -70
 
-    left_Lhand_y_alignment:
-      sign: interval
-      threshold: 0.03
-    left_Rhand_y_alignment:
-      sign: interval
-      threshold: 0.03
+    left_nose_ear_shorter:
+      sign: positive
+      threshold: 0.9
 
-    left_Lhand_x_alignment:
-      sign: negative
-      threshold: 0.01
-    left_Rhand_x_alignment:
+    left_Lhand_eye_y_diff:
+      sign: positive
+      threshold: 0.05
+    left_Lhand_Rhand_y_diff:
       sign: positive
       threshold: 0.01
+    left_Lhand_x_alignment:
+      sign: negative
+      threshold: -0.1
+    left_Rhand_x_alignment:
+      sign: positive
+      threshold: 0.05
 
   right:
     left_elbow_angle: 
-      sign: positive 
-      threshold: 150
+      sign: negative 
+      threshold: -70
     right_elbow_angle:
       sign: negative
       threshold: -100
 
-    right_Lhand_y_alignment:
-      sign: interval
-      threshold: 0.03
-    right_Rhand_y_alignment:
-      sign: interval
-      threshold: 0.03
-
-    right_Lhand_x_alignment:
+    left_nose_ear_shorter:
+      sign: negative
+      threshold: -0.1
+      
+    right_Lhand_eye_y_diff:
+      sign: positive
+      threshold: 0.05
+    right_Rhand_Lhand_y_diff:
       sign: positive
       threshold: 0.01
-    right_Rhand_x_alignment:
+    right_Lhand_x_alignment:
       sign: negative
-      threshold: 0.01
+      threshold: 0.05
+    right_Rhand_x_alignment:
+      sign: positive
+      threshold: -0.1
