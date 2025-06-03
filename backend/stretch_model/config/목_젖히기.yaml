@@ -56,25 +56,25 @@ thresholds:
     value: 0.01     
     message: "오른쪽 팔이 부정확해요."
 
-  min_left_eye_ear_y_diff: 
-    value: 0.015
+  max_left_mouth_ear_y_diff: 
+    value: 0.02
     message: "고개를 더 젖히거나, 카메라와 너무 멀리 떨어져 있을 수 있어요."
-  min_right_eye_ear_y_diff: 
-    value: 0.015
+  max_right_mouth_ear_y_diff: 
+    value: 0.02
     message: "고개를 더 젖히거나, 카메라와 너무 멀리 떨어져 있을 수 있어요."
   
   min_hold_duration_sec: 10    # 자세를 유지해야 하는 최소 시간 (단위: 초)
 
-  calibration_min_left_eye_ear_y_diff:
-    calibration_key: left_eye_ear_y_diff
-    operator: greater_than
-    offset: 0.02
+  calibration_min_left_mouth_ear_y_diff:
+    calibration_key: left_mouth_ear_y_diff
+    operator: less_than
+    offset: 0.005
     message: "고개를 더 젖히거나, 카메라와 너무 멀리 떨어져 있을 수 있어요."
     
-  calibration_min_right_eye_ear_y_diff:
-    calibration_key: right_eye_ear_y_diff
-    operator: greater_than
-    offset: 0.02
+  calibration_min_right_mouth_ear_y_diff:
+    calibration_key: right_mouth_ear_y_diff
+    operator: less_than
+    offset: 0.005
     message: "고개를 더 젖히거나, 카메라와 너무 멀리 떨어져 있을 수 있어요."
 
 
@@ -84,5 +84,5 @@ cycles:
 
 
 calibration:
-  - left_eye_ear_y_diff
-  - right_eye_ear_y_diff
+  - left_mouth_ear_y_diff
+  - right_mouth_ear_y_diff
