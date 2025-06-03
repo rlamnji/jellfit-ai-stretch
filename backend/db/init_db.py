@@ -120,7 +120,7 @@ db.add(Pose(name="Y자가슴열기", duration=10, count=1,
             category_id=5,
             have_direction=False))  # 가슴
 
-db.add(Pose(name="손걸고잡아당기기", duration=5, count=1,
+db.add(Pose(name="손걸고잡아당기기", duration=10, count=1,
             video_url="https://www.youtube.com/embed/8q3lHCP3E7g",
             thumbnail_url="/images/stretching/sggjadgg",
             category_id=2,

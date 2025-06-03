@@ -34,6 +34,7 @@ function SelfStretchPage({ stretchingOrder, completedStretchings, setCompletedSt
     const [rightElapsedTime, setRightElapsedTime] = useState(0); // 오른쪽 스트레칭 시간
 
     const [isCompleted, setIsCompleted] = useState(false); // 모든 스트레칭 완료 여부
+    const [isStretchingQuit, setIsStretchingQuit] = useState(false);
 
 
 
@@ -306,12 +307,17 @@ function SelfStretchPage({ stretchingOrder, completedStretchings, setCompletedSt
         }
     }
 
+    const handleQuitStretching = () => {
+        setModalType('confirmQuit');
+        setIsStretchingQuit(true);
+    };
+
     return (
         <div className="w-full h-screen overflow-hidden flex flex-col items-center bg-space min-w-[1144px]">
             <StretchingSteps className="fixed left-[4%] max-w-[180px] overflow-hidden top-64 z-50" stretchingOrder={stretchingOrder} currentStretchingIndex={stretchingOrder.indexOf(Number(stretchingId))} />
             <div className='topBar w-full h-14 flex justify-between'>      
                 <img src={arrowLeft} className="w-8 h-8 m-4 cursor-pointer" 
-                    onClick={() => {setModalType('confirmQuit'); }} />
+                    onClick={handleQuitStretching} />
                 <SoundBtn />
             </div>
 
@@ -335,6 +341,7 @@ function SelfStretchPage({ stretchingOrder, completedStretchings, setCompletedSt
                     handleElapsedTime={handleElapsedTime}
                     sendFrameTime={sendFrameTime}
                     stretchingId = {stretchingId}
+                    isStretchingQuit={isStretchingQuit}
                 />
 
                 {/* 임시용 버튼 == 넘어가기> 버튼 */}
@@ -359,7 +366,7 @@ function SelfStretchPage({ stretchingOrder, completedStretchings, setCompletedSt
                     <div className="relative group w-24 h-8">
                         <button 
                             className="w-full h-full flex items-center cursor-pointer justify-center bg-[#FBF2E6] text-[#463C3C] font-semibold rounded-2xl shadow-lg"
-                            onClick={() => navigate("/condition/:id")}  // 이동 경로 적절히 수정
+                            onClick={() => navigate("/condition/:id", { state: { from: "stretch" } })}  // 이동 경로 적절히 수정
                         >
                             <img src={questionImg} alt="물음표 아이콘" className="w-4 h-4 mr-1" />
                             인식오류
