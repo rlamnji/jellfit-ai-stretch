@@ -50,8 +50,8 @@ calibration_names = [
     "left_arm_length",
     "right_arm_length",
     "tpose_wrist_distance",
-    "neutral_left_eye_ear_y_diff",
-    "neutral_right_eye_ear_y_diff",
+    "left_eye_ear_y_diff",
+    "right_eye_ear_y_diff",
     "neutral_wrist_distance",
     "avg_arm_length",
     "wrist_expansion_ratio",
@@ -76,8 +76,8 @@ user_calibration_data = {
     "left_arm_length": 0.3842569816357875,
     "right_arm_length": 0.3681222228558816,
     "tpose_wrist_distance": 1.0807652487717991,
-    "neutral_left_eye_ear_y_diff": -0.03830407261848445,
-    "neutral_right_eye_ear_y_diff": -0.0381600916385651,
+    "left_eye_ear_y_diff": -0.03830407261848445,
+    "right_eye_ear_y_diff": -0.0381600916385651,
     "neutral_wrist_distance": 0.5425606955543977,
     "avg_arm_length": 0.37618960224583453,
     "wrist_expansion_ratio": 1.9919711428183255,
@@ -89,6 +89,30 @@ temp_cali_id = 1
 for name, value in user_calibration_data.items():
     uc = UserCalibration(
         user_id=1,
+        calibration_id=temp_cali_id,
+        value=value
+    )
+    db.add(uc)
+    temp_cali_id += 1
+
+user_calibration_data = {
+    "shoulder_width": 0.2758897202010935,
+    "left_arm_length": 0.34725480555553095,
+    "right_arm_length": 0.3439392139675874,
+    "tpose_wrist_distance": 0.9651724520317491,
+    "left_eye_ear_y_diff": -0.023846172624164164,
+    "right_eye_ear_y_diff": -0.03790162338150871,
+    "neutral_wrist_distance": 0.40597742540426524,
+    "avg_arm_length": 0.34559700976155916,
+    "wrist_expansion_ratio": 2.3774042388456627,
+    "arm_shoulder_ratio": 1.252663598736686
+}
+
+temp_cali_id = 1
+
+for name, value in user_calibration_data.items():
+    uc = UserCalibration(
+        user_id=2,
         calibration_id=temp_cali_id,
         value=value
     )

@@ -43,7 +43,7 @@ POSE_ID_TO_OUTLIER_THRESHOLD = {
     5: 0,   # 등_위 O
     6: 0,   # 어깨_겨드랑이 
     7: 0,   # 등_팔꿈치 
-    6: 0,   # 목_젖히기 O
+    8: 0,   # 목_젖히기 O
 }
 
 tracker_cache = {}
