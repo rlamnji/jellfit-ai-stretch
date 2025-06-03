@@ -7,11 +7,7 @@ from typing import Dict, List, Tuple
 from collections import deque
 from pathlib import Path
 import pandas as pd
-<<<<<<< HEAD
-from .utils import extract_features
-=======
 from .utils import extract_features, load_user_calibration
->>>>>>> 749e8193bd8e407149c54a23f2b9c3f30c19eb25
 import time
 
 
