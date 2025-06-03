@@ -5,8 +5,16 @@ import background from '../../assets/images/etc/basic_background.png';
 // 이미지
 import cloudeL from '../../assets/images/etc/cloud_left.png'
 import cloudeR from '../../assets/images/etc/cloud_right.png'
+import { useEffect, useState } from "react";
 
 function CalibrationPage() {
+  const [showGuideModal, setShowGuideModal] = useState(true); // 캘리브레이션 모달 표시 여부
+
+  useEffect(() => {
+    // 페이지가 로드될 때 가이드 모달을 표시합니다.
+    if(!showGuideModal) return; 
+  }, []);
+
   return (
     <div className="relative w-full h-screen overflow-hidden">
       {/* 배경 */}
@@ -48,6 +56,26 @@ function CalibrationPage() {
         {/* 카메라 컴포넌트 */}
         <CameraCaliScreen />
       </div>
+
+      {/* 캘리브레이션 모달 */}
+      {showGuideModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-60 flex justify-center items-center z-50">
+          <div className="bg-white rounded-2xl shadow-xl p-8 text-center relative w-[90%] sm:w-[80%] md:w-[70%] lg:w-[60%] max-w-3xl">
+            <h2 className="text-2xl font-bold mb-4">📸 사용 방법 안내</h2>
+            <p className="mb-4 text-gray-700 text-lg">
+              이 화면은 자세 측정(캘리브레이션)을 위한 페이지입니다.<br></br>
+              화면의 안내에 따라 <strong>정자세와 T자세</strong>를 정확히 취해 주세요.<br></br>
+             특히 <strong className="text-blue-600">십자 가이드라인의 교차점</strong>에 턱끝이 오도록 정렬해 주세요.<br></br>
+            </p>
+            <button
+              onClick={() => setShowGuideModal(false)}
+              className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg"
+            >
+              시작하기
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
