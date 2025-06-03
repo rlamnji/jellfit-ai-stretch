@@ -230,6 +230,8 @@ class CalibrationProcessor:
         return {
             'success': True,
             'message': '캘리브레이션 완료!',
+            'collected_frames': self.pose_configs['tpose']['cycles']['target_frames'],  # 보통 30
+            'target_frames': self.pose_configs['tpose']['cycles']['target_frames'],
             'features': features
         }
     

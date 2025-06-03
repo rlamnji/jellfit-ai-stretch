@@ -36,6 +36,7 @@ function CameraCaliCapture() {
   const [collectedFrames, setCollectedFrames] = useState(0); // 수집된 프레임 수
   const [isCalibrationDone, setIsCalibrationDone] = useState(false); // 캘리브레이션 완료 여부
   const token = sessionStorage.getItem("accessToken");
+  let isProcessing = false;
 
   // 카메라 on off 핸들러
   const handleStopCamera = () => stopCamera(videoRef, guideCanvasRef, setIsCameraOn);
@@ -75,11 +76,15 @@ function CameraCaliCapture() {
     drawGuideLines(step, ctx, canvas, isCameraOn);
   }, [step, isCameraOn]);
 
+
+  // 프레임 전송 함수
+  // poseType: "neutral" 또는 "tpose"로 구분
+  // setStep("done") 면 캘리 완료로 간주
   const sendFrame = (poseType) => {
     const canvas = canvasRef.current;
     const video = videoRef.current;
 
-    if (isCalibrationDone) return Promise.resolve(null);
+    if (!isCameraOn || isCalibrationDone || step === "done") return Promise.resolve(null);
 
     return new Promise((resolve, reject) => {
       if (!canvas || !video) {
@@ -98,6 +103,12 @@ function CameraCaliCapture() {
       canvas.toBlob(async (blob) => {
         if (!blob) return resolve(null);
 
+        if (!isCameraOn || isCalibrationDone || step === "done") {
+          console.warn("⛔ 카메라 꺼짐 또는 캘리 완료 → 전송 생략");
+          return resolve(null);
+        }
+
+
         const formData = new FormData();
         formData.append("file", blob, "frame.jpg");
         formData.append("pose_type", poseType);
@@ -113,12 +124,15 @@ function CameraCaliCapture() {
 
           const result = await res.json();
 
-          setStep(result.current_pose);
+          if (step !== "done") {
+            setStep(result.current_pose);
+          }
           setMessage(result.message);
           setCollectedFrames(result.collected_frames || 0); // 수집된 프레임 수 업데이트
 
           console.log("📥 서버 응답:", result);
-          resolve(result); // ✅ 이제 진짜 반환됨
+          resolve(result);
+
         } catch (err) {
           console.error("❌ 전송 실패:", err);
           reject(err);
@@ -128,25 +142,23 @@ function CameraCaliCapture() {
   };
 
   // 여러 프레임 보내는 함수
-  const sendMultipleFrames = async (count = 5, interval = 500, poseType = "neutral") => {
-    let lastResult = null;
+  const sendMultipleFrames = async (count = 5, interval = 300, poseType = "neutral") => {
+    if (isCalibrationDone || !isCameraOn || step === "done") return null;
 
-    if (isCalibrationDone) return null;
+    const framePromises = [];
 
     for (let i = 0; i < count; i++) {
-      lastResult = await sendFrame(poseType);
-
-      // ✅ 실패하면 바로 루프 중단
-      if (lastResult?.success === false) {
-        console.warn("📛 서버 응답 실패 → 루프 중단");
-        break;
-      }
-
-      await new Promise((res) => setTimeout(res, interval));
+      framePromises.push(sendFrame(poseType));
+      await new Promise((res) => setTimeout(res, interval)); // 인터벌 유지
     }
-    
 
-    return lastResult;
+    const results = await Promise.all(framePromises);
+
+    // 유효한 결과만 필터
+    const validResults = results.filter((res) => res?.success);
+    const lastValid = validResults[validResults.length - 1];
+
+    return lastValid || null;
   };
 
   useEffect(() => {
@@ -171,7 +183,7 @@ function CameraCaliCapture() {
     let tposeSuccess = false;
 
     pose.onResults( async (results) => {
-      if (!results.poseLandmarks || step === "" || step === "done") return;
+      if (!results.poseLandmarks || step === "" || step === "done" || isCalibrationDone) return;
 
       const landmarks = results.poseLandmarks;
 
@@ -192,7 +204,6 @@ function CameraCaliCapture() {
               while (collected < 30) {
                 result = await sendMultipleFrames(10, 300, "neutral");
                 collected = result?.collected_frames || 0;
-                //console.log(`📦 누적 수집된 프레임: ${collected}/30`);
               }
 
             if(result.collected_frames >= 30){
@@ -215,61 +226,86 @@ function CameraCaliCapture() {
           console.log(`T자세 정렬 프레임 수: ${tposeStableCount}`);
           setMessage("T자 자세 인식을 시작합니다! 다음 안내까지 자세를 유지해주세요!");
 
-          if (tposeStableCount >= 30) { // 암튼 정렬 프레임?(준비프레임)이 30 넘어가면 시작은 함
+          if (tposeStableCount >= 30) {
             tposeSuccess = true;
             console.log("✅ T자세 연속 인식 성공 → 프레임 전송 시작");
             setMessage("✅ T자세 연속 인식 성공 → 프레임 전송 시작");
 
             let collected = 0;
             let result;
-              while (collected < 30) {
-                result = await sendMultipleFrames(10, 300, "tpose");
-                collected = result?.collected_frames || 0;
-                //console.log(`📦 누적 수집된 프레임: ${collected}/30`);
-                if (result?.message?.includes("캘리브레이션 완료")) break;
+
+            while (collected < 30) {
+              result = await sendMultipleFrames(10, 300, "tpose");
+              if (!result) break;
+
+              if (step !== "done") {
+                setStep(result.current_pose); // 현재 단계 업데이트 (단 완료 후 덮어쓰기 방지)
+              }
+
+              setMessage(result.message);
+              setCollectedFrames(result.collected_frames || 0);
+              collected = result.collected_frames || 0;
+            
+              if (collected >= 30 || result.message?.includes("캘리브레이션 완료")) {
+                console.log("🧪 collected:", collected, "result.success:", result?.success); 
+
+                // ✅ 여기에서 바로 캘리 완료 처리
+                setMessage("캘리브레이션이 성공적으로 완료되었습니다.");
+                setIsCalibrationDone(true);
+                stopCamera();
+                break;
+              }
+
+
+              if (collected === 0) {
+                console.warn("📛 프레임 수집 실패 → 중단");
+                break;
+              }
+
+              /*if (
+                result.code === "INSUFFICIENT_DATA"
+              ) {
+                console.warn("📛 캘리브레이션 실패 → 초기화");
+                setMessage("충분한 데이터가 없어 측정을 다시 시작합니다.");
+                setStep("neutral");
+
+                // 프레임 수 카운트도 초기화
+                postureStableCount = 0;
+                postureSuccess = false;
+                tposeStableCount = 0;
+                tposeSuccess = false;
+
+                return;
+              }*/
             }
 
-          // ✅ 먼저 조건 체크
-          if (!result || result.collected_frames < 30 || result.success === false) {
-            console.warn("📛 캘리브레이션 실패로 초기화합니다.");
-            setMessage("충분한 데이터가 없어 측정을 다시 시작합니다.");
-
-            postureStableCount = 0;
-            postureSuccess = false;
-            tposeStableCount = 0;
-            tposeSuccess = false;
-            setStep("neutral");
-            return;
-          }
-
-          // ✅ 조건 통과 시 성공 처리
-          console.log("✅ 캘리브레이션 완료 응답 → 종료");
-          setMessage("캘리브레이션이 성공적으로 완료되었습니다.");
-          setStep("done");
-          setIsCalibrationDone(true); // 이게 useEffect에서 페이지 이동을 트리거함
-          stopCamera();
+            console.log("반복문 탈출");
           }
         } else {
           if (tposeStableCount > 0) console.log("↩ T자세 흐트러짐, 카운트 초기화");
           tposeStableCount = 0;
         }
       }
+
     });
 
 
     const cam = new Camera(videoRef.current, {
       onFrame: async () => {
         const video = videoRef.current;
-        if (!video || !video.srcObject || !video.srcObject.active) {
-          console.warn("📛 video 없음 또는 스트림 종료됨 → pose.send() 생략");
-          return;
-        }
+
+        if (!video || !video.srcObject || !video.srcObject.active) return;
+        if (isProcessing || step === "done" || isCalibrationDone) return;
+
+        isProcessing = true;
 
         try {
           await pose.send({ image: video });
-        } catch (err) {
-          console.error("❌ pose.send 중 에러:", err);
+        } catch (e) {
+          console.error("❌ pose.send 중 에러:", e);
         }
+
+        isProcessing = false;
       },
     });
 
