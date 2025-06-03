@@ -32,25 +32,3 @@ for idx, image_path in enumerate(image_files):
 
     result = tracker.is_performing(image)
     print(f"[{idx+1}/{len(image_files)}] 프레임 결과: {result}")
-
-# StretchTracker.save_landmarks_to_csv("landmark_log.csv", tracker.landmark_history)
-
-# @staticmethod
-#     def save_landmarks_to_csv(filepath: str, data: list[dict]):
-#         if not data:
-#             print("No landmark data to save.")
-#             return
-
-#         fieldnames = list(data[0].keys())
-#         with open(filepath, 'w', newline='', encoding='utf-8') as f:
-#             writer = csv.DictWriter(f, fieldnames=fieldnames)
-#             writer.writeheader()
-#             writer.writerows(data)
-
-
-    # 시각화 (선택)
-    # cv2.imshow("Frame", image)
-    # if cv2.waitKey(100) & 0xFF == ord('q'):
-    #     break
-
-# cv2.destroyAllWindows()
