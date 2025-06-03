@@ -7,7 +7,7 @@ import yaml
 import json
 import numpy as np
 from pathlib import Path
-from utils import load_config, extract_features
+from .utils import load_config, extract_features
 from typing import Dict, List
 
 

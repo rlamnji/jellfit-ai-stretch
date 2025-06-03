@@ -314,15 +314,17 @@ class CalibrationProcessor:
             'used_frames': len(clean_df),
             'total_frames': len(df)
         }
-    
 
     def save_calibration(self, calibration_data: Dict):
         """캘리브레이션 데이터 저장"""
         user_id = calibration_data['user_id']
 
         db = next(get_db())
-    
-        # 캘리브레이션 특징값 저장
-        save_user_calibration(db, user_id=int(user_id), calibration_features=calibration_data['features'])
-    
-        print(f"✅ User calibration saved to database for user {user_id}")
+
+        try:
+            # 캘리브레이션 특징값 저장
+            save_user_calibration(db, user_id=int(user_id), calibration_features=calibration_data['features'])
+        
+            print(f"✅ User calibration saved to database for user {user_id}")
+        finally:
+            db.close()
