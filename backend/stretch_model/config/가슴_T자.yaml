@@ -30,11 +30,8 @@ thresholds:
     value: 140
     message: "오른쪽 팔이 구부러졌어요. 팔을 쭉 뻗어주세요."
                                                 
-  # min_left_shoulder_hand_alignment: -0.1      
-  # min_right_shoulder_hand_alignment: -0.1     
-  # 팔을 뒤로 젖히는 스트레칭, 카메라 각도 특성상 팔을 쭉 폈음에도 구부러져 보임
-  # 또한, 아래로 팔이 내려가 보이는 특징 때문에 음수 판단은 x
-
+  min_left_shoulder_hand_alignment: -0.2      
+  min_right_shoulder_hand_alignment: -0.2     
   max_left_shoulder_hand_alignment: 
     value: 0.1
     message: "왼쪽 팔이 너무 위로 올라갔어요."

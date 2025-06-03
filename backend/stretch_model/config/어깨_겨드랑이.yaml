@@ -45,7 +45,7 @@ features:
 
 thresholds:
 
-  min_hold_duration_sec: 5    # 자세를 유지해야 하는 최소 시간 (단위: 초)
+  min_hold_duration_sec: 10    # 자세를 유지해야 하는 최소 시간 (단위: 초)
 
 
 cycles:
