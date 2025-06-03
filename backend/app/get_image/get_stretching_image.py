@@ -9,6 +9,7 @@ from sqlalchemy.orm import Session
 from db.database import get_db
 from db.models import User, Pose
 from dependencies import get_current_user
+import time
 
 router = APIRouter(prefix="/guide/analyze", tags=["Stretching_Analyze"])
 
@@ -48,9 +49,27 @@ POSE_ID_TO_OUTLIER_THRESHOLD = {
 tracker_cache = {}
 def get_tracker(exercise_name: str) -> StretchTracker:
     """exercise 이름에 맞는 Tracker를 반환 (캐싱 방식)"""
-    if exercise_name not in tracker_cache:
-        tracker_cache[exercise_name] = StretchTracker(exercise=exercise_name)
-    return tracker_cache[exercise_name]
+    current_time = time.time()
+    if exercise_name in tracker_cache:
+        tracker_cache[exercise_name]["last_used"] = current_time
+        return tracker_cache[exercise_name]["tracker"]
+    
+    tracker = StretchTracker(exercise=exercise_name)
+    tracker_cache[exercise_name] = {
+        "tracker": tracker,
+        "last_used": current_time
+    }
+    return tracker
+
+def cleanup_tracker_cache(timeout: float = 3.0):
+    """지정된 시간(timeout) 이상 사용되지 않은 tracker 삭제"""
+    now = time.time()
+    expired_keys = [
+        k for k, v in tracker_cache.items()
+        if now - v["last_used"] > timeout
+    ]
+    for k in expired_keys:
+        del tracker_cache[k]
 
 @router.post("")
 async def analyze_image(
@@ -59,6 +78,9 @@ async def analyze_image(
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user)
 ):
+    
+    cleanup_tracker_cache(timeout=2.0)
+
     content = await file.read()
     image_array = np.asarray(bytearray(content), dtype=np.uint8)
     image = cv2.imdecode(image_array, cv2.IMREAD_COLOR)
