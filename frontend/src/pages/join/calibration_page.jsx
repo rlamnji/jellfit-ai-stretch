@@ -44,7 +44,7 @@ function CalibrationPage() {
             <div className="w-full h-[90px] pl-8 bg-[#FFF1D5] rounded-[40px] flex items-center justify-center text-[#552F2F] text-[16px] text-center">
                 <div className="text-[#552F2F] text-[17px] text-center">
                 서비스 이용을 위한 기준 자세를 등록하고, 시스템과 사용자의 자세 기준을 일치시키는 과정입니다.<br />
-                카메라를 통해 <span className="text-[18px] font-bold">정자세</span>와 <span className="text-[18px] font-bold">T자 자세</span>를 자동으로 인식하고 감지되면 사진이 <span className="text-[18px] font-bold">자동으로 캡쳐</span>되어 저장됩니다.
+                카메라를 통해 <span className="text-[18px] font-bold">정자세</span>를 자동으로 인식하고 감지되면 사진이 <span className="text-[18px] font-bold">자동으로 캡쳐</span>되어 저장됩니다.
                 </div>
             </div>
         </div>
@@ -64,7 +64,7 @@ function CalibrationPage() {
             <h2 className="text-2xl font-bold mb-4">📸 사용 방법 안내</h2>
             <p className="mb-4 text-gray-700 text-lg">
               이 화면은 자세 측정(캘리브레이션)을 위한 페이지입니다.<br></br>
-              화면의 안내에 따라 <strong>정자세와 T자세</strong>를 정확히 취해 주세요.<br></br>
+              화면의 안내에 따라 <strong>정자세</strong>를 정확히 취해 주세요.<br></br>
              특히 <strong className="text-blue-600">십자 가이드라인의 교차점</strong>에 턱끝이 오도록 정렬해 주세요.<br></br>
             </p>
             <button
