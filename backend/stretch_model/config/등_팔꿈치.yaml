@@ -27,7 +27,17 @@ features:
     type: delta_y
     points: [11, 12]
 
+  - name: left_elbow_angle
+    type: angle
+    points: [11, 13, 15]
+  - name: right_elbow_angle
+    type: angle
+    points: [12, 14, 16]
+
 thresholds:
+  max_left_elbow_angle: 140
+  max_right_elbow_angle: 140
+
   min_hold_duration_sec: 10
 
 
@@ -45,7 +55,7 @@ direction:
       threshold: 0.01
     left_pull_distance:  # 팔꿈치를 잡은 상태 확인
       sign: negative
-      threshold: -0.5
+      threshold: -0.3
     left_pull_alignment:
       sign: positive
       threshold: 0.05
@@ -58,7 +68,7 @@ direction:
       threshold: 0.01
     right_pull_distance: 
       sign: negative
-      threshold: -0.5
+      threshold: -0.3
     right_pull_alignment:
       sign: positive
       threshold: 0.05

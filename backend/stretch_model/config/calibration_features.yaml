@@ -27,7 +27,7 @@ features:
     points: [15, 16]
     description: "T자세 손목 간격"
 
-  # 귀-입 Y차이 (고개 각도 기준)
+  # 입-귀 Y차이 (고개 각도 기준)
   - name: left_mouth_ear_y_diff
     type: delta_y
     source_pose: neutral
@@ -53,20 +53,20 @@ features:
     points: [15, 16]
     description: "중립 자세 손목 간격"
 
-computed_features:
-  - name: avg_arm_length
-    type: average
-    source_features: [left_arm_length, right_arm_length]
-    description: "평균 팔 길이"
+# computed_features:
+#   - name: avg_arm_length
+#     type: average
+#     source_features: [left_arm_length, right_arm_length]
+#     description: "평균 팔 길이"
     
-  - name: wrist_expansion_ratio
-    type: ratio
-    numerator: tpose_wrist_distance
-    denominator: neutral_wrist_distance
-    description: "손목 확장 비율 (T자세/중립자세)"
+#   - name: wrist_expansion_ratio
+#     type: ratio
+#     numerator: tpose_wrist_distance
+#     denominator: neutral_wrist_distance
+#     description: "손목 확장 비율 (T자세/중립자세)"
     
-  - name: arm_shoulder_ratio
-    type: ratio
-    numerator: avg_arm_length
-    denominator: shoulder_width
-    description: "팔길이 대비 어깨너비 비율"
+#   - name: arm_shoulder_ratio
+#     type: ratio
+#     numerator: avg_arm_length
+#     denominator: shoulder_width
+#     description: "팔길이 대비 어깨너비 비율"
