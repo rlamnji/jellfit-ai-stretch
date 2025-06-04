@@ -51,7 +51,7 @@ thresholds:
 
 
   # 자세 유지 시간 (초)
-  min_hold_duration_sec: 5
+  min_hold_duration_sec: 10
 
 cycles:
   type: hold      # rep vs hold 구분 플래그
