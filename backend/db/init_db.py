@@ -121,8 +121,8 @@ for name, value in user_calibration_data.items():
 
 
 # 사용자 스트레칭 기록(횟수 + 시간) (더미데이터)
-db.add(UsageRecord(record_id=1, user_id=1, pose_id=1, repeat_cnt=5))
-db.add(UsageRecord(record_id=2, user_id=1, pose_id=2, repeat_cnt=1))
+#db.add(UsageRecord(record_id=1, user_id=1, pose_id=1, repeat_cnt=5))
+#db.add(UsageRecord(record_id=2, user_id=1, pose_id=2, repeat_cnt=1))
 
 # 스트레칭(자세) 정보 
 

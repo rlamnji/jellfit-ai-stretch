@@ -116,19 +116,19 @@ class CalibrationProcessor:
             if collected_count >= target_count:
                 if current_pose == 'neutral':
                     # 다음 자세로 이동
-                    session['current_pose'] = 'tpose'
-                    session['status'] = 'collecting_tpose'
-                    
-                    return {
-                        'success': True,
-                        'message': '정자세 완료! T자세로 이동합니다',
-                        'pose_completed': 'neutral',
-                        'current_pose': 'tpose',
-                        'target_frames': self.pose_configs['tpose']['cycles']['target_frames']
-                    }
-                else:
-                    # 캘리브레이션 완료
+                    # session['current_pose'] = 'tpose'
+                    # session['status'] = 'collecting_tpose'
+
+                    # 👇 정자세만으로 캘리브레이션 완료 처리
                     return self.finalize_calibration(user_id)
+
+                    # return {
+                    #     'success': True,
+                    #     'message': '정자세 완료! T자세로 이동합니다',
+                    #     'pose_completed': 'neutral',
+                    #     'current_pose': 'tpose',
+                    #     'target_frames': self.pose_configs['tpose']['cycles']['target_frames']
+                    # }
             
             return {
                 'success': True,
@@ -206,7 +206,7 @@ class CalibrationProcessor:
                 if cleaned_data:
                     pose_averages[pose_name] = cleaned_data
         
-        if len(pose_averages) < 2:
+        if len(pose_averages) < 1:
             return {'success': False, 'message': '충분한 데이터가 없습니다.'}
         
         # 특징 추출
@@ -227,11 +227,13 @@ class CalibrationProcessor:
         # 세션 정리
         del self.sessions[user_id]
         
+        neutral_target = self.pose_configs['neutral']['cycles']['target_frames']
+
         return {
             'success': True,
             'message': '캘리브레이션 완료!',
-            'collected_frames': self.pose_configs['tpose']['cycles']['target_frames'],  # 보통 30
-            'target_frames': self.pose_configs['tpose']['cycles']['target_frames'],
+            'collected_frames': len(session['collected_frames']['neutral']),
+            'target_frames': neutral_target,
             'features': features
         }
     
@@ -249,7 +251,12 @@ class CalibrationProcessor:
             if source_pose not in pose_averages:
                 continue
                 
-            pose_data = pose_averages[source_pose]['landmarks_mean']
+            
+            #pose_data = pose_averages[source_pose]['landmarks_mean']
+
+            pose_data = pose_averages[source_pose].get('landmarks_mean')
+            if pose_data is None:
+                continue
             
             if feature_type == 'distance':
                 p1 = (pose_data[f'x{points[0]}'], pose_data[f'y{points[0]}'])

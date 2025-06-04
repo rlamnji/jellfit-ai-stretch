@@ -39,6 +39,8 @@ function CameraCaliCapture() {
   const from = location.state?.from || null;
   let isProcessing = false;
 
+  const poseRef = useRef(null);
+
   let postureStableCount = 0;
   let postureSuccess = false;
   let tposeStableCount = 0;
@@ -164,6 +166,7 @@ function CameraCaliCapture() {
           // 캘리브레이션 완료 조건
           if(result.success === true && result.collected_frames >= result.target_frames) {
             console.log("🎉 캘리브레이션 완료");
+            poseRef.current?.reset();
             setMessage("캘리브레이션이 완료되었습니다! 로그인 페이지로 이동합니다.");
             handleStopCamera();
             setIsCalibrationDone(true);
@@ -172,6 +175,7 @@ function CameraCaliCapture() {
           }
 
           // 이상치 탐지 실패 로직
+          // 이거 오류남
           if(result.success === false && result.message.includes("충분한 데이터가 없습니다.")){
             console.warn("📛 이상치 탐지 실패 → 캘리 초기화");
             navigate("/condition/:id", { replace: true });
@@ -255,7 +259,7 @@ function CameraCaliCapture() {
       }
 
       // 3. T자세 인식
-      if (step === "tpose" && !tposeSuccess) {
+      /*if (step === "tpose" && !tposeSuccess) {
         if (isTPoseAligned(landmarks)) {
           tposeStableCount++;
           console.log(`T자세 정렬 프레임 수: ${tposeStableCount}`);
@@ -302,29 +306,38 @@ function CameraCaliCapture() {
           if (tposeStableCount > 0) console.log("↩ T자세 흐트러짐, 카운트 초기화");
           tposeStableCount = 0;
         }
+      }*/
+
+    });
+
+    poseRef.current = pose;
+
+
+  const cam = new Camera(videoRef.current, {
+    onFrame: async () => {
+      const video = videoRef.current;
+
+      if (
+        !video ||
+        !video.srcObject ||
+        !video.srcObject.active ||
+        video.videoWidth === 0 ||
+        video.videoHeight === 0
+      ) return;
+
+      if (isProcessing || step === "done" || isCalibrationDone) return;
+
+      isProcessing = true;
+
+      try {
+        await pose.send({ image: video });
+      } catch (e) {
+        console.error("❌ pose.send 중 에러:", e);
       }
 
-    });
-
-
-    const cam = new Camera(videoRef.current, {
-      onFrame: async () => {
-        const video = videoRef.current;
-
-        if (!video || !video.srcObject || !video.srcObject.active) return;
-        if (isProcessing || step === "done" || isCalibrationDone) return;
-
-        isProcessing = true;
-
-        try {
-          await pose.send({ image: video });
-        } catch (e) {
-          console.error("❌ pose.send 중 에러:", e);
-        }
-
-        isProcessing = false;
-      },
-    });
+      isProcessing = false;
+    },
+  });
 
     cam.start();
 
