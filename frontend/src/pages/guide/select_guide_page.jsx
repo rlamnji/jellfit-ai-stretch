@@ -218,18 +218,27 @@ function SelectGuidePage({ setStretchingOrder, setCompletedStretchings }) {
     const fetchMyFavorites = async () => {
         try {
             const res = await fetch("http://localhost:8000/favorites", {
-            headers: {
-                "Authorization": "Bearer " + token,
-            },
+                headers: {
+                    "Authorization": "Bearer " + token,
+                },
             });
             if (!res.ok) throw new Error("불러오기 실패");
+    
             const data = await res.json();
-            setMyFavorites(data); // ← 백엔드 응답 구조에 맞게
-            console.log("✅ 즐겨찾기 불러오기 성공:", data);
+    
+            // thumbnail_url → imgURL로 키 이름 변경
+            const converted = data.map(item => ({
+                ...item,
+                imgURL: item.thumbnail_url,
+            }));
+    
+            setMyFavorites(converted);  // 변환된 데이터 저장
+            console.log("✅ 즐겨찾기 불러오기 성공:", converted);
         } catch (err) {
             console.error("❌ 즐겨찾기 불러오기 실패:", err.message);
         }
     };
+    
 
     // 즐겨찾기 탭을 클릭했을 때
     const handleFavoritesTabClick = () => {
