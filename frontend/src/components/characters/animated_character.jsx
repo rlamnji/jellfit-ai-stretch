@@ -24,7 +24,7 @@ function AnimatedCharacter({ character, position }) {
     <motion.img
       src={character.image_url}
       alt={character.name}
-      className="w-[200px] h-[200px] object-contain absolute pointer-events-none"
+      className="w-[150px] h-[150px] object-contain absolute pointer-events-none"
       style={{
         transform: `scale(${scale})`,
       }}
