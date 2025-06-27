@@ -20,7 +20,7 @@ pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 # 환경 변수에서 가져오기
 SECRET_KEY = os.getenv("SECRET_KEY", "your-secret-key")
 ALGORITHM = os.getenv("ALGORITHM", "HS256")
-ACCESS_TOKEN_EXPIRE_MINUTES = int(os.getenv("ACCESS_TOKEN_EXPIRE_MINUTES", 1440))
+ACCESS_TOKEN_EXPIRE_MINUTES = int(os.getenv("ACCESS_TOKEN_EXPIRE_MINUTES", 5000))
 
 def create_access_token(data: dict, expires_delta: timedelta = None):
     to_encode = data.copy()

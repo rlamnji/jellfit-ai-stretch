@@ -54,13 +54,13 @@ thresholds:
   calibration_min_left_mouth_ear_y_diff:
     calibration_key: left_mouth_ear_y_diff
     operator: less_than
-    offset: -0.04
+    offset: -0.02
     message: "고개를 더 젖히거나, 카메라와 너무 멀리 떨어져 있을 수 있어요."
     
   calibration_min_right_mouth_ear_y_diff:
     calibration_key: right_mouth_ear_y_diff
     operator: less_than
-    offset: -0.04
+    offset: -0.02
     message: "고개를 더 젖히거나, 카메라와 너무 멀리 떨어져 있을 수 있어요."
 
 
