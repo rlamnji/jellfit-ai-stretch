@@ -14,31 +14,36 @@ jellfit/
     └── requirements.txt # Python 의존성
 ```
 
-## 백엔드 설정
+## 실행 방법
+1. 개발환경 준비
+🐍 Python 백엔드용
 
-1. 가상환경 생성 및 활성화:
 ```bash
+cd backend
 python -m venv venv
-source venv/bin/activate  # Linux/Mac
-.\venv\Scripts\activate   # Windows
+venv\Scripts\activate         # Windows
+# source venv/bin/activate    # Mac/Linux
 ```
 
-2. 의존성 설치: 프로젝트 루트에서
 ```bash
-pip install -r requirements.txt
+pip install -r requirements.txt # 필수 패키지 설치치
 ```
-
-3. 환경 변수 설정:
-- `.env` 파일을 생성하고 필요한 환경 변수를 설정합니다.
-
-4. 서버 실행:
 ```bash
-uvicorn main:app --reload
+python -m db.init_db          # DB 파일 생성
 ```
 
-## 서버 실행
-cd backend -> uvicorn app.main:app --reload
-cd frontend -> yarn start 
-cd frontend -> yarn electron start
+🌐 Node 프론트엔드용
+```bash
+cd frontend
+yarn install
+```
+
+2. 통합 실행 (매번 실행 시)
+```bash
+start.bat
+```
+→ 백엔드(uvicorn main:app --reload)와
+→ 프론트엔드(yarn start)가 각각 최소화된 창에서 실행
 
 API 문서는 http://localhost:8000/docs 에서 확인할 수 있습니다.
+자세한 설정 및 사용법은 backend/README.md와 frontend/README.md에서 확인하실 수 있습니다.
