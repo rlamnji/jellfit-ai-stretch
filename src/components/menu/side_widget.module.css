@@ -1,9 +1,0 @@
-.sideWidget{
-    display: flex;
-    flex-direction: row;
-    padding: 20px;
-}
-
-.alarmBox{
-    padding-right: 30px;
-}

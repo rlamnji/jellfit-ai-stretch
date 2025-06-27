@@ -1,0 +1,4 @@
+.joinPage {
+    display: flex;
+    flex-direction: column;
+}

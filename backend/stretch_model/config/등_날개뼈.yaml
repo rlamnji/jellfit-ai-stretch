@@ -1,0 +1,81 @@
+landmarks: [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22]
+
+features:
+  # 양손을 잡은 상태 확인: 엄지 간 거리
+  - name: hand_clasp_distance
+    type: distance
+    points: [20, 21]
+
+  - name: ear_level_y_diff
+    type: delta_y
+    points: [7, 8]   # 왼쪽 귀(7) – 오른쪽 귀(8) 각도
+
+  - name: left_hand_shoulder_x_diff
+    type: delta_x
+    points: [11, 15]  # 왼손목과 왼어깨의 x좌표값 차이
+  - name: right_hand_shoulder_x_diff
+    type: delta_x
+    points: [16, 12]
+
+  - name: left_Lhand_y_diff
+    type: delta_y
+    points: [15, 12]  # 왼손목의 y위치 정의 
+  - name: left_Rhand_y_diff
+    type: delta_y
+    points: [16, 12]  
+
+  - name: right_Lhand_y_diff
+    type: delta_y
+    points: [15, 11]
+  - name: right_Rhand_y_diff
+    type: delta_y
+    points: [16, 11]
+  
+
+thresholds:
+  # 손깍지 거리 최대 허용치
+  max_hand_clasp_distance: 
+    value: 0.2
+    message: "손을 가슴 앞에 위치시키세요."
+
+  abs_ear_level_y_diff:
+    value: 0.02
+    message: "고개를 더 기울이세요."
+
+  min_left_hand_shoulder_x_diff: 
+    value: -0.1
+    message: "손을 가슴 앞에 위치시키세요."
+  min_right_hand_shoulder_x_diff: 
+    value: -0.1
+    message: "손을 가슴 앞에 위치시키세요."
+
+
+  # 자세 유지 시간 (초)
+  min_hold_duration_sec: 10
+
+cycles:
+  type: hold      # rep vs hold 구분 플래그
+  count: 1        # 10초 유지 동작을 1회 수행해야 성공
+
+direction:
+  left:
+    ear_level_y_diff: 
+      sign: positive  # 양수면 왼쪽
+      threshold: 0.02  # 최소 레벨 차이
+    left_Lhand_y_diff:
+      sign: positive
+      threshold: -0.02
+    left_Rhand_y_diff:
+      sign: positive
+      threshold: -0.02
+
+  right:
+    ear_level_y_diff:
+      sign: negative  # 음수면 오른쪽
+      threshold: 0.02
+    right_Lhand_y_diff:
+      sign: positive
+      threshold: -0.02
+    right_Rhand_y_diff:
+      sign: positive
+      threshold: -0.02

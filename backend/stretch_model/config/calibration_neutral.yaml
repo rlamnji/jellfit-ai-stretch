@@ -1,0 +1,32 @@
+landmarks: [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22]
+
+features:
+  
+  # 팔꿈치 각도 (자연스럽게 내린 상태)
+  - name: left_arm_angle
+    type: angle
+    points: [7, 11, 13]
+  - name: right_arm_angle
+    type: angle
+    points: [8, 12, 14]
+  
+  # 어깨 정렬
+  - name: shoulder_alignment
+    type: delta_y
+    points: [11, 12]
+
+thresholds:
+  
+  # 팔을 아래로 내린 상태
+  min_left_arm_angle: 150
+  min_right_arm_angle: 150
+  
+  # 어깨가 수평이어야 함
+  max_shoulder_alignment: 0.05
+  
+  # 최소 수집 프레임 수
+  min_frames_needed: 30
+
+cycles:
+  type: calibration
+  target_frames: 30
