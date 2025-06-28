@@ -3,7 +3,6 @@ import { useState } from "react";
 import LoginPage from '../pages/login/login_page';
 import HomePage from '../pages/home/home_page';
 import JoinPage from '../pages/join/join_page';
-import ConditionPage from '../pages/condition/condition_page';
 import FriendPage from '../pages/home/dash_board/friend_page';
 import CollectPage from '../pages/home/dash_board/collect_page';
 import UserProfilePage from '../pages/user/user_profile_page';
@@ -28,7 +27,6 @@ function Router() {
                 {/* 로그인과 회원가입 */}
                 <Route path="/login" element={<LoginPage />} />
                 <Route path="/join" element={<JoinPage />} />
-                <Route path="/condition" element={<ConditionPage />} />
                 <Route path="/condition/:id" element={<CalibrationPage />} />
                 
                 {/* 홈화면 */}
