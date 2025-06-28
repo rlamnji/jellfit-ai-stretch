@@ -1,8 +1,8 @@
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 import { useState } from "react";
-import LoginPage from '../pages/login/login_page';
+import LoginPage from '../auth/pages/login_page';
 import HomePage from '../pages/home/home_page';
-import JoinPage from '../pages/join/join_page';
+import JoinPage from '../auth/pages/join_page';
 import FriendPage from '../pages/home/dash_board/friend_page';
 import CollectPage from '../pages/home/dash_board/collect_page';
 import UserProfilePage from '../pages/user/user_profile_page';
@@ -11,7 +11,7 @@ import SelectGuidePage from "../pages/guide/select_guide_page";
 import SelfStretchPage from "../pages/guide/self_strech_page";
 import WatchGuidePage from "../pages/guide/watch_guide_page";
 import GuideCompletePage from "../pages/guide/guide_complete_page";
-import CalibrationPage from "../pages/join/calibration_page";
+import CalibrationPage from "../auth/pages/calibration_page";
 import CameraPostureScreen from "../components/camera_posture/camera_posture_screen";
 import PostureModeStatePage from "../pages/posture/posture_mode_state_page";
 

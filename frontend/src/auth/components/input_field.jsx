@@ -1,3 +1,4 @@
+// 라이브러리
 import { useState } from "react";
 
 function InputField({id, title, type, placeholder, onTextChange}){

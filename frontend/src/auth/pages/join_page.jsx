@@ -1,13 +1,18 @@
-import InputField from '../../components/input_field';
+// 회원가입 페이지
+// 라이브러리
 import { useNavigate } from 'react-router-dom';
 import { useState } from 'react';
+
+// 컴포넌트
+import InputField from '../components/input_field';
+import SuccessModal from '../../components/success_modal';
+import TopBar from '../../components/top_bar'; // 공통
+
+// 이미지/에셋
 import imgJoinLogo from '../../assets/images/etc/join_title.png';
 import imgCloudLeft from '../../assets/images/etc/cloud_left.png';
 import imgCloudRight from '../../assets/images/etc/cloud_right.png';
-import TopBar from '../../components/top_bar';
 import background from '../../assets/images/etc/basic_background2.png';
-import SuccessModal from '../../components/success_modal';
-
 
 
 function JoinPage (){
