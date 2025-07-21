@@ -8,7 +8,7 @@ import ProfileCard from "../components/layout/profile";
 import SideWidget from "../components/layout/side_widget";
 import DashBoard from "../components/layout/dash_board";
 import StartButton from "../components/layout/start_button";
-import CharacterGroup from '../../components/characters/character_group';
+import CharacterGroup from '../components/characters/character_group';
 import Test3d from "../components/background_3d/space_scence"
 
 // 사운드
