@@ -4,7 +4,7 @@ import { Link } from 'react-router-dom';
 
 // 컴포넌트
 import LoginForm from '../components/login_form';
-import SoundBtn from '../../components/buttons/sound_btn'; // 공통
+import SoundBtn from '../../common/components/sound_btn'; // 공통
 
 // 이미지/에셋
 import imgLogo from '../../assets/images/etc/logo_title.png';

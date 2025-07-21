@@ -4,8 +4,8 @@
 import { useEffect, useState } from 'react';
 
 // 컴포넌트
-import BackBtn from '../../components/buttons/back_btn';
-import SoundBtn from '../../components/buttons/sound_btn';
+import BackBtn from '../../common/components/back_btn';
+import SoundBtn from '../../common/components/sound_btn';
 
 // 이미지/에셋
 import background from '../../assets/images/etc/basic_background2.png';

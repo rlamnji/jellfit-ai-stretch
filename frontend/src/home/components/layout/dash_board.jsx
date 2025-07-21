@@ -9,7 +9,7 @@ import collections from '../../../assets/images/icons/home/home_collect.png';
 import exercise from '../../../assets/images/icons/home/home_exercise.png';
 
 // 유틸
-import { playClickSound } from '../../../utils/sound';
+import { playClickSound } from '../../../common/utils/sound';
 
 function DashBoard() {
   const navigate = useNavigate();

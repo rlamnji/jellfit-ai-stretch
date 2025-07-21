@@ -1,6 +1,6 @@
 import { useMemo } from "react";
 import { motion } from "framer-motion";
-import { getRandomFloat, getRandomItem, animationPresets } from "../../../utils/animation_preset";
+import { getRandomFloat, getRandomItem, animationPresets } from "../../utils/animation_preset";
 
 function AnimatedCharacter({ character, position }) {
   const {

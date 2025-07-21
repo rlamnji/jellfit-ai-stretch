@@ -5,7 +5,7 @@ import React, { useState, useEffect } from 'react';
 import Dropdown from 'react-dropdown';
 import 'react-dropdown/style.css';
 
-import { startReminder, stopRepeatingReminder } from '../../../utils/reminder';
+import { startReminder, stopRepeatingReminder } from '../../utils/reminder';
 import { useReminder } from '../../../context/reminder_context';
 
 function DropDown() {

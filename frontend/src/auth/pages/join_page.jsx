@@ -2,8 +2,8 @@
 // 라이브러리
 
 // 컴포넌트
-import SuccessModal from '../../components/success_modal';
-import TopBar from '../../components/top_bar'; // 공통
+import SuccessModal from '../../common/components/success_modal';
+import TopBar from '../../common/components/top_bar'; // 공통
 import JoinForm from '../components/join_form';
 
 // 훅(커스텀 훅)

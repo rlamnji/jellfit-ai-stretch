@@ -9,7 +9,7 @@ import backModeBtn from '../../../assets/images/icons/home/background_mode.png';
 import guideModeBtn from '../../../assets/images/icons/home/guide_mode.png';
 
 // 컴포넌트
-import BackgroundModal from './background_mode_modal';
+import BackgroundModal from '../../../posture/components/background_mode_modal';
 
 function StartButton() {
 

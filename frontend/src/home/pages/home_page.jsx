@@ -12,7 +12,7 @@ import CharacterGroup from '../components/characters/character_group';
 import Test3d from "../components/background_3d/space_scence"
 
 // 사운드
-import { playAudio, stopAudio } from '../../utils/sound';
+import { playAudio, stopAudio } from '../../common/utils/sound';
 import { useSound } from '../../context/sound_context';
 import backgroundMusic from '../../assets/sounds/track1.mp3';
 
