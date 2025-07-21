@@ -1,16 +1,18 @@
 // 친구 목록 컴포넌트
-// tailwindcss 사용
-import { useNavigate } from 'react-router-dom';
-import BackBtn from '../buttons/back_btn';
-import SoundBtn from '../buttons/sound_btn';
 
-// 이미지
+// 라이브러리
+import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+
+// 컴포넌트
+import BackBtn from '../../components/buttons/back_btn';
+import SoundBtn from '../../components/buttons/sound_btn';
+
+// 이미지/에셋
 import background from '../../assets/images/etc/basic_background2.png';
 import friendsContent from '../../assets/images/icons/friends/friends_content.png';
 import workLog from '../../assets/images/icons/friends/friends_log.png';
 import deleteBtn from '../../assets/images/icons/friends/friends_delete.png';
-import testImg from '../../assets/images/test.jpg'
-import { useState, useEffect } from 'react';
 
 function FriendList({ setSelectedTab }) {
 

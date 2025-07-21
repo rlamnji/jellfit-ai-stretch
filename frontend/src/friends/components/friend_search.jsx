@@ -1,10 +1,13 @@
 // 친구 검색 컴포넌트
-// tailwind css 사용
-import { useState } from 'react';
-import BackBtn from '../buttons/back_btn';
-import SoundBtn from '../buttons/sound_btn';
 
-// 이미지
+// 라이브러리
+import { useState } from 'react';
+
+// 컴포넌트
+import BackBtn from '../../components/buttons/back_btn';
+import SoundBtn from '../../components/buttons/sound_btn';
+
+// 이미지/에셋
 import background from '../../assets/images/etc/basic_background2.png';
 import friendsContent from '../../assets/images/icons/friends/friends_content.png';
 import sendBtn from '../../assets/images/icons/friends/friends_send.png';

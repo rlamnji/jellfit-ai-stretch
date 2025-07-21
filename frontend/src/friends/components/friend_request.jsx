@@ -1,11 +1,13 @@
 // 친구 요청 컴포넌트
-// tailwind css 사용
-import { useEffect, useState } from 'react';
-//import axios from 'axios';
-import BackBtn from '../buttons/back_btn';
-import SoundBtn from '../buttons/sound_btn';
 
-// 이미지
+// 라이브러리
+import { useEffect, useState } from 'react';
+
+// 컴포넌트
+import BackBtn from '../../components/buttons/back_btn';
+import SoundBtn from '../../components/buttons/sound_btn';
+
+// 이미지/에셋
 import background from '../../assets/images/etc/basic_background2.png';
 import friendsContent from '../../assets/images/icons/friends/friends_content.png';
 import checkBtn from '../../assets/images/icons/friends/friends_check.png';

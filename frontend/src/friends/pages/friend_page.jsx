@@ -1,8 +1,11 @@
 // 친구 페이지
-import FriendList from '../../../components/friends/friend_list';
-import FriendSearch from '../../../components/friends/friend_search';
-import FriendRequest from '../../../components/friends/friend_request';
+// 라이브러리
 import { useState } from 'react';
+
+// 컴포넌트
+import FriendList from '../components/friend_list';
+import FriendSearch from '../components/friend_search';
+import FriendRequest from '../components/friend_request';
 
 function FriendPage() {
 
