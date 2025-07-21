@@ -1,7 +1,7 @@
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 import { useState } from "react";
 import LoginPage from '../auth/pages/login_page';
-import HomePage from '../pages/home/home_page';
+import HomePage from '../home/pages/home_page';
 import JoinPage from '../auth/pages/join_page';
 import FriendPage from '../pages/home/dash_board/friend_page';
 import CollectPage from '../pages/home/dash_board/collect_page';

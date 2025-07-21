@@ -1,9 +1,13 @@
 // 환경설정 팝업창
-// tailwind 적용
+
+// 라이브러리
 import { useEffect} from 'react';
+
 import { useReminder } from '../../../context/reminder_context';
 import { useSound } from '../../../context/sound_context';
 import DropDown from './drop_down';
+
+// 이미지/에셋
 import setModal from '../../../assets/images/icons/setting_content.png';
 import setCancel  from '../../../assets/images/icons/cancel.png';
 

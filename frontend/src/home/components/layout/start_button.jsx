@@ -1,9 +1,14 @@
 // 자율모드, 가이드모드 시작 버튼
-// tailwindcss 사용
+
+// 라이브러리
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
+
+// 이미지/에셋
 import backModeBtn from '../../../assets/images/icons/home/background_mode.png';
 import guideModeBtn from '../../../assets/images/icons/home/guide_mode.png';
+
+// 컴포넌트
 import BackgroundModal from './background_mode_modal';
 
 function StartButton() {
@@ -51,8 +56,6 @@ function StartButton() {
             /> : null}
         
         </div>
-        
-
 
         <div onMouseEnter={()=>setHovered('guide')} onMouseLeave={()=>setHovered(null)} className='relative'>
 

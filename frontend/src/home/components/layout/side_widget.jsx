@@ -1,11 +1,11 @@
 // 오른쪽 사이드바 위젯(설정)
-// tailwind css 사용
+
+// 라이브러리
 import { useState } from 'react';
-
-import setting from '../../../assets/images/icons/settings.png';
-
-// 팝업창
+// 컴포넌트
 import SettingModal from '../settings/setting_modal';
+// 이미지/에셋
+import setting from '../../../assets/images/icons/settings.png';
 
 function SideWidget() {
   const [openModal, setOpenModal] = useState(false);

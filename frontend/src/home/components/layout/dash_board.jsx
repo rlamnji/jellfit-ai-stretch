@@ -1,11 +1,14 @@
 // 친구, 도감, 운동일지 컴포넌트
-// tailwind css 사용
+
+// 라이브러리
 import { useNavigate } from 'react-router-dom';
 
+// 이미지/에셋
 import friends from '../../../assets/images/icons/home/home_friends.png';
 import collections from '../../../assets/images/icons/home/home_collect.png';
 import exercise from '../../../assets/images/icons/home/home_exercise.png';
 
+// 유틸
 import { playClickSound } from '../../../utils/sound';
 
 function DashBoard() {

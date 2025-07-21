@@ -1,13 +1,11 @@
-// 환경설정 드롭박스 (스트레칭 알림 주기)
-// tailwind css 사용
+// 환경설정 드롭박스 (스트레칭 알림 주기) : 현재 선택된 value 의 시간으로 백그라운드 창 띄우기
 
-// 현재 선택된 value 의 시간으로 백그라운드 창 띄우기
- 
+// 라이브러리
 import React, { useState, useEffect } from 'react';
 import Dropdown from 'react-dropdown';
 import 'react-dropdown/style.css';
-import { startReminder, stopRepeatingReminder } from '../../../utils/reminder';
 
+import { startReminder, stopRepeatingReminder } from '../../../utils/reminder';
 import { useReminder } from '../../../context/reminder_context';
 
 function DropDown() {
