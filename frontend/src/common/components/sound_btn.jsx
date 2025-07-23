@@ -1,12 +1,15 @@
 import { useEffect, useState } from 'react';
 import { useLocation } from 'react-router-dom';
+
 import volumeOn from '../../assets/images/icons/volume_max.png';
 import volumeOff from '../../assets/images/icons/volume_x.png';
+
 import backgroundMusic from '../../assets/sounds/track1.mp3';
 import loginMusic from '../../assets/sounds/startTrack.mp3';
 
 import { useSound } from '../../context/sound_context';
 import { playAudio, stopAudio } from '../utils/sound';
+
 //ON! 로그인 페이지 외의 페이지 갈때 소리가 안바뀜.
 function SoundBtn() {
   const { isPlaying, setIsPlaying } = useSound();
@@ -43,7 +46,7 @@ function SoundBtn() {
   useEffect(() => {
     console.log('음악이 바뀜:', music);
     if (!isPlaying && music) {
-      playAudio(music); // ✅ 바뀐 음악으로 즉시 재생
+      playAudio(music); // 바뀐 음악으로 즉시 재생
     }
   }, [music]);
 
@@ -52,9 +55,9 @@ function SoundBtn() {
     console.log('사운드 상태 변경:', isPlaying);
     localStorage.setItem('isPlaying', isPlaying.toString());
     if (!isPlaying && music) {
-      playAudio(music); // ✅ 꺼져있던 걸 다시 킴
+      playAudio(music); // 꺼져있던 걸 다시 킴
     } else {
-      stopAudio(); // ❗소리 끔
+      stopAudio(); // 소리 끔
     }
   }, [isPlaying]);
 
