@@ -6,105 +6,30 @@ import { useEffect, useState } from 'react';
 // 컴포넌트
 import BackBtn from '../../common/components/back_btn';
 import SoundBtn from '../../common/components/sound_btn';
-// 이미지
+// 이미지/에셋
 import collectBox from '../../assets/images/icons/home/collect_box.png';
 import collectBook from '../../assets/images/icons/home/collect_book.png';
 import collectCancel from '../../assets/images/icons/home/collect_cancel.png';
 import backgroundImg from '../../assets/images/etc/basic_background2.png';
 
+// 커스텀 훅
+import { useCollection } from '../hooks/use_collection';
+
 function CollectPage() {
 
    const navigate = useNavigate();
-   
-   const [characterMap, setCharacterMap] = useState([]); // 전체 캐릭터
-   const [characterUserGetMap, setCharacterUserGetMap] = useState([]); // 사용자가 가진 캐릭터 id
-   const [selectedCharacterId, setSelectedCharacterId] = useState(null);  // 현재 선택된 id 번호
-   
-   const [poseId, setPoseId] = useState(null); // pose_id 저장용
-   const [poseName, setPoseName] = useState(null); // 스트레칭 이름 저장용
-   const [userCnt, setUserCnt] = useState(null); // 스트레칭 누적 횟수 저장용
 
-   // selectedCharacterId를 기반으로 전체 캐릭터 리스트에서 해당 캐릭터 정보 찾기
-   const fullCharacter = characterMap.find(c => c.character_id === selectedCharacterId);
-   // characterUserGetMap에 선택된 캐릭터 ID가 있는지 여부 (획득 여부 판단)
-   const isUnlocked = characterUserGetMap.some(c => c.character_id === selectedCharacterId);
-
-   // 최초 렌더링 시 전체 캐릭터와 내 캐릭터 조회 api
-   useEffect(() => {
-   const fetchData = async () => {
-      try {
-         const token = sessionStorage.getItem("accessToken"); 
-         console.log("토큰" ,token)
-
-         const [allRes, userRes/*,stretchRes*/] = await Promise.all([
-         fetch("http://localhost:8000/characters"),
-         fetch("http://localhost:8000/characters/my-characters", {
-            headers: {
-               Authorization: `Bearer ${token}`,
-            }
-         }),
-         ]);
-
-         if (!allRes.ok || !userRes.ok) {
-            console.error("인증 실패 또는 서버 오류");
-            return;
-         }
-
-         const allData = await allRes.json();
-         const userData = await userRes.json();
-
-         setCharacterMap(allData);
-         setCharacterUserGetMap(userData);
-      } catch (err) {
-         console.log("API 호출 오류", err);
-      }
-   };
-
-   fetchData();
-   }, []);
-
-   console.log("보유",characterUserGetMap);
-
-
-   // pose_id에 맞는 스트레칭 이름 가져오는 api
-   useEffect(() => {
-      if (!selectedCharacterId) return;
-      const selected = characterMap.find(c => c.character_id === selectedCharacterId); // 내가 선택한 id랑 캐릭터 id 일치하는 게 있는지
-      if (selected) {
-         setPoseId(selected.pose_id);
-      }
-   }, [selectedCharacterId, characterMap]);
-
-   useEffect(() => {
-      const fetchData = async () =>{
-         try{
-            if (!poseId) return; // poseId가 없으면 실행하지 않음
-
-            const [nameRes, cntRes] = await Promise.all([
-               fetch(`http://localhost:8000/guide/stretching/${poseId}`),
-               fetch(`http://localhost:8000/users/repeat-count/${poseId}`)
-            ]);
-
-            if (!nameRes.ok || !cntRes.ok /*|| !stretchRes.ok*/) {
-               console.error("인증 실패 또는 서버 오류");
-               return;
-            }
-
-            // 자세 이름
-            const nameData = await nameRes.json();
-            setPoseName(nameData.name);
-
-            // 사용자 누적 횟수
-            const cntData = await cntRes.json();
-            setUserCnt(cntData.repeat_cnt);
-
-         } catch(err){
-            console(err);
-         }
-      }
-
-      fetchData();
-   }, [poseId]);
+   const {
+      characterMap,
+      characterUserGetMap,
+      selectedCharacterId,
+      setSelectedCharacterId,
+      fullCharacter,
+      isUnlocked,
+      poseName,
+      userCnt,
+      selectCharacter,
+   } = useCollection();
 
 
    // 그리드에 캐릭터 번호 매핑 (캐릭터 자리 지정)
