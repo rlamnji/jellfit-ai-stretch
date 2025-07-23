@@ -1,10 +1,8 @@
-// 상세프로필 수정 (이용약관)
+// 개발자 정보
 import DetailModal from '../../assets/images/icons/detail_user_modal.png';
 import setCancel from '../../assets/images/icons/cancel.png';
 
-import { useEffect, useState } from 'react';
-
-function SymptomModal({onClose}){
+function DeveloperInfoModal({onClose}){
 
         return (
             <div className='fixed top-0 left-0 w-screen h-screen bg-black bg-opacity-60 z-[99999] flex justify-center items-center pointer-events-auto'>
@@ -55,4 +53,4 @@ function SymptomModal({onClose}){
 
 }
 
-export default SymptomModal;
+export default DeveloperInfoModal;

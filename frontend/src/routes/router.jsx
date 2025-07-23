@@ -1,19 +1,28 @@
+// 라이브러리
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 import { useState } from "react";
+
+// 페이지 컴포넌트
+// auth
 import LoginPage from '../auth/pages/login_page';
-import HomePage from '../home/pages/home_page';
 import JoinPage from '../auth/pages/join_page';
+
+// cali
+import CalibrationPage from "../cali/pages/calibration_page";
+
+// home + dashboard
+import HomePage from '../home/pages/home_page';
+
 import FriendPage from '../friends/pages/friend_page';
 import CollectPage from '../collection/pages/collect_page';
-import UserProfilePage from '../profile/pages/user_profile_page';
 import DiaryPage from "../diary/pages/diary_page";
+import UserProfilePage from '../profile/pages/user_profile_page';
 
+// guide + posture
 import SelectGuidePage from "../guide/pages/select_guide_page";
 import SelfStretchPage from "../guide/pages/self_strech_page";
 import WatchGuidePage from "../guide/pages/watch_guide_page";
 import GuideCompletePage from "../guide/pages/guide_complete_page";
-
-import CalibrationPage from "../cali/pages/calibration_page";
 import CameraPostureScreen from "../posture/camera/camera_posture_screen";
 import PostureModeStatePage from "../posture/pages/posture_mode_state_page";
 
@@ -53,7 +62,6 @@ function Router() {
                 />
                 <Route path="/guide/complete" element={<GuideCompletePage />} /> 
                     
-            
                     
                 {/* 일지 화면 */}   
                 <Route path="/diary" element={<DiaryPage />} />

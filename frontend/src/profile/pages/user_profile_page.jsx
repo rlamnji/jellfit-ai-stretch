@@ -1,19 +1,20 @@
 // 개인 프로필 수정 화면
+// 라이브러리
 import { useState } from "react";
+
+// 컴포넌트
+import TopBar from "../../common/components/top_bar";
 import UserProfile from "../components/user_profile";
-import Info from "../components/user_symptom";
+import Info from "../components/user_developer";
 import PwdModify from "../components/user_pwdmodify";
 import Terms from "../components/user_terms";
-import TopBar from "../../common/components/top_bar";
+import DeveloperModal from "../components/user_developer_modal";
 
-//import BackBtn from "../components/buttons/back_btn";
-//import SoundBtn from "../components/buttons/sound_btn";
-import SymptomModal from "../components/user_symptom_modal";
-
+// 이미지/에셋
 import background from "../../assets/images/etc/basic_background2.png";
 
 function UserProfilePage() {
-  const [isSymptomModalOpen, setIsSymptomModalOpen] = useState(false);
+  const [isModalOpen, setModalOpen] = useState(false);
   return (
     <div className="relative w-screen h-screen overflow-hidden">
        <img
@@ -32,7 +33,7 @@ function UserProfilePage() {
             </div>
 
             <div className="flex  absolute inset-0  h-[170px] top-[480px] w-[300px] left-[60px] ">
-              <Info setIsSymptomModalOpen={setIsSymptomModalOpen}/>
+              <Info setModalOpen={setModalOpen}/>
             </div> 
 
             <div className="flex  absolute inset-0  h-[170px] top-[290px] w-[300px] left-[60px]">
@@ -44,8 +45,8 @@ function UserProfilePage() {
             </div>
         </div>
         
-        {isSymptomModalOpen && (
-          <SymptomModal onClose={() => setIsSymptomModalOpen(false)} />
+        {isModalOpen && (
+          <DeveloperModal onClose={() => setModalOpen(false)} />
         )}
     </div>
   );

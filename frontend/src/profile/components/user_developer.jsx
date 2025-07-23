@@ -1,10 +1,9 @@
-// 통증선택 
-import { useState } from "react";
+// 개발 정보 컴포넌트
 import github from "../../assets/images/etc/github.png";
 import notion from "../../assets/images/etc/notion.png";
 import developer from "../../assets/images/etc/develop.png";
 
-function Symptom({setIsSymptomModalOpen}){
+function DeveloperInfo({setModalOpen}){
 
     const clickHandler = () => {
         window.open("https://github.com/minJOO03210/jellfit", "_blank");
@@ -30,7 +29,7 @@ function Symptom({setIsSymptomModalOpen}){
                         <img src={notion} className='w-[30px] h-[30px] mr-2' alt="Notion Logo" />
                         <div className='text-[20px] text-[#7E6161] text-center' >Notion</div>
                     </div>
-                    <div className='flex w-[170px] h-[50px] bg-[#FFF1D5] opacity-40 rounded-3xl justify-center items-center cursor-pointer' onClick={setIsSymptomModalOpen}>
+                    <div className='flex w-[170px] h-[50px] bg-[#FFF1D5] opacity-40 rounded-3xl justify-center items-center cursor-pointer' onClick={setModalOpen}>
                         <img src={developer} className='w-[30px] h-[30px] mr-2' alt="developer Logo" />
                         <div className='text-[20px] text-[#7E6161] text-center' >Developers</div>
                     </div>
@@ -42,4 +41,4 @@ function Symptom({setIsSymptomModalOpen}){
     );
 }
 
-export default Symptom;
+export default DeveloperInfo;

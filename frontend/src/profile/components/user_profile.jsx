@@ -2,37 +2,17 @@
 // 이미지
 import friendsContent from '../../assets/images/icons/detail_user_content.png';
 import ProfileModal from './user_profile_modal';
-import { useState, useEffect } from 'react';
-import { useLocation, useNavigate } from 'react-router-dom';
+import { useState } from 'react';
+import { useLocation } from 'react-router-dom';
+
+// 커스텀 훅
+import { useUserProfile } from '../hooks/use_user_profile';
 
 function UserProfile(){
-    const navigate = useNavigate();
     const [modal, setOpenModal] = useState(false);
     const location = useLocation();
+    const { handleLogout } = useUserProfile();
     const [userData, setUserData] = useState(location.state?.userData || {});
-
-    const handleLogout = () => {
-
-        const accessToken = sessionStorage.getItem("accessToken");
-
-        fetch('http://127.0.0.1:8000/auth/logout', {
-            method:"POST",
-            headers:{
-                'Authorization': `Bearer ${accessToken}`
-            },
-        })
-        .then(res =>{
-            if(res.ok){
-                sessionStorage.removeItem('token');
-                navigate('/login');
-            } else {
-                console.error("로그아웃 실패 ", res.statusText);
-            }
-        })
-        .catch(err =>{
-            console.log(err);
-        });
-    }
 
     return (
        
@@ -60,6 +40,7 @@ function UserProfile(){
                         <div className='flex justify-end text-[15px] text-[#552F2F] underline pb-8 cursor-pointer' onClick={()=>handleLogout()}>로그아웃</div>
                         <div className='flex w-[200px] h-[50px] bg-[#552F2F] rounded-2xl justify-center items-center cursor-pointer'  onClick={()=>{setOpenModal(true)}}>
                             <div className='text-[20px] text-white text-center'>프로필 수정</div>
+                            {console.log(userData)}
                         </div>
                         {modal && <ProfileModal data={userData} onClose={() => setOpenModal(false)}  />}
                     </div>

@@ -4,9 +4,10 @@ import setCancel from '../../assets/images/icons/cancel.png';
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 
-function ProfileModal({data, onClose}){
+// 커스텀 훅
+import { useUserProfile } from '../hooks/use_user_profile';
 
-    const navigator = useNavigate();
+function ProfileModal({data, onClose}){
 
     const profileImg_1 = "/images/profile/profile_1.png";
     const profileImg_2 = "/images/profile/profile_2.png";
@@ -15,43 +16,17 @@ function ProfileModal({data, onClose}){
     const [introduction, setIntroduction] = useState(data?.introduction || "");
     const [isVisible, setIsVisible] = useState(false);
 
+    const { changeUserProfile, msg, setMsg } = useUserProfile();
+
+    const selectedProfile = isVisible ? profileImg_2 : profileImg_1;
+    
+
     useEffect(() => {
         if (data) {
             setUsername(data.username);
             setIntroduction(data.introduction);
         }
     }, [data]);
-
-    // 사용자 정보 변경 api
-    const saveProfile = () => {
-        const selectedProfile = isVisible ? profileImg_2 : profileImg_1;
-        const body = {
-            profile_url: selectedProfile,
-            username: username,        
-            introduction: introduction  
-        };
-
-        fetch(`http://127.0.0.1:8000/users/${data.user_id}/change-detail`, {
-            method: "PATCH",
-            headers: {
-                "Content-Type": "application/json",
-            },
-            body: JSON.stringify(body),
-        })
-            .then((res) => {
-                if (res.ok){ 
-                    alert("프로필 정보가 저장되었습니다"); 
-                    navigator('/home');
-                }else if(!res.ok){
-                    throw new Error("저장 실패");
-                }
-                return res.json();
-            })
-            .catch((err) => {
-                console.error("에러 발생:", err);
-                alert("에러 발생");
-            });
-    };
 
         return (
             <div className='fixed top-0 left-0 w-screen h-screen bg-black bg-opacity-60 z-50 flex justify-center items-center pointer-events-auto'>
@@ -110,7 +85,7 @@ function ProfileModal({data, onClose}){
 
                         <div className='flex justify-center'>
                         <div className='flex w-[150px] h-[50px] bg-[#552F2F] rounded-2xl justify-center items-center cursor-pointer'>
-                            <div className='text-[20px] text-white text-center' onClick={()=>saveProfile()}>저장</div>
+                            <div className='text-[20px] text-white text-center' onClick={()=>changeUserProfile( data.user_id, selectedProfile, username, introduction)}>저장</div>
                         </div>
                     </div>
                     </div>
@@ -119,8 +94,16 @@ function ProfileModal({data, onClose}){
                     <div className="absolute w-[40px] top-7 right-[93px] cursor-pointer" onClick={onClose}>
                         <img src={setCancel}/>
                     </div>
-                    
+
                 </div>
+
+                {msg && (
+                <div className="absolute top-[20px] left-1/2 transform -translate-x-1/2 z-50">
+                    <div className="bg-[#ffffff] text-[#552F2F] font-bold px-6 py-3 rounded-full shadow-md text-center text-[18px]">
+                    {msg}
+                    </div>
+                </div>
+                )}
             
             </div>
         );
