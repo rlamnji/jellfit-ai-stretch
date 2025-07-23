@@ -1,20 +1,30 @@
+// 라이브러리
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 import { useState } from "react";
-import LoginPage from '../pages/login/login_page';
-import HomePage from '../pages/home/home_page';
-import JoinPage from '../pages/join/join_page';
-import ConditionPage from '../pages/condition/condition_page';
-import FriendPage from '../pages/home/dash_board/friend_page';
-import CollectPage from '../pages/home/dash_board/collect_page';
-import UserProfilePage from '../pages/user/user_profile_page';
-import DiaryPage from "../pages/diary/diary_page";
-import SelectGuidePage from "../pages/guide/select_guide_page";
-import SelfStretchPage from "../pages/guide/self_strech_page";
-import WatchGuidePage from "../pages/guide/watch_guide_page";
-import GuideCompletePage from "../pages/guide/guide_complete_page";
-import CalibrationPage from "../pages/join/calibration_page";
-import CameraPostureScreen from "../components/camera_posture/camera_posture_screen";
-import PostureModeStatePage from "../pages/posture/posture_mode_state_page";
+
+// 페이지 컴포넌트
+// auth
+import LoginPage from '../auth/pages/login_page';
+import JoinPage from '../auth/pages/join_page';
+
+// cali
+import CalibrationPage from "../cali/pages/calibration_page";
+
+// home + dashboard
+import HomePage from '../home/pages/home_page';
+
+import FriendPage from '../friends/pages/friend_page';
+import CollectPage from '../collection/pages/collect_page';
+import DiaryPage from "../diary/pages/diary_page";
+import UserProfilePage from '../profile/pages/user_profile_page';
+
+// guide + posture
+import SelectGuidePage from "../guide/pages/select_guide_page";
+import SelfStretchPage from "../guide/pages/self_strech_page";
+import WatchGuidePage from "../guide/pages/watch_guide_page";
+import GuideCompletePage from "../guide/pages/guide_complete_page";
+import CameraPostureScreen from "../posture/camera/camera_posture_screen";
+import PostureModeStatePage from "../posture/pages/posture_mode_state_page";
 
 function Router() {
     const [stretchingOrder, setStretchingOrder] = useState([]);
@@ -28,7 +38,6 @@ function Router() {
                 {/* 로그인과 회원가입 */}
                 <Route path="/login" element={<LoginPage />} />
                 <Route path="/join" element={<JoinPage />} />
-                <Route path="/condition" element={<ConditionPage />} />
                 <Route path="/condition/:id" element={<CalibrationPage />} />
                 
                 {/* 홈화면 */}
@@ -53,7 +62,6 @@ function Router() {
                 />
                 <Route path="/guide/complete" element={<GuideCompletePage />} /> 
                     
-            
                     
                 {/* 일지 화면 */}   
                 <Route path="/diary" element={<DiaryPage />} />

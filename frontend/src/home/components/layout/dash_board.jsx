@@ -1,0 +1,29 @@
+// 친구, 도감, 운동일지 컴포넌트
+
+// 라이브러리
+import { useNavigate } from 'react-router-dom';
+
+// 이미지/에셋
+import friends from '../../../assets/images/icons/home/home_friends.png';
+import collections from '../../../assets/images/icons/home/home_collect.png';
+import exercise from '../../../assets/images/icons/home/home_exercise.png';
+
+// 유틸
+import { playClickSound } from '../../../common/utils/sound';
+
+function DashBoard() {
+  const navigate = useNavigate();
+
+  return (
+    <div className="flex items-center justify-between pl-8 pt-10 ">
+      <div className="flex flex-col gap-[3vw]">
+        <img className="w-[200px] cursor-pointer animate-[moveing_3s_ease-in-out_infinite] transition-transform duration-200 hover:animate-none hover:-translate-y-[5px] hover:scale-[1.02]" src= {friends} onClick={()=>{playClickSound(); navigate('/home/friends');}}/>
+        <img className="w-[200px] cursor-pointer animate-[moveing_3s_ease-in-out_infinite] transition-transform duration-200 hover:animate-none hover:-translate-y-[5px] hover:scale-[1.02]" src= {collections} onClick={()=>{playClickSound(); navigate('/home/collection');}}/>
+        <img className="w-[200px] cursor-pointer animate-[moveing_3s_ease-in-out_infinite] transition-transform duration-200 hover:animate-none hover:-translate-y-[5px] hover:scale-[1.02]" src= {exercise} onClick={()=>{playClickSound(); navigate('/diary');}} />          
+      </div>
+      
+    </div>
+  );
+}
+
+export default DashBoard;
